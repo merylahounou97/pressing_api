@@ -5,9 +5,10 @@ name = "pypi"
 
 [packages]
 pytest = "*"
-fastapi = {extras = ["all"], version = "*"}
+fastapi = {extras = ["all"] }
 python-dotenv = "*"
 sqlalchemy = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 

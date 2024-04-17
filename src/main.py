@@ -17,6 +17,8 @@ def get_db():
     finally:
         db.close()
 
+
+
 @app.get("/")
 def main_page():
     return "ok"
