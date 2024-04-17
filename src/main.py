@@ -17,6 +17,9 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/")
+def main_page():
+    return "ok"
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
