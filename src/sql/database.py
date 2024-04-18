@@ -1,13 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from config  import Settings
+from ..config  import Settings
 
 settings = Settings()
-
-
-
-print()
 
 # SQLALCHEMY_DATABASE_URL =  "sqlite:///./sql/local.db"
 # engine = create_engine(

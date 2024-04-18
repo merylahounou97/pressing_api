@@ -1,8 +1,8 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from sql import crud, models, schemas
-from sql.database import SessionLocal, engine
+from .sql import crud, models, schemas
+from .sql.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -56,3 +56,7 @@ def create_item_for_user(
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
+
+
+def test_function(a: int=0, b: int=0) -> int :
+    return a+b

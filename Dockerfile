@@ -10,10 +10,10 @@ COPY Pipfile Pipfile.lock ./
 
 RUN pipenv  install --deploy --system
 
-COPY ./src ./
+COPY ./src ./src
 
 # Exposer le port sur lequel FastAPI sera accessible
 EXPOSE 8000
 
 # Commande pour lancer l'application en utilisant uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
