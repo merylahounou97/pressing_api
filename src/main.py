@@ -21,7 +21,7 @@ def get_db():
 
 @app.get("/")
 def main_page():
-    return "Hello world moon wold"
+    return "Hello monde hdf"
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):

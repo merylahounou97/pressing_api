@@ -1,6 +1,7 @@
 # Python
+src/__pycache__
 *.pyc
-*.egg-info/
 __pycache__/
+*.egg-info/
 .vscode/
 .pytest_cache/
