@@ -1,0 +1,12 @@
+# Python
+*.pyc
+.git/
+__pycache__/
+*.egg-info/
+__pycache__/
+.vscode/
+.pytest_cache/
+test/
+Dockerfile
+scripts/
+README.md

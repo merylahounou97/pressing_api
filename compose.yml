@@ -1,0 +1,26 @@
+services:
+  pressing_api:
+    container_name: pressing_api
+    build: .
+    environment:
+      database_name: pressingdb
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+
+    
+  postgres:
+    image: postgres
+    container_name: postgresdb
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: pressing-api
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
