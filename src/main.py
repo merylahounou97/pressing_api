@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 
 from .sql import crud, models, schemas
 from .sql.database import SessionLocal, engine
+from src.config import Settings
+
+settings = Settings()
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -17,6 +20,10 @@ def get_db():
     finally:
         db.close()
 
+
+@app.get("/")
+def main_page():
+    return settings.database_name
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
