@@ -1,10 +1,9 @@
-from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import  FastAPI, HTTPException
 
-from .sql.database import SessionLocal, engine, Base
+from .sql.database import  engine, Base
 from src.config import Settings
-from src.sql.customer.customer_schema import Customer_schema, Customer_create_schema
-from src.sql.customer import customer_service
+from .routers import  customers
+
 
 settings = Settings()
 
@@ -13,13 +12,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(customers.router)
 
 
 @app.get("/")
@@ -27,14 +20,15 @@ def main_page():
     return "Ceci est un pressing de wash man"
 
 
-@app.post("/customers", response_model=Customer_schema)
-def create_customers(customer: Customer_create_schema , db: Session = Depends(get_db)):
-    return customer_service.create_customer(db,customer) 
 
-@app.get("/customers", response_model=list[Customer_schema])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = customer_service.get_customers(db, skip=skip, limit=limit)
-    return users
+# @app.post("/customers", response_model=Customer_schema)
+# def create_customers(customer: Customer_create_schema , db: Session = Depends(get_db)):
+#     return customer_service.create_customer(db,customer) 
+
+# @app.get("/customers", response_model=list[Customer_schema])
+# def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+#     users = customer_service.get_customers(db, skip=skip, limit=limit)
+#     return users
 
 # @app.post("/users/", response_model=schemas.User)
 # def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
