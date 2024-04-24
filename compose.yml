@@ -1,13 +1,20 @@
 services:
-  pressing_api:
-    container_name: pressing_api
-    build: .
-    environment:
-      database_name: pressingdb
-    ports:
-      - 8000:8000
-    depends_on:
-      - postgres
+  # pressing_api:
+  #   container_name: pressing_api
+  #   build: .
+  #   develop:
+  #     watch: 
+  #     - path: ./src
+  #       action: sync + restart
+  #       target: /app
+  #     - path: Pipfile
+  #       action: rebuild
+  #   environment:
+  #     database_name: pressingdb
+  #   ports:
+  #     - 8000:8000
+  #   depends_on:
+  #     - postgres
 
     
   postgres:
