@@ -1,8 +1,10 @@
 from fastapi import  FastAPI, HTTPException
 
-from .sql.database import  engine, Base
+
+from .database import  engine, Base
 from src.config import Settings
 from .routers import  customers
+from src.mail.send_mail import send_email
 
 
 settings = Settings()
@@ -19,7 +21,9 @@ app.include_router(customers.router)
 def main_page():
     return "Ceci est un pressing de wash man"
 
-
+@app.get("/mail")
+async def test_mail():
+    return await send_email(settings.sender_email,"test","Un test de mail \U0001FAE1")
 
 # @app.post("/customers", response_model=Customer_schema)
 # def create_customers(customer: Customer_create_schema , db: Session = Depends(get_db)):

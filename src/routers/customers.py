@@ -4,10 +4,10 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from src.sql.database import SessionLocal, engine, Base
+from src.database import SessionLocal, engine, Base
 from src.config import Settings
-from src.sql.customer.customer_schema import Customer_schema, Customer_create_schema
-from src.sql.customer import customer_service
+from src.customer.customer_schema import Customer_schema, Customer_create_schema
+from src.customer import customer_service
 
 settings = Settings()
 
