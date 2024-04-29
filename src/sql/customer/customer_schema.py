@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 class Customer_create_schema(BaseModel):
-    email: str
+    email: EmailStr
     last_name: str
     first_name: str
     phone_number: str

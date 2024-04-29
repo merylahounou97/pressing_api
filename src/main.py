@@ -3,6 +3,7 @@ from fastapi import  FastAPI, HTTPException
 from .sql.database import  engine, Base
 from src.config import Settings
 from .routers import  customers
+from .routers import login
 
 
 settings = Settings()
@@ -13,12 +14,12 @@ app = FastAPI()
 
 
 app.include_router(customers.router)
+app.include_router(login.router)
 
 
 @app.get("/")
 def main_page():
     return "Ceci est un pressing de wash man"
-
 
 
 # @app.post("/customers", response_model=Customer_schema)
