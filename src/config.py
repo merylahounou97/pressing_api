@@ -7,3 +7,5 @@ class Settings(BaseSettings):
     database_user: str 
     database_host: str 
     database_password: str 
+    mail_password: str
+    sender_email: str

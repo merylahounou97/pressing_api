@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import  Column,  String
 
 class Person_model:
     __tablename__ = "persons"
