@@ -1,12 +1,11 @@
-from pydantic import BaseModel
 
-class Customer_create_schema(BaseModel):
-    email: str
-    last_name: str
-    first_name: str
-    phone_number: str
-    address: str
-    password: str
+from src.sql.person.person_schema import Person
 
-class Customer_schema(Customer_create_schema):
+
+class Customer_create_output(Person):
     id: str
+
+
+            
+class Customer_create_input(Person):
+    password: str
