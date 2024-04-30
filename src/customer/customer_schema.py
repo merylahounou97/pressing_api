@@ -1,5 +1,5 @@
 
-from src.sql.person.person_schema import Person
+from src.person.person_schema import Person
 
 
 class Customer_create_output(Person):

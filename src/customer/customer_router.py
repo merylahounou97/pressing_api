@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.database import SessionLocal, engine, Base
 from src.config import Settings
-from src.customer.customer_schema import Customer_schema, Customer_create_schema
+from src.customer.customer_schema import Customer_create_output, Customer_create_input
 from src.customer import customer_service
 
 settings = Settings()

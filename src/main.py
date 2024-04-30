@@ -3,7 +3,7 @@ from fastapi import  FastAPI, HTTPException
 
 from .database import  engine, Base
 from src.config import Settings
-from .routers import  customers
+from .customer import  customer_router
 from src.mail.send_mail import send_email
 
 
@@ -14,7 +14,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-app.include_router(customers.router)
+app.include_router(customer_router.router)
 
 
 @app.get("/")
