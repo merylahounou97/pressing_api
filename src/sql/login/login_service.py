@@ -1,7 +1,5 @@
-
 from sqlalchemy.orm import Session
-from sql.customer.customer_model import Customer_model
-
+from ..customer.customer_model import Customer_model
 
 
 def get_user_by_email(db: Session, email: str):

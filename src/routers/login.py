@@ -28,16 +28,16 @@ def get_db():
 
 
 # Créer une route pour la connexion
-@router.post("/login", response_model=Login_schema)
+@router.post("/login")
 async def login(login: Login_schema):
     db = SessionLocal()
     user = login_service.authenticate_user(db, login.identifier, login.password)
     db.close()
-    if user:
-        user_data = {"email": user.email, 
-                     "first_name": user.first_name, 
-                     "last_name": user.last_name,
-                     "phone_number": user.phone_number
+    if user :
+        user_data = {"email": user['email'], 
+                     "first_name": user['first_name'], 
+                     "last_name": user['last_name'],
+                     "phone_number": user['phone_number']
                      }
         return user_data
     else:
