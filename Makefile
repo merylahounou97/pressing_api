@@ -4,6 +4,9 @@ install:
 test:
 	pipenv run pytest -vv
 
+cov:
+	pipenv run pytest --cov
+
 dev:
 	pipenv run uvicorn src.main:app --reload
 
