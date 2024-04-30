@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from ..customer.customer_model import Customer_model
+from ..security import security_service
 
 
 def get_user_by_email(db: Session, email: str):
@@ -26,9 +27,7 @@ def authenticate_user(db: Session, identifier: str, password: str):
     
     """
     user = get_user_by_identifier(db, identifier)
-    if not user:
-        return None     
-    elif user.password != password:
-        return None
-    else:
+    if user is not None and security_service.compareHashedText(password,user.password):
         return user
+    else:
+        return None

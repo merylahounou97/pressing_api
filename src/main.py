@@ -5,8 +5,7 @@ from .database import  engine, Base
 from src.config import Settings
 from .customer import  customer_router
 from src.mail.send_mail import send_email
-from .routers import login
-from .routers import login
+from src.auth import auth_router
 
 
 settings = Settings()
@@ -17,8 +16,7 @@ app = FastAPI()
 
 
 app.include_router(customer_router.router)
-app.include_router(login.router)
-app.include_router(login.router)
+app.include_router(auth_router.router)
 
 
 @app.get("/")

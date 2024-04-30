@@ -4,14 +4,12 @@ from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from src.sql.database import SessionLocal, engine, Base
+from src.database import SessionLocal, engine, Base
 from src.config import Settings
-from src.sql.login import login_service
-from src.sql.login.login_schema import Login_schema
+from src.auth import auth_service
+from src.auth.auth_schema import Login_input
 
 settings = Settings()
-
-Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
@@ -28,9 +26,9 @@ def get_db():
 
 # Créer une route pour la connexion
 @router.post("/login")
-async def login(login: Login_schema):
+async def login(login: Login_input):
     db = SessionLocal()
-    user = login_service.authenticate_user(db, login.identifier, login.password)
+    user = auth_service.authenticate_user(db, login.identifier, login.password)
     db.close()
     if user :
         user_data = {"email": user.email, 
