@@ -26,7 +26,6 @@ def get_db():
         db.close()
 
 
-
 # Créer une route pour la connexion
 @router.post("/login")
 async def login(login: Login_schema):
@@ -34,14 +33,15 @@ async def login(login: Login_schema):
     user = login_service.authenticate_user(db, login.identifier, login.password)
     db.close()
     if user :
-        user_data = {"email": user['email'], 
-                     "first_name": user['first_name'], 
-                     "last_name": user['last_name'],
-                     "phone_number": user['phone_number']
+        user_data = {"email": user.email, 
+                     "first_name": user.first_name, 
+                     "last_name": user.last_name,
+                     "phone_number": user.phone_number
                      }
         return user_data
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
     
 
 
