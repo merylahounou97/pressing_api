@@ -12,4 +12,6 @@ RUN pipenv install --system
 
 COPY . .
 
+
+
 CMD  ["make","dev-con"]

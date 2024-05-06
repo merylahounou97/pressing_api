@@ -21,15 +21,17 @@ services:
       - path: .
         action: sync+restart
         target: /app
-      - path: Pipfile
-        action: rebuild
     environment:
       database_host: postgresdb
     ports:
       - 8000:8000
     depends_on:
       - postgres
+    volumes:
+      - ./Pipfile:/app/Pipfile
+      - /Pipfile.lock:/app/Pipfile.lock
 
 
 volumes:
   db:
+    name: pressingdb
