@@ -29,7 +29,7 @@ services:
       - postgres
     volumes:
       - ./Pipfile:/app/Pipfile
-      - /Pipfile.lock:/app/Pipfile.lock
+      - ./Pipfile.lock:/app/Pipfile.lock
 
 
 volumes:

@@ -8,8 +8,8 @@ from fastapi import HTTPException
 
 from ..security import security_service 
 
-def check_existing_customer(db: Session, identifier: str):
-    user = get_customer_by_email_or_phone(db, identifier, identifier)
+def check_existing_customer(db: Session, email: str, phone_number: str):
+    user = get_customer_by_email_or_phone(db, email, phone_number)
     return user is not None
 
 def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str):
