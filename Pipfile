@@ -8,7 +8,9 @@ fastapi = {extras = ["all"] }
 sqlalchemy = "*"
 psycopg2-binary = "*"
 passlib = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
+python-jose = {extras = ["cryptography"] }
+phonenumbers = "*"
+jinja2 = "*"
 
 [dev-packages]
 

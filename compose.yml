@@ -6,8 +6,9 @@ services:
     container_name: postgresdb
     environment:
       POSTGRES_DB: pressingdb
-      POSTGRES_USER: pressing-api
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: root
+      POSTGRES_HOST_AUTH_METHOD: trust
+      # POSTGRES_PASSWORD: ""
     ports:
       - "5432:5432"
     volumes:
@@ -18,11 +19,15 @@ services:
     build: .
     develop:
       watch: 
-      - path: .
+      - path: ./src
         action: sync+restart
-        target: /app
+        target: /app/src
+      # - path: ./Pipfile
+      #   action: rebuild
     environment:
       database_host: postgresdb
+      database_user: root
+      database_password: ""
     ports:
       - 8000:8000
     depends_on:
