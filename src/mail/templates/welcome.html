@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,43 +10,53 @@
             display: inline-block;
             padding: 10px 20px;
             margin: 10px 0;
-            background-color: #4CAF50; /* Vert */
+            background-color: #4CAF50;
+            /* Vert */
             color: white;
             text-align: center;
             text-decoration: none;
             border-radius: 5px;
         }
+
         .button:hover {
             background-color: #45a049;
         }
     </style>
 </head>
+
 <body style="font-family: Arial, sans-serif; color: #333;">
     <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
         <header>
-            <img src="https://cdn.pixabay.com/photo/2024/02/13/07/12/ai-generated-8570336_960_720.png" alt="{{app_name}} Logo" style="max-width: 100px;">
+            <img src="logo.jpg" alt="Logo de {{app_name}}" style="width: 100px; height: 100px;">
             <h1>Bienvenue à {{app_name}}, {{person.first_name}}!</h1>
         </header>
         <section>
             <p>Cher/Chère {{ person.first_name}},</p>
-            <p>Merci de vous être inscrit à {{app_name}}. Avant de commencer, veuillez activer votre compte en cliquant sur le bouton ci-dessous.</p>
+            <p>Merci de vous être inscrit à {{app_name}}. Avant de commencer, veuillez activer votre compte en cliquant
+                sur le bouton ci-dessous.</p>
             <a href="https://yourdomain.com/activate?token=yourUniqueToken" class="button">Activer Mon Compte</a>
             <p>Après activation, vous pourrez profiter de tous nos services sans restriction.</p>
             <p>Voici ce que vous pouvez attendre de notre service :</p>
             <ul>
-                <li><strong>Collecte et livraison gratuites</strong>: Nous venons chercher et livrons vos vêtements directement à votre porte, sans frais supplémentaires.</li>
-                <li><strong>Service rapide</strong>: Besoin de quelque chose pressé? Pas de problème! Nous offrons des options de traitement express.</li>
-                <li><strong>Accès 24/7</strong>: Planifiez et gérez vos commandes avec facilité depuis notre plateforme en ligne, disponible à tout moment.</li>
+                <li><strong>Collecte et livraison gratuites</strong>: Nous venons chercher et livrons vos vêtements
+                    directement à votre porte, sans frais supplémentaires.</li>
+                <li><strong>Service rapide</strong>: Besoin de quelque chose pressé? Pas de problème! Nous offrons des
+                    options de traitement express.</li>
+                <li><strong>Accès 24/7</strong>: Planifiez et gérez vos commandes avec facilité depuis notre plateforme
+                    en ligne, disponible à tout moment.</li>
             </ul>
-            <p>Pour toute question ou demande, n'hésitez pas à contacter notre équipe de support client. Nous sommes là pour vous aider !</p>
+            <p>Pour toute question ou demande, n'hésitez pas à contacter notre équipe de support client. Nous sommes là
+                pour vous aider !</p>
             <p>Merci de choisir {{app_name}}. Nous sommes impatients de prendre soin de vos vêtements.</p>
             <p>Cordialement,</p>
             <p>Méryl ahounou<br>
-            L'équipe de {{app_name}}</p>
+                L'équipe de {{app_name}}</p>
         </section>
         <footer>
-            <p>Vous recevez cet email car vous vous êtes inscrit sur notre plateforme. Si vous ne souhaitez plus recevoir ces emails, vous pouvez <a href="unsubscribe_link">vous désinscrire ici</a>.</p>
+            <p>Vous recevez cet email car vous vous êtes inscrit sur notre plateforme. Si vous ne souhaitez plus
+                recevoir ces emails, vous pouvez <a href="unsubscribe_link">vous désinscrire ici</a>.</p>
         </footer>
     </div>
 </body>
+
 </html>

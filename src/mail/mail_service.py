@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="src/mail/templates")
 
 
 async def  send_welcome_email(person: Person):
-    mail_content = get_parsed_template(template_name="welcome.html",person=person,app_name="Whash man")
+    mail_content = get_parsed_template(template_name="welcome.html",person=person,app_name="WashMan")
     return  send_email(person.email,f"Bienvenue à WashMan , {person.first_name} ! Prêt à simplifier votre routine de nettoyage ?",mail_content)
 
 def get_parsed_template(template_name: str,**kargs):

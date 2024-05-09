@@ -28,7 +28,7 @@ def main_page():
 @app.get("/mail")
 async def test_mail():
     meryl =Person(
-        email="aiounouu@gmail.com",
+        email="merylahounou@gmail.com",
         first_name="Méryl",
         last_name="AHOUNOU",
         address="sf",
