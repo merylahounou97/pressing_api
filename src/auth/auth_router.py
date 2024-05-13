@@ -44,7 +44,8 @@ def create_login_token(login:  Annotated[OAuth2PasswordRequestForm,Depends()],db
     user = auth_service.authenticate_user(db, login.username, login.password)
     if user:
         access_token = create_access_token(
-            data={"sub": user.email}
+            data={"sub": user.email,
+                  "phone_number":user.phone_number_id}
         )
         return Token(access_token=access_token,token_type="Bearer")
     else:

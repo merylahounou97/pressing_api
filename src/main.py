@@ -1,7 +1,6 @@
-from fastapi import  FastAPI, HTTPException
-
+from fastapi import  FastAPI
+from fastapi.staticfiles import StaticFiles
 from src.person.person_schema import Person, Phone_number
-
 
 from .database import  engine, Base
 from src.config import Settings
@@ -10,12 +9,15 @@ from src.mail import mail_service
 from src.auth import auth_router
 
 
+
 settings = Settings()
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
+app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 
 app.include_router(customer_router.router)
 app.include_router(auth_router.router)
@@ -28,7 +30,7 @@ def main_page():
 @app.get("/mail")
 async def test_mail():
     meryl =Person(
-        email="merylahounou@gmail.com",
+        email="aiounouu@gmail.com",
         first_name="Méryl",
         last_name="AHOUNOU",
         address="sf",

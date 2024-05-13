@@ -37,6 +37,18 @@ services:
       - ./Pipfile.lock:/app/Pipfile.lock
 
 
+  ngrok:
+    image: wernight/ngrok
+    container_name: ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_PORT=8000
+      - NGROK_AUTHTOKEN=1vzNLlXWt5pL1FbMA7rYSJWgXXf_5Y8K4wKUYp4zfbsx8FaEC
+      # - NGROK_USERNAME=aiounouu@gmail.com
+    command: ngrok http pressing_api:8000
+      
+
 volumes:
   db:
     name: pressingdb

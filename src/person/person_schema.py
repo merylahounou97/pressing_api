@@ -15,11 +15,15 @@ class Phone_number(BaseModel):
     def remove_tel_prefix(cls, v):
         return PhoneNumber.removeprefix(v,'tel:').replace("-","")
 
-class Person(BaseModel):
+
+class Person_base(BaseModel):
     last_name: str
     first_name: str
-    phone_number: Phone_number #Annotated[str, StringConstraints(strip_whitespace=True,min_length=7,max_length=15,pattern=r'^\+?\d{7,15}$')]  
+  #Annotated[str, StringConstraints(strip_whitespace=True,min_length=7,max_length=15,pattern=r'^\+?\d{7,15}$')]  
     address: str
+
+class Person(Person_base):
     email: EmailStr
+    phone_number: Phone_number 
 
 

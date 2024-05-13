@@ -20,3 +20,9 @@ ou
 
 # Lancer les tests
 Pour lancer les test il faut exécuter la commande `make test`
+
+# Chargement des fichiers statics
+Pour charger les fichiers statiques comme les images et autres, 
+en local il faut changer la valeur de la variable d'environnement api_url.
+A cet effet on peut utiliser [](ngrok)
+Notamment il faut exécuter `ngrok http 8000` 

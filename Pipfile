@@ -11,6 +11,7 @@ passlib = "*"
 python-jose = {extras = ["cryptography"] }
 phonenumbers = "*"
 jinja2 = "*"
+requests = "*"
 
 [dev-packages]
 
