@@ -1,3 +1,4 @@
+import random
 from passlib.hash import bcrypt
 from datetime import datetime, timedelta, timezone
 from typing import Union
@@ -26,3 +27,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 def decode_token(token: str):
     return jwt.decode(str(token), SECRET_KEY, algorithms=[ALGORITHM])
+
+def generate_random_code(low=100,high=99999):
+    return str(random.randint(low, high))

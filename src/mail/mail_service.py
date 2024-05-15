@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from src.person.person_schema import Person
 
 from ..dependencies.get_api_url import get_api_url
+from ..customer.customer_schema import  Customer_create_input
 
 
 
@@ -19,8 +20,9 @@ templates = Jinja2Templates(directory="src/mail/templates")
 
 
 
-async def  send_welcome_email(person: Person):
-    mail_content = get_parsed_template(template_name="welcome.html",person=person,app_name="WashMan",api_url=api_url)
+async def  send_welcome_email(person: Customer_create_input,redirect_url):
+
+    mail_content = get_parsed_template(template_name="welcome.html",person=person,app_name="WashMan",api_url=api_url,redirect_url=redirect_url)
     return  send_email(person.email,f"Bienvenue à WashMan , {person.first_name} ! Prêt à simplifier votre routine de nettoyage ?",mail_content)
 
 def get_parsed_template(template_name: str,**kargs):
