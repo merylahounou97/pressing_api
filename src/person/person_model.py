@@ -1,4 +1,4 @@
-from sqlalchemy import  Column,  String,ForeignKey
+from sqlalchemy import  Column, String, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column,relationship,Mapped
 from src.database import Base
 
@@ -22,6 +22,8 @@ class Person_model(Base):
     phone_number_id= mapped_column(ForeignKey("phone_numbers.phone_text"))
     address = Column(String)
     password = Column(String)
+    verification_code = Column(String, index=True)
+    is_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
     
     phone_number: Mapped["Phone_number_model"] = relationship(
         back_populates="person"

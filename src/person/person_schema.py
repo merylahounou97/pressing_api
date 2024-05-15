@@ -21,9 +21,14 @@ class Person_base(BaseModel):
     first_name: str
   #Annotated[str, StringConstraints(strip_whitespace=True,min_length=7,max_length=15,pattern=r'^\+?\d{7,15}$')]  
     address: str
+    is_verified: int
+    verification_code: str
 
 class Person(Person_base):
     email: EmailStr
     phone_number: Phone_number 
 
 
+class Verify_code(BaseModel):
+    phone_number: str
+    verification_code: str

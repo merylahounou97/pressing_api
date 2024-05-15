@@ -12,6 +12,7 @@ python-jose = {extras = ["cryptography"] }
 phonenumbers = "*"
 jinja2 = "*"
 requests = "*"
+twilio = "*"
 
 [dev-packages]
 

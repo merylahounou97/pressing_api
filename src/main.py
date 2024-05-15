@@ -8,7 +8,7 @@ from .customer import  customer_router
 from src.mail import mail_service
 from src.auth import auth_router
 
-
+from src.customer.customer_schema import Customer_create_input
 
 settings = Settings()
 
@@ -30,21 +30,21 @@ def main_page():
 @app.get("/mail")
 async def test_mail():
     meryl =Person(
-        email="aiounouu@gmail.com",
-        first_name="Méryl",
-        last_name="AHOUNOU",
-        address="sf",
+        email=Customer_create_input.email,
+        first_name=Customer_create_input.first_name,
+        last_name=Customer_create_input.last_name,
+        address=Customer_create_input.address,
         phone_number=Phone_number(
-            dial_code="+229",
-            iso_code="BJ",
-            phone_text="+22966086304"
+            dial_code=Customer_create_input.phone_number.dial_code,
+            iso_code=Customer_create_input.phone_number.iso_code,
+            phone_text=Customer_create_input.phone_number.phone_text
         )
     )
     return await mail_service.send_welcome_email(person=meryl)
     # return await mail_service.send_email(meryl.email,"aboo","shjdhf")
 
 # @app.post("/customers", response_model=Customer_schema)
-# def create_customers(customer: Customer_create_schema , db: Session = Depends(get_db)):
+# def create_customers(customer: Customer_create_input , db: Session = Depends(get_db)):
 #     return customer_service.create_customer(db,customer) 
 
 # @app.get("/customers", response_model=list[Customer_schema])

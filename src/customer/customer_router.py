@@ -6,7 +6,7 @@ from ..security import security_service
 
 
 from src.config import Settings
-from src.customer.customer_schema import Customer_edit_input, Customer_output, Customer_create_input
+from src.customer.customer_schema import Customer_edit_input, Customer_output, Customer_create_input, Customer_verify_code
 from src.customer import customer_service
 from src.dependencies.db import get_db
 
@@ -36,3 +36,7 @@ def edit_customer(customer_edit_input: Customer_edit_input,access_token : access
     user = customer_service.validate_token(access_token=access_token,db=db)
     return customer_service.edit_customer(id=user.id, customer_edit_input= customer_edit_input,db=db)
 
+
+@router.post("/verify/")
+def verify_code(verification: Customer_verify_code , db: Session = Depends(get_db)):
+    return customer_service.verify_code(verification=verification, db=db)

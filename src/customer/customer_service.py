@@ -7,12 +7,23 @@ from src.mail import mail_service
 from src.person.person_model import Phone_number_model
 from src.person.person_schema import Phone_number
 from .customer_model import Customer_model
-from .customer_schema import  Customer_create_input,Customer_edit_input
+from .customer_schema import  Customer_create_input,Customer_edit_input, Customer_verify_code
 import uuid
 from fastapi import Depends, HTTPException
 from src.dependencies.db import get_db
+from twilio.rest import Client
+import random
+from src.config import Settings
 
 from ..security import security_service 
+
+
+settings = Settings()
+
+TWILIO_ACCOUNT_SID = settings.twilio_account_sid
+TWILIO_AUTH_TOKEN = settings.twilio_auth_token
+TWILIO_PHONE_NUMBER = settings.twilio_phone_number
+twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 
 
@@ -27,9 +38,10 @@ def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str):
 async def create_customer(db: Session, customerCreate: Customer_create_input):
     if check_existing_customer(db, customerCreate.email, customerCreate.phone_number.phone_text):
         raise HTTPException(status_code=400, detail="Phone number or email already registered")
-    
-    hashed_password = security_service.hashText(customerCreate.password)
 
+    hashed_password = security_service.hashText(customerCreate.password)
+    verification_code = str(random.randint(1000, 9999))
+    
     db_user = Customer_model(
         id= str(uuid.uuid4()),
         email =customerCreate.email,
@@ -41,16 +53,24 @@ async def create_customer(db: Session, customerCreate: Customer_create_input):
         phone_text= customerCreate.phone_number.phone_text,
     ),
         address =customerCreate.address,
-        password =hashed_password 
+        password =hashed_password, 
+        verification_code=verification_code
     )
 
     db.add(db_user)
     
     db.commit()
 
+    # Envoyer le SMS de vérification
+    message = twilio_client.messages.create(
+        body=f"Votre code de vérification est {verification_code}",
+        from_=TWILIO_PHONE_NUMBER,
+        to=db_user.phone_number_id
+    )
     
     #Send welcome email
     await mail_service.send_welcome_email(customerCreate)
+    
 
     return db_user
 
@@ -73,3 +93,19 @@ def edit_customer(id: str, customer_edit_input: Customer_edit_input, db:Session)
     db_user.address = customer_edit_input.address
     db.commit()
     return db_user
+
+
+def verify_code(verification: Customer_verify_code, db: Session):
+    db_user = db.query(Customer_model).filter(Customer_model.phone_number_id == verification.phone_number).first()
+    
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    if db_user.verification_code != verification.verification_code:
+        raise HTTPException(status_code=400, detail="Code de vérification incorrect")
+    
+    db_user.is_verified = 1
+    db.commit()
+    db.refresh(db_user)
+    
+    return {"message": "Numéro de téléphone vérifié avec succès."}
