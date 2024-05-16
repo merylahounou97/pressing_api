@@ -11,3 +11,4 @@ class Settings(BaseSettings):
     sender_email: str
     api_url: str
     ENV: str
+    code_expiry_time: int

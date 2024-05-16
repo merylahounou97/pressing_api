@@ -1,6 +1,6 @@
 from typing_extensions import Annotated
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from pydantic import BaseModel, StringConstraints, EmailStr, field_validator 
+from pydantic import BaseModel, Field, StringConstraints, EmailStr, field_validator 
 import phonenumbers
 
 
@@ -16,19 +16,24 @@ class Phone_number(BaseModel):
         return PhoneNumber.removeprefix(v,'tel:').replace("-","")
 
 
-class Person_base(BaseModel):
+class Person_base_input(BaseModel):
     last_name: str
     first_name: str
-  #Annotated[str, StringConstraints(strip_whitespace=True,min_length=7,max_length=15,pattern=r'^\+?\d{7,15}$')]  
     address: str
-    is_verified: int
-    verification_code: str
-
-class Person(Person_base):
     email: EmailStr
     phone_number: Phone_number 
 
+class Person(Person_base_input):
+    phone_number_verified: bool  
+    email_verified: bool  
 
-class Verify_code(BaseModel):
-    phone_number: str
+
+class Person_verify_code_input(BaseModel):
+    identifier: str
     verification_code: str
+
+class Person_generate_new_validation_code_input(BaseModel):
+    identifier: str
+    strategy: str
+    redirect_url: str
+
