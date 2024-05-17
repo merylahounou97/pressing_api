@@ -1,14 +1,14 @@
-from fastapi import  FastAPI
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
+from src.auth import auth_router
+from src.config import Settings
+from src.customer.customer_schema import Customer_create_input
+from src.mail import mail_service
 from src.person.person_schema import Person, Phone_number
 
-from .database import  engine, Base
-from src.config import Settings
-from .customer import  customer_router
-from src.mail import mail_service
-from src.auth import auth_router
-
-from src.customer.customer_schema import Customer_create_input
+from .customer import customer_router
+from .database import Base, engine
 
 settings = Settings()
 
@@ -27,9 +27,10 @@ app.include_router(auth_router.router)
 def main_page():
     return "Ceci est un pressing de wash man"
 
+
 @app.get("/mail")
 async def test_mail():
-    meryl =Person(
+    meryl = Person(
         email=Customer_create_input.email,
         first_name=Customer_create_input.first_name,
         last_name=Customer_create_input.last_name,
@@ -37,15 +38,16 @@ async def test_mail():
         phone_number=Phone_number(
             dial_code=Customer_create_input.phone_number.dial_code,
             iso_code=Customer_create_input.phone_number.iso_code,
-            phone_text=Customer_create_input.phone_number.phone_text
-        )
+            phone_text=Customer_create_input.phone_number.phone_text,
+        ),
     )
     return await mail_service.send_welcome_email(person=meryl)
     # return await mail_service.send_email(meryl.email,"aboo","shjdhf")
 
+
 # @app.post("/customers", response_model=Customer_schema)
 # def create_customers(customer: Customer_create_input , db: Session = Depends(get_db)):
-#     return customer_service.create_customer(db,customer) 
+#     return customer_service.create_customer(db,customer)
 
 # @app.get("/customers", response_model=list[Customer_schema])
 # def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
