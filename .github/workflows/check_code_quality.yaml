@@ -2,10 +2,10 @@ name: check_code_quality
 on:
   push:
     branches:
-      - develop
+      - dev
   pull_request:
     branches:
-      - develop
+      - dev
 
 jobs:
   check_code_quality:
