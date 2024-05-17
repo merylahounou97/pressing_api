@@ -1,27 +1,21 @@
-import random
 import uuid
 from datetime import datetime, timedelta
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from twilio.rest import Client
-from typing_extensions import Annotated
 
 from src.config import Settings
 from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
 from src.person.person_model import Phone_number_model
-from src.person.person_schema import Phone_number
 
 from ..security import security_service
 from . import customer_schema
 from .customer_model import Customer_model
-from .customer_schema import (
-    Customer_create_input,
-    Customer_edit_input,
-    Customer_verify_code,
-)
+from .customer_schema import (Customer_create_input, Customer_edit_input,
+                              Customer_verify_code)
 
 settings = Settings()
 
@@ -118,7 +112,7 @@ async def create_customer(
     db.commit()
 
     # Envoyer le SMS de vérification
-    message = twilio_client.messages.create(
+    twilio_client.messages.create(
         body=f"Votre code de vérification est {verification_code_phone_number}",
         from_=TWILIO_PHONE_NUMBER,
         to=db_user.phone_number_id,
@@ -168,18 +162,20 @@ def get_customers(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Customer_model).offset(skip).limit(limit).all()
 
 
-def edit_customer(id: str, customer_edit_input: Customer_edit_input, db: Session):
+def edit_customer(
+    customer_id: str, customer_edit_input: Customer_edit_input, db: Session
+):
     """Edit a customer
 
     Args:
-        id (str): Customer ID
-        customer_edit_input (Customer_edit_input): Customer object
+        customer_id (str): Customer ID
+        customer_edit_input (Customer_edit_input): Customer edit input
         db (Session): Database session
 
     Returns:
         Customer_model: Customer object
     """
-    db_user = db.query(Customer_model).get({"id": id})
+    db_user = db.query(Customer_model).get({"id": customer_id})
     db_user.last_name = customer_edit_input.last_name
     db_user.first_name = customer_edit_input.first_name
     db_user.address = customer_edit_input.address
@@ -248,7 +244,9 @@ async def generate_new_validation_code(
     """Generate a new validation code
 
     Args:
-        generate_new_validation_code (customer_schema.Customer_generate_new_validation_code_input): Generate new validation code object
+        generate_new_validation_code
+           (customer_schema.Customer_generate_new_validation_code_input): Generate new validation
+                                                                                    code object
 
     Returns:
         None

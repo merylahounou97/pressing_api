@@ -25,11 +25,13 @@ app.include_router(auth_router.router)
 
 @app.get("/")
 def main_page():
+    """Main page of the API."""
     return "Ceci est un pressing de wash man"
 
 
 @app.get("/mail")
 async def test_mail():
+    """Test the mail service."""
     meryl = Person(
         email=Customer_create_input.email,
         first_name=Customer_create_input.first_name,

@@ -11,14 +11,17 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 def hashText(text: str) -> str:
+    """Hashes the given text using bcrypt algorithm."""
     return bcrypt.hash(text)
 
 
 def compareHashedText(text: str, hashed_text: str) -> bool:
+    """Compares the given text with the hashed text using bcrypt algorithm."""
     return bcrypt.verify(text, hashed_text)
 
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+    """Creates an access token with the given data."""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -32,8 +35,10 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 
 def decode_token(token: str):
+    """Decodes the given token."""
     return jwt.decode(str(token), SECRET_KEY, algorithms=[ALGORITHM])
 
 
 def generate_random_code(low=100, high=99999):
+    """Generates a random code."""
     return str(random.randint(low, high))

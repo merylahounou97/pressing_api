@@ -6,9 +6,14 @@ config = Settings()
 
 
 def get_api_url():
+    """Get the API URL.
+
+    Returns:
+        str: The API URL.
+    """
 
     if config.ENV == "dev":
-        response = requests.get("http://ngrok:4040/api/tunnels")
+        response = requests.get("http://ngrok:4040/api/tunnels", timeout=15)
         print(response.json())
         if response.status_code == 200:
             return response.json()["tunnels"][0]["public_url"]

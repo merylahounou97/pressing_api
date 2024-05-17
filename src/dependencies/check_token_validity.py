@@ -11,6 +11,15 @@ from src.security import security_service
 def check_token_validity(
     access_token: str, db: Annotated[sessionmaker, Depends(get_db)]
 ):
+    """Check if the token is valid and if the user exists in the database.
+
+    Args:
+        access_token (str): The access token.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the token is invalid or the user does not exist.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -21,8 +30,8 @@ def check_token_validity(
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+    except JWTError as exc:
+        raise credentials_exception from exc
     user = customer_service.check_existing_customer(db=db, identifier=username)
     if user is None:
         raise credentials_exception

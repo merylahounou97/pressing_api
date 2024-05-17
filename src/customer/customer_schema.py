@@ -1,13 +1,8 @@
 from typing import Union
 
-from pydantic import Field
-
 from src.person.person_schema import (
-    Person,
-    Person_base_input,
-    Person_generate_new_validation_code_input,
-    Person_verify_code_input,
-)
+    Person, Person_base_input, Person_generate_new_validation_code_input,
+    Person_verify_code_input)
 
 
 class Customer_output(Person):

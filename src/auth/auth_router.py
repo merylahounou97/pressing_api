@@ -1,8 +1,8 @@
-from datetime import timedelta
+# from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from typing_extensions import Annotated
 
 from src.auth import auth_service
@@ -19,8 +19,19 @@ router = APIRouter()
 
 # Créer une route pour la connexion
 @router.post("/login")
-async def login(login: Login_input, db: Annotated[sessionmaker, Depends(get_db)]):
-    user = auth_service.authenticate_user(db, login.identifier, login.password)
+async def login(login_input: Login_input, db: Annotated[sessionmaker, Depends(get_db)]):
+    """Login a user
+
+    args:
+        login_input (Login_input): The login input
+        db (Session): The database session
+
+    Returns:
+        dict: The user data
+    """
+    user = auth_service.authenticate_user(
+        db, login_input.identifier, login_input.password
+    )
     if user:
         user_data = {
             "email": user.email,
@@ -35,10 +46,19 @@ async def login(login: Login_input, db: Annotated[sessionmaker, Depends(get_db)]
 
 @router.post("/token")
 def create_login_token(
-    login: Annotated[OAuth2PasswordRequestForm, Depends()],
+    login_form: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[sessionmaker, Depends(get_db)],
 ):
-    user = auth_service.authenticate_user(db, login.username, login.password)
+    """Create a login token
+
+    args:
+        login_form (OAuth2PasswordRequestForm): The login form
+        db (Session): The database session
+
+    Returns:
+        Token: The token
+    """
+    user = auth_service.authenticate_user(db, login_form.username, login_form.password)
     if user:
         access_token = create_access_token(
             data={"sub": user.email, "phone_number": user.phone_number_id}

@@ -1,7 +1,5 @@
-import phonenumbers
-from pydantic import BaseModel, EmailStr, Field, StringConstraints, field_validator
+from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from typing_extensions import Annotated
 
 
 class Phone_number(BaseModel):

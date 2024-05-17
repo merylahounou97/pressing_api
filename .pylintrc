@@ -1,2 +1,2 @@
-[pylint.messages.control]
-disable=invalid-name
+[MESSAGES CONTROL]
+disable=invalid-name,missing-class-docstring,missing-module-docstring
