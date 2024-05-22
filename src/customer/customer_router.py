@@ -5,9 +5,9 @@ from typing_extensions import Annotated
 
 from src.config import Settings
 from src.customer import customer_schema, customer_service
-from src.customer.customer_schema import (Customer_create_input,
-                                          Customer_edit_input, CustomerOutput,
-                                          Customer_verify_code)
+from src.customer.customer_schema import (CreateCustomerInput,
+                                          CustomerEditInput, CustomerOutput,
+                                          CustomerValidationCode)
 from src.dependencies.db import get_db
 
 settings = Settings()
@@ -17,12 +17,12 @@ router = APIRouter(prefix="/customers")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-access_token_dep = Annotated[str, Depends(oauth2_scheme)]
+AccessTokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 
 @router.post("/", response_model=CustomerOutput)
 async def create_customers(
-    customer: Customer_create_input, redirect_url: str, db: Session = Depends(get_db)
+    customer: CreateCustomerInput, redirect_url: str, db: Session = Depends(get_db)
 ):
     """Create a customer
 
@@ -55,8 +55,8 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @router.patch("/", response_model=CustomerOutput)
 def edit_customer(
-    customer_edit_input: Customer_edit_input,
-    access_token: access_token_dep,
+    customer_edit_input: CustomerEditInput,
+    access_token: AccessTokenDep,
     db: Session = Depends(get_db),
 ):
     """Edit a customer by id
@@ -71,12 +71,12 @@ def edit_customer(
     """
     user = customer_service.validate_token(access_token=access_token, db=db)
     return customer_service.edit_customer(
-        id=user.id, customer_edit_input=customer_edit_input, db=db
+        customer_id=user.id, customer_edit_input=customer_edit_input, db=db
     )
 
 
 @router.post("/verify_phone_number/")
-def verify_code(verification: Customer_verify_code, db: Session = Depends(get_db)):
+def verify_code(verification: CustomerValidationCode, db: Session = Depends(get_db)):
     """Verify a phone number by code
 
     Args:
@@ -92,7 +92,7 @@ def verify_code(verification: Customer_verify_code, db: Session = Depends(get_db
 
 
 @router.post("/verify_email")
-def verify_email(verification: Customer_verify_code, db: Session = Depends(get_db)):
+def verify_email(verification: CustomerValidationCode, db: Session = Depends(get_db)):
     """Verify an email by code
 
     Args:
@@ -109,7 +109,7 @@ def verify_email(verification: Customer_verify_code, db: Session = Depends(get_d
 
 @router.post("/generate_new_email_validation_code")
 def generate_new_email_validation_code(
-    create_new_validation_code_input: customer_schema.Customer_generate_new_validation_code_input,
+    create_new_validation_code_input: customer_schema.CustomerNewValidationCodeInput,
 ):
     """Generate a new email validation code
 

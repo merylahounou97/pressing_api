@@ -3,9 +3,9 @@ from fastapi.staticfiles import StaticFiles
 
 from src.auth import auth_router
 from src.config import Settings
-from src.customer.customer_schema import Customer_create_input
+from src.customer.customer_schema import CreateCustomerInput
 from src.mail import mail_service
-from src.person.person_schema import Person, Phone_number
+from src.person.person_schema import Person, PhoneNumberModel
 
 from .customer import customer_router
 from .database import Base, engine
@@ -33,17 +33,19 @@ def main_page():
 async def test_mail():
     """Test the mail service."""
     meryl = Person(
-        email=Customer_create_input.email,
-        first_name=Customer_create_input.first_name,
-        last_name=Customer_create_input.last_name,
-        address=Customer_create_input.address,
-        phone_number=Phone_number(
-            dial_code=Customer_create_input.phone_number.dial_code,
-            iso_code=Customer_create_input.phone_number.iso_code,
-            phone_text=Customer_create_input.phone_number.phone_text,
+        email=CreateCustomerInput.email,
+        first_name=CreateCustomerInput.first_name,
+        last_name=CreateCustomerInput.last_name,
+        address=CreateCustomerInput.address,
+        phone_number=PhoneNumberModel(
+            dial_code=CreateCustomerInput.phone_number.dial_code,
+            iso_code=CreateCustomerInput.phone_number.iso_code,
+            phone_text=CreateCustomerInput.phone_number.phone_text,
         ),
     )
-    return await mail_service.send_welcome_email(person=meryl)
+    return await mail_service.send_welcome_email(
+        person=meryl, redirect_url="https://www.google.com"
+    )
     # return await mail_service.send_email(meryl.email,"aboo","shjdhf")
 
 

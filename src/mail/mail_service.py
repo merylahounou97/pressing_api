@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 from src.config import Settings
 
-from ..customer.customer_schema import Customer_create_input
+from ..customer.customer_schema import CreateCustomerInput
 from ..dependencies.get_api_url import get_api_url
 
 settings = Settings()
@@ -17,7 +17,7 @@ api_url = get_api_url()
 templates = Jinja2Templates(directory="src/mail/templates")
 
 
-async def send_welcome_email(person: Customer_create_input, redirect_url):
+async def send_welcome_email(person: CreateCustomerInput, redirect_url):
     """Send a welcome email to the user.
 
     Args:

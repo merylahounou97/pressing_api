@@ -4,25 +4,25 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from twilio.rest import Client
 
 from src.config import Settings
 from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
-from src.person.person_model import Phone_number_model
+from src.person.person_model import PhoneNumber
+from src.sms import sms_service
 
 from ..security import security_service
 from . import customer_schema
-from .customer_model import Customer_model
-from .customer_schema import (Customer_create_input, Customer_edit_input,
-                              Customer_verify_code)
+from .customer_model import CustomerModel
+from ..person import person_schema
+from .customer_schema import (
+    CreateCustomerInput,
+    CustomerEditInput,
+    CustomerValidationCode,
+)
 
 settings = Settings()
 
-TWILIO_ACCOUNT_SID = settings.twilio_account_sid
-TWILIO_AUTH_TOKEN = settings.twilio_auth_token
-TWILIO_PHONE_NUMBER = settings.twilio_phone_number
-twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 
 def check_existing_customer(db: Session, email: str, phone_number: str):
@@ -52,11 +52,11 @@ def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str):
         Customer_model: Customer object
     """
     return (
-        db.query(Customer_model)
+        db.query(CustomerModel)
         .filter(
             or_(
-                Customer_model.phone_number_id == phone_number,
-                Customer_model.email == email,
+                CustomerModel.phone_number_id == phone_number,
+                CustomerModel.email == email,
             )
         )
         .first()
@@ -64,7 +64,7 @@ def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str):
 
 
 async def create_customer(
-    db: Session, customerCreate: Customer_create_input, redirect_url: str
+    db: Session, customer_create: CreateCustomerInput, redirect_url: str
 ):
     """Create a new customer
 
@@ -77,31 +77,31 @@ async def create_customer(
         Customer_model: Customer object
     """
     if check_existing_customer(
-        db, customerCreate.email, customerCreate.phone_number.phone_text
+        db, customer_create.email, customer_create.phone_number.phone_text
     ):
         raise HTTPException(
             status_code=400, detail="Phone number or email already registered"
         )
 
-    hashed_password = security_service.hashText(customerCreate.password)
+    hashed_password = security_service.hash_text(customer_create.password)
 
     verification_code_email = security_service.generate_random_code()
     verification_code_phone_number = security_service.generate_random_code()
     expiry_time = datetime.now() + timedelta(minutes=settings.code_expiry_time)
 
-    db_user = Customer_model(
+    db_user = CustomerModel(
         id=str(uuid.uuid4()),
-        email=customerCreate.email,
-        last_name=customerCreate.last_name,
-        first_name=customerCreate.first_name,
-        phone_number=Phone_number_model(
-            iso_code=customerCreate.phone_number.iso_code,
-            dial_code=customerCreate.phone_number.dial_code,
-            phone_text=customerCreate.phone_number.phone_text,
+        email=customer_create.email,
+        last_name=customer_create.last_name,
+        first_name=customer_create.first_name,
+        phone_number=PhoneNumber(
+            iso_code=customer_create.phone_number.iso_code,
+            dial_code=customer_create.phone_number.dial_code,
+            phone_text=customer_create.phone_number.phone_text,
         ),
         phone_number_verification_code=verification_code_phone_number,
         email_verification_code=verification_code_email,
-        address=customerCreate.address,
+        address=customer_create.address,
         password=hashed_password,
         phone_number_verification_expiry=expiry_time,
         email_verification_expiry=expiry_time,
@@ -112,18 +112,14 @@ async def create_customer(
     db.commit()
 
     # Envoyer le SMS de vérification
-    twilio_client.messages.create(
-        body=f"Votre code de vérification est {verification_code_phone_number}",
-        from_=TWILIO_PHONE_NUMBER,
-        to=db_user.phone_number_id,
-    )
+    sms_service.send_welcome_sms(db_user)
 
     redirect_url = parse_validation_email(
-        redirect_url, verification_code_email, customerCreate.email
+        redirect_url, verification_code_email, customer_create.email
     )
 
     # Send welcome email
-    await mail_service.send_welcome_email(customerCreate, redirect_url)
+    await mail_service.send_welcome_email(customer_create, redirect_url)
 
     return db_user
 
@@ -159,11 +155,11 @@ def get_customers(db: Session, skip: int = 0, limit: int = 100):
     Returns:
         list[Customer_model]: List of customers
     """
-    return db.query(Customer_model).offset(skip).limit(limit).all()
+    return db.query(CustomerModel).offset(skip).limit(limit).all()
 
 
 def edit_customer(
-    customer_id: str, customer_edit_input: Customer_edit_input, db: Session
+    customer_id: str, customer_edit_input: CustomerEditInput, db: Session
 ):
     """Edit a customer
 
@@ -175,7 +171,7 @@ def edit_customer(
     Returns:
         Customer_model: Customer object
     """
-    db_user = db.query(Customer_model).get({"id": customer_id})
+    db_user = db.query(CustomerModel).get({"id": customer_id})
     db_user.last_name = customer_edit_input.last_name
     db_user.first_name = customer_edit_input.first_name
     db_user.address = customer_edit_input.address
@@ -183,7 +179,7 @@ def edit_customer(
     return db_user
 
 
-def verify_code(verification: Customer_verify_code, strategy: str, db: Session):
+def verify_code(verification: CustomerValidationCode, strategy: str, db: Session):
     """Verify the code
 
     Args:
@@ -197,11 +193,10 @@ def verify_code(verification: Customer_verify_code, strategy: str, db: Session):
 
     if strategy == "email":
         db_user = (
-            db.query(Customer_model)
+            db.query(CustomerModel)
             .filter(
-                Customer_model.email == verification.identifier,
-                Customer_model.email_verification_code
-                == verification.verification_code,
+                CustomerModel.email == verification.identifier,
+                CustomerModel.email_verification_code == verification.verification_code,
             )
             .first()
         )
@@ -209,10 +204,10 @@ def verify_code(verification: Customer_verify_code, strategy: str, db: Session):
 
     elif strategy == "phone_number":
         db_user = (
-            db.query(Customer_model)
+            db.query(CustomerModel)
             .filter(
-                Customer_model.phone_number_id == verification.identifier,
-                Customer_model.phone_number_verification_code
+                CustomerModel.phone_number_id == verification.identifier,
+                CustomerModel.phone_number_verification_code
                 == verification.verification_code,
             )
             .first()
@@ -238,31 +233,6 @@ def verify_code(verification: Customer_verify_code, strategy: str, db: Session):
     return db_user
 
 
-async def generate_new_validation_code(
-    generate_new_validation_code: customer_schema.Customer_generate_new_validation_code_input,
-):
-    """Generate a new validation code
-
-    Args:
-        generate_new_validation_code
-           (customer_schema.Customer_generate_new_validation_code_input): Generate new validation
-                                                                                    code object
-
-    Returns:
-        None
-    """
-    random_code = security_service.generate_random_code()
-    if generate_new_validation_code.strategy == "email":
-        generate_new_validation_code.redirect_url = parse_validation_email(
-            generate_new_validation_code.redirect_url,
-            random_code,
-            generate_new_validation_code.identifier,
-        )
-    await mail_service.send_welcome_email(
-        generate_new_validation_code, generate_new_validation_code.redirect_url
-    )
-
-
 def parse_validation_email(redirect_url: str, verification_code_email: str, email: str):
     """Parse the validation email
 
@@ -277,3 +247,37 @@ def parse_validation_email(redirect_url: str, verification_code_email: str, emai
     if settings.ENV == "dev":
         redirect_url = get_api_url()
     return f"{redirect_url}?code={verification_code_email}&identifier={email}"
+
+
+async def generate_new_validation_code(
+    new_validation_code: customer_schema.CustomerNewValidationCodeInput,
+):
+    """Generate a new validation code
+
+    Args:
+        generate_new_validation_code
+           (customer_schema.Customer_generate_new_validation_code_input): Generate new validation
+                                                                                    code object
+
+    Returns:
+        None
+    """
+    random_code = security_service.generate_random_code()
+    if new_validation_code.strategy == person_schema.ValidationStrategyEnum.EMAIL:
+        new_validation_code.redirect_url = parse_validation_email(
+            new_validation_code.redirect_url,
+            random_code,
+            new_validation_code.identifier,
+        )
+        await mail_service.send_welcome_email(
+            new_validation_code, new_validation_code.redirect_url
+        )
+    elif (
+        new_validation_code.strategy
+        == person_schema.ValidationStrategyEnum.PHONE_NUMBER
+    ):
+       sms_service.send_verification_sms(
+            new_validation_code.identifier, random_code
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Unknown strategy")

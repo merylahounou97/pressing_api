@@ -1,12 +1,10 @@
-# from datetime import timedelta
-
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import sessionmaker
 from typing_extensions import Annotated
 
 from src.auth import auth_service
-from src.auth.auth_schema import Login_input, Token
+from src.auth.auth_schema import LoginForm, Token
 from src.config import Settings
 from src.security.security_service import create_access_token
 
@@ -19,7 +17,7 @@ router = APIRouter()
 
 # Créer une route pour la connexion
 @router.post("/login")
-async def login(login_input: Login_input, db: Annotated[sessionmaker, Depends(get_db)]):
+async def login(login_input: LoginForm, db: Annotated[sessionmaker, Depends(get_db)]):
     """Login a user
 
     args:

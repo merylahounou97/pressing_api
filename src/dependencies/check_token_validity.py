@@ -28,10 +28,13 @@ def check_token_validity(
     try:
         payload = security_service.decode_token(token=access_token)
         username: str = payload.get("sub")
+        phone_number: str = payload.get("phone_number")
         if username is None:
             raise credentials_exception
     except JWTError as exc:
         raise credentials_exception from exc
-    user = customer_service.check_existing_customer(db=db, identifier=username)
+    user = customer_service.check_existing_customer(
+        db=db, email=username, phone_number=phone_number
+    )
     if user is None:
         raise credentials_exception

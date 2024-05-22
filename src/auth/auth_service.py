@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from src.customer import customer_service
 
-from ..customer.customer_model import Customer_model
+from ..customer.customer_model import CustomerModel
 from ..security import security_service
 
 
@@ -16,7 +16,7 @@ def get_user_by_email(db: Session, email: str):
     Returns:
         Customer_model: The user
     """
-    return db.query(Customer_model).filter(Customer_model.email == email).first()
+    return db.query(CustomerModel).filter(CustomerModel.email == email).first()
 
 
 def get_user_by_tel_number(db: Session, phone_number: str):
@@ -30,8 +30,8 @@ def get_user_by_tel_number(db: Session, phone_number: str):
         Customer_model: The user
     """
     return (
-        db.query(Customer_model)
-        .filter(Customer_model.phone_number_id == phone_number)
+        db.query(CustomerModel)
+        .filter(CustomerModel.phone_number_id == phone_number)
         .first()
     )
 
@@ -68,7 +68,7 @@ def authenticate_user(db: Session, identifier: str, password: str):
     user = customer_service.get_customer_by_email_or_phone(
         db=db, email=identifier, phone_number=identifier
     )
-    if user is not None and security_service.compareHashedText(password, user.password):
+    if user is not None and security_service.compare_hashed_text(
+        password, user.password
+    ):
         return user
-    else:
-        return None

@@ -10,18 +10,42 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-def hashText(text: str) -> str:
-    """Hashes the given text using bcrypt algorithm."""
+def hash_text(text: str) -> str:
+    """Hashes the given text using bcrypt algorithm
+    and returns the hashed text.
+
+    Args:
+        text (str): The text to hash.
+
+        Returns:
+        str: The hashed text.
+    """
     return bcrypt.hash(text)
 
 
-def compareHashedText(text: str, hashed_text: str) -> bool:
-    """Compares the given text with the hashed text using bcrypt algorithm."""
+def compare_hashed_text(text: str, hashed_text: str) -> bool:
+    """Compares the given text with the given hashed text.
+
+    Args:
+        text (str): The text to compare.
+        hashed_text (str): The hashed text to compare.
+
+    Returns:
+        bool: True if the text matches the hashed text, False otherwise.
+    """
     return bcrypt.verify(text, hashed_text)
 
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
-    """Creates an access token with the given data."""
+    """Creates an access token with the given data and expiration time.
+
+    Args:
+        data (dict): The data to encode in the token.
+        expires_delta (Union[timedelta, None], optional): The expiration time.
+
+    Returns:
+        str: The encoded token.
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -35,10 +59,25 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 
 def decode_token(token: str):
-    """Decodes the given token."""
+    """Decodes the given token and returns the payload.
+
+    Args:
+        token (str): The token to decode.
+
+    Returns:
+        dict: The payload of the token.
+    """
     return jwt.decode(str(token), SECRET_KEY, algorithms=[ALGORITHM])
 
 
 def generate_random_code(low=100, high=99999):
-    """Generates a random code."""
+    """Generates a random code between the given range.
+
+    Args:
+        low (int, optional): The lower bound of the range.
+        high (int, optional): The upper bound of the range.
+
+    Returns:
+        str: The generated code.
+    """
     return str(random.randint(low, high))
