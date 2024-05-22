@@ -1,11 +1,11 @@
 from typing import Union
 
 from src.person.person_schema import (
-    Person, Person_base_input, Person_generate_new_validation_code_input,
+    Person, Person_base_input, PersonGenerateNewvalidationCodeInput,
     Person_verify_code_input)
 
 
-class Customer_output(Person):
+class CustomerOutput(Person):
     id: str
     phone_number_verification_code: Union[str, None]
 
@@ -25,6 +25,6 @@ class Customer_verify_code(Person_verify_code_input):
 
 
 class Customer_generate_new_validation_code_input(
-    Person_generate_new_validation_code_input
+    PersonGenerateNewvalidationCodeInput
 ):
     pass

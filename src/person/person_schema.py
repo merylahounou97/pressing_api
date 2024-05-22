@@ -1,6 +1,11 @@
+from enum import Enum
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
+
+class ValidationStrategyEnum (Enum) :
+    PHONE_NUMBER="phone_number"
+    EMAIL="email"
 
 class Phone_number(BaseModel):
     iso_code: str
@@ -31,7 +36,9 @@ class Person_verify_code_input(BaseModel):
     verification_code: str
 
 
-class Person_generate_new_validation_code_input(BaseModel):
+class PersonGenerateNewvalidationCodeInput(BaseModel):
     identifier: str
-    strategy: str
+    strategy: ValidationStrategyEnum
     redirect_url: str
+
+

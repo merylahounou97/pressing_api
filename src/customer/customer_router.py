@@ -6,7 +6,7 @@ from typing_extensions import Annotated
 from src.config import Settings
 from src.customer import customer_schema, customer_service
 from src.customer.customer_schema import (Customer_create_input,
-                                          Customer_edit_input, Customer_output,
+                                          Customer_edit_input, CustomerOutput,
                                           Customer_verify_code)
 from src.dependencies.db import get_db
 
@@ -20,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 access_token_dep = Annotated[str, Depends(oauth2_scheme)]
 
 
-@router.post("/", response_model=Customer_output)
+@router.post("/", response_model=CustomerOutput)
 async def create_customers(
     customer: Customer_create_input, redirect_url: str, db: Session = Depends(get_db)
 ):
@@ -37,7 +37,7 @@ async def create_customers(
     return await customer_service.create_customer(db, customer, redirect_url)
 
 
-@router.get("/", response_model=list[Customer_output])
+@router.get("/", response_model=list[CustomerOutput])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get customers from the database
 
@@ -53,7 +53,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@router.patch("/", response_model=Customer_output)
+@router.patch("/", response_model=CustomerOutput)
 def edit_customer(
     customer_edit_input: Customer_edit_input,
     access_token: access_token_dep,
