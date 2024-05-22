@@ -6,8 +6,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from src.config import Settings
-from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
+from src.mail.mail_service import parse_validation_email
 from src.person.person_model import PhoneNumber
 from src.sms import sms_service
 
@@ -113,10 +113,6 @@ async def create_customer(
 
     # Envoyer le SMS de vérification
     sms_service.send_welcome_sms(db_user)
-
-    redirect_url = parse_validation_email(
-        redirect_url, verification_code_email, customer_create.email
-    )
 
     # Send welcome email
     await mail_service.send_welcome_email(customer_create, redirect_url)
@@ -233,24 +229,9 @@ def verify_code(verification: CustomerValidationCode, strategy: str, db: Session
     return db_user
 
 
-def parse_validation_email(redirect_url: str, verification_code_email: str, email: str):
-    """Parse the validation email
-
-    Args:
-        redirect_url (str): Redirect URL
-        verification_code_email (str): Verification code
-        email (str): Email
-
-    Returns:
-        str: Redirect URL
-    """
-    if settings.ENV == "dev":
-        redirect_url = get_api_url()
-    return f"{redirect_url}?code={verification_code_email}&identifier={email}"
-
-
 async def generate_new_validation_code(
     new_validation_code: customer_schema.CustomerNewValidationCodeInput,
+    db
 ):
     """Generate a new validation code
 
@@ -262,22 +243,29 @@ async def generate_new_validation_code(
     Returns:
         None
     """
+    print("generate_new_validation_code")
     random_code = security_service.generate_random_code()
+
+    user =  get_customer_by_email_or_phone(db=db,
+                                          email=new_validation_code.identifier,
+                                          phone_number=new_validation_code.identifier
+                                        )
+
     if new_validation_code.strategy == person_schema.ValidationStrategyEnum.EMAIL:
+        print("1")
         new_validation_code.redirect_url = parse_validation_email(
             new_validation_code.redirect_url,
             random_code,
             new_validation_code.identifier,
         )
-        await mail_service.send_welcome_email(
-            new_validation_code, new_validation_code.redirect_url
-        )
+    
+        await mail_service.send_validation_email(person=user, redirect_url=new_validation_code.redirect_url)
     elif (
         new_validation_code.strategy
         == person_schema.ValidationStrategyEnum.PHONE_NUMBER
     ):
-       sms_service.send_verification_sms(
-            new_validation_code.identifier, random_code
-        )
+        print("2")
+        sms_service.send_verification_sms(new_validation_code.identifier, random_code)
     else:
+        print("3")
         raise HTTPException(status_code=400, detail="Unknown strategy")

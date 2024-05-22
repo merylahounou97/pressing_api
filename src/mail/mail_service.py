@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
 
 from src.config import Settings
+from src.customer.customer_model import CustomerModel
 
 from ..customer.customer_schema import CreateCustomerInput
 from ..dependencies.get_api_url import get_api_url
@@ -27,22 +28,55 @@ async def send_welcome_email(person: CreateCustomerInput, redirect_url):
     Returns:
         dict: The status of the email sending.
     """
-
-    mail_content = get_parsed_template(
+    redirect_url = parse_validation_email(redirect_url=redirect_url,verification_code_email=person.email_verification_code,email=person.email)
+    mail_content = __get_parsed_template(
         template_name="welcome.html",
         person=person,
         app_name="WashMan",
         api_url=api_url,
         redirect_url=redirect_url,
     )
-    return send_email(
+    return __send_email(
         person.email,
         f"Bienvenue à WashMan, {person.first_name}! Prêt à simplifier votre routine de nettoyage ?",
         mail_content,
     )
 
 
-def get_parsed_template(template_name: str, **kargs):
+async def send_validation_email(person: CustomerModel, redirect_url: str):
+
+    redirect_url = parse_validation_email(redirect_url=redirect_url,verification_code_email=person.email_verification_code,email=person.email)
+    mail_content = __get_parsed_template(
+        template_name="email_validation.html",
+        person=person,
+        app_name="WashMan",
+        api_url=api_url,
+        redirect_url=redirect_url,
+    )
+    return __send_email(
+        person.email,
+        f"Bienvenue à WashMan, {person.first_name}! Prêt à simplifier votre routine de nettoyage ?",
+        mail_content,
+    )
+
+
+def parse_validation_email(redirect_url: str, verification_code_email: str, email: str):
+    """Parse the validation email
+
+    Args:
+        redirect_url (str): Redirect URL
+        verification_code_email (str): Verification code
+        email (str): Email
+
+    Returns:
+        str: Redirect URL
+    """
+    if settings.ENV == "dev":
+        redirect_url = get_api_url()
+    return f"{redirect_url}?code={verification_code_email}&identifier={email}"
+
+
+def __get_parsed_template(template_name: str, **kargs):
     """Parse a Jinja2 template with the given arguments.
 
     Args:
@@ -56,7 +90,7 @@ def get_parsed_template(template_name: str, **kargs):
     return email_template.render(kargs)
 
 
-def send_email(to: str, subject: str, email_content: str):
+def __send_email(to: str, subject: str, email_content: str):
     """Send an email to the given recipient.
 
     Args:

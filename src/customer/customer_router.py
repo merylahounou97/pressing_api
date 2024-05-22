@@ -107,10 +107,10 @@ def verify_email(verification: CustomerValidationCode, db: Session = Depends(get
     )
 
 
-@router.post("/generate_new_email_validation_code")
-def generate_new_email_validation_code(
+@router.post("/validate_identifier")
+async def generate_new_email_validation_code(
     create_new_validation_code_input: customer_schema.CustomerNewValidationCodeInput,
-):
+     db: Session = Depends(get_db)):
     """Generate a new email validation code
 
     Args:
@@ -119,6 +119,6 @@ def generate_new_email_validation_code(
     Returns:
         bool: The result
     """
-    return customer_service.generate_new_validation_code(
-        create_new_validation_code_input
+    return await customer_service.generate_new_validation_code(db=db,
+        new_validation_code=create_new_validation_code_input
     )

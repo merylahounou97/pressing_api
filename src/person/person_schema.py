@@ -25,7 +25,7 @@ class PhoneNumberModel(BaseModel):
 
     # Ajout d'une méthode de validation personnalisée pour `phone_text`
     @field_validator("phone_text")
-    def remove_tel_prefix(self, v):
+    def remove_tel_prefix(cls, v):
         """Supprime le préfixe 'tel:' et les tirets du numéro de téléphone
         Args:
             v (PhoneNumber): Numéro de téléphone
