@@ -7,10 +7,9 @@ from typing_extensions import Annotated
 from src.config import Settings
 from src.customer import  customer_service
 from src.customer.customer_schema import (CreateCustomerInput,
-                                          CustomerEditInput, CustomerOutput,
-                                          CustomerValidationCode)
+                                           CustomerOutput)
 from src.dependencies.db import get_db
-from src.person.person_schema import PersonVerifyIdentifierInput
+from src.person.person_schema import PersonBaseSchema, VerifyIdentifierInput, SendVerifyIndentifierInput
 
 settings = Settings()
 
@@ -39,25 +38,9 @@ async def create_customers(
     return await customer_service.create_customer(db, customer, redirect_url)
 
 
-# @router.get("/", response_model=list[CustomerOutput])
-# def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-#     """Get customers from the database
-
-#     Args:
-#         skip (int, optional): The skip. Defaults to 0.
-#         limit (int, optional): The limit. Defaults to 100.
-#         db (Session, optional): The database session. Defaults to Depends(get_db).
-
-#     Returns:
-#         list[Customer_output]: The list of customers
-#     """
-#     users = customer_service.get_customers(db=db, skip=skip, limit=limit)
-#     return users
-
-
 @router.patch("/", response_model=CustomerOutput)
 def edit_customer(
-    customer_edit_input: CustomerEditInput,
+    customer_edit_input: PersonBaseSchema,
     access_token: AccessTokenDep,
     db: Session = Depends(get_db),
 ):
@@ -78,7 +61,7 @@ def edit_customer(
 
 
 @router.post("/verify_verification_code",response_model=CustomerOutput)
-async def verify_verification_code(customer_validation_code: CustomerValidationCode, \
+async def verify_verification_code(customer_validation_code: VerifyIdentifierInput, \
                                     db: Session = Depends(get_db)):
     """Verify a phone number by code
 
@@ -94,7 +77,7 @@ async def verify_verification_code(customer_validation_code: CustomerValidationC
 
 @router.post("/send_verification_code", response_model=Union[CustomerOutput,None])
 async def generate_new_email_validation_code(
-    verify_input: PersonVerifyIdentifierInput,
+    verify_input: SendVerifyIndentifierInput,
      db: Session = Depends(get_db)):
     """Generate a validation code sent to the user by email or phone number
 

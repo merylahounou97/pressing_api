@@ -1,9 +1,8 @@
-from typing import Union
 
-from src.person.person_schema import (Person,PersonInputBase, PersonVerificationInput)
+from src.person.person_schema import (PersonSchema,PersonBaseSchema)
 
 
-class CustomerOutput(Person):
+class CustomerOutput(PersonSchema):
     """Customer output model
 
     Attributes:
@@ -16,34 +15,13 @@ class CustomerOutput(Person):
         is_active (bool): The status of the customer
         is_verified (bool): The verification status of the customer
     """
-
     id: str
 
 
-class CreateCustomerInput(PersonInputBase):
+class CreateCustomerInput(PersonBaseSchema):
     """Create customer input model
 
     Attributes:
         password (str): The password of the customer
     """
-
     password: str
-
-
-class CustomerEditInput(PersonInputBase):
-    """Edit customer input model
-
-    Attributes:
-        password (str): The password of the customer
-    """
-
-
-class CustomerValidationCode(PersonVerificationInput):
-    """Customer validation code model
-
-    Attributes:
-        identifier (str): The identifier of the customer
-        verification_code (str): The verification code of the customer
-    """
-
-

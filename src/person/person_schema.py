@@ -11,7 +11,7 @@ class ValidationStrategyEnum(Enum):
     EMAIL = "email"
 
 
-class PhoneNumberModel(BaseModel):
+class PhoneNumberSchema(BaseModel):
     """Modèle de numéro de téléphone
     Attributes:
         iso_code (str): Code ISO du pays
@@ -36,7 +36,7 @@ class PhoneNumberModel(BaseModel):
         return PhoneNumber.removeprefix(v, "tel:").replace("-", "")
 
 
-class PersonInputBase(BaseModel):
+class PersonBaseSchema(BaseModel):
     """Modèle de base pour les informations d'une personne
     Attributes:
         last_name (str): Nom de famille
@@ -45,15 +45,14 @@ class PersonInputBase(BaseModel):
         email (EmailStr): Adresse email
         phone_number (PhoneNumberModel): Numéro de téléphone
     """
-
     last_name: str
     first_name: str
     address: str
     email: EmailStr
-    phone_number: PhoneNumberModel
+    phone_number: PhoneNumberSchema
 
 
-class Person(PersonInputBase):
+class PersonSchema(PersonBaseSchema):
     """Modèle de personne
     Attributes:
         id (str): Identifiant unique de la personne
@@ -65,7 +64,7 @@ class Person(PersonInputBase):
     email_verified: bool
 
 
-class PersonVerificationInput(BaseModel):
+class VerifyIdentifierInput(BaseModel):
     """Modèle de vérification d'une personne
     Attributes:
         identifier (str): Identifiant de la personne
@@ -76,7 +75,7 @@ class PersonVerificationInput(BaseModel):
     verification_code: str
 
 
-class PersonVerifyIdentifierInput(BaseModel):
+class SendVerifyIndentifierInput(BaseModel):
     """Modèle de génération d'un nouveau code de validation
     Attributes:
         identifier (str): Identifiant de la personne

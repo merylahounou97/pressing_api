@@ -16,8 +16,6 @@ from .customer_model import CustomerModel
 from ..person import person_schema
 from .customer_schema import (
     CreateCustomerInput,
-    CustomerEditInput,
-    CustomerValidationCode,
 )
 
 settings = Settings()
@@ -155,7 +153,7 @@ def get_customers(db: Session, skip: int = 0, limit: int = 100):
 
 
 def edit_customer(
-    customer_id: str, customer_edit_input: CustomerEditInput, db: Session
+    customer_id: str, customer_edit_input: person_schema.PersonBaseSchema, db: Session
 ):
     """Edit a customer
 
@@ -175,7 +173,7 @@ def edit_customer(
     return db_user
 
 
-def verify_code(verification: CustomerValidationCode, db: Session):
+def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
     """Verify the code
 
     Args:
@@ -204,7 +202,7 @@ def verify_code(verification: CustomerValidationCode, db: Session):
         )
 
         if db_user is not None:
-                expiry_date_time = db_user.email_verification_expiry
+            expiry_date_time = db_user.email_verification_expiry
 
     elif strategy == person_schema.ValidationStrategyEnum.PHONE_NUMBER:
         db_user = (
@@ -239,7 +237,7 @@ def verify_code(verification: CustomerValidationCode, db: Session):
 
 
 async def generate_new_validation_code(
-    new_validation_code: person_schema.PersonVerifyIdentifierInput,db
+    new_validation_code: person_schema.SendVerifyIndentifierInput,db
 ):
     """Generate a new validation code
 
