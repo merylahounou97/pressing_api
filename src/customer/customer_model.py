@@ -1,10 +1,10 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 
-from src.person.person_model import PersonEntityModel
+from src.person.person_model import PersonModel
 
 
-class CustomerModel(PersonEntityModel):
+class CustomerModel(PersonModel):
     """Modèle de client"""
 
     __tablename__ = "customers"

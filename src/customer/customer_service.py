@@ -12,7 +12,6 @@ from src.person.person_model import PhoneNumber
 from src.sms import sms_service
 
 from ..security import security_service
-from . import customer_schema
 from .customer_model import CustomerModel
 from ..person import person_schema
 from .customer_schema import (
@@ -40,7 +39,8 @@ def check_existing_customer(db: Session, email: str, phone_number: str):
     return user is not None
 
 
-def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str):
+def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str) \
+    -> CustomerModel|None:
     """Get a customer by email or phone number
 
     Args:
@@ -49,7 +49,7 @@ def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str):
         phone_number (str): Phone number of the customer
 
     Returns:
-        Customer_model: Customer object
+        Customer_model: Customer object or null
     """
     return (
         db.query(CustomerModel)
@@ -115,7 +115,7 @@ async def create_customer(
     sms_service.send_welcome_sms(db_user)
 
     # Send welcome email
-    await mail_service.send_welcome_email(customer_create, redirect_url)
+    await mail_service.send_welcome_email(db_user, redirect_url)
 
     return db_user
 
@@ -175,7 +175,7 @@ def edit_customer(
     return db_user
 
 
-def verify_code(verification: CustomerValidationCode, strategy: str, db: Session):
+def verify_code(verification: CustomerValidationCode, db: Session):
     """Verify the code
 
     Args:
@@ -187,7 +187,13 @@ def verify_code(verification: CustomerValidationCode, strategy: str, db: Session
         Customer_model: Customer object
     """
 
-    if strategy == "email":
+    strategy = person_schema.ValidationStrategyEnum.EMAIL if verification.identifier.count("@")==1 else person_schema.ValidationStrategyEnum.PHONE_NUMBER
+
+
+    strategy_string = strategy.name.lower()
+
+
+    if strategy == person_schema.ValidationStrategyEnum.EMAIL:
         db_user = (
             db.query(CustomerModel)
             .filter(
@@ -196,9 +202,11 @@ def verify_code(verification: CustomerValidationCode, strategy: str, db: Session
             )
             .first()
         )
-        expiry_date_time = db_user.email_verification_expiry
 
-    elif strategy == "phone_number":
+        if db_user is not None:
+                expiry_date_time = db_user.email_verification_expiry
+
+    elif strategy == person_schema.ValidationStrategyEnum.PHONE_NUMBER:
         db_user = (
             db.query(CustomerModel)
             .filter(
@@ -208,7 +216,8 @@ def verify_code(verification: CustomerValidationCode, strategy: str, db: Session
             )
             .first()
         )
-        expiry_date_time = db_user.phone_number_verification_expiry
+        if db_user is not None:
+            expiry_date_time = db_user.phone_number_verification_expiry
     else:
         raise HTTPException(status_code=500, detail="Unknown strategy")
 
@@ -216,13 +225,13 @@ def verify_code(verification: CustomerValidationCode, strategy: str, db: Session
         raise HTTPException(status_code=400, detail="Code de vérification invalid")
 
     if expiry_date_time <= datetime.now():
-        setattr(db_user, f"{strategy}_verification_code", None)
+        setattr(db_user, f"{strategy_string}_verification_code", None)
         db.commit()
         db.refresh(db_user)
         raise HTTPException(status_code=400, detail="Code de vérification expiré")
 
-    setattr(db_user, f"{strategy}_verified", 1)
-    setattr(db_user, f"{strategy}_verification_code", None)
+    setattr(db_user, f"{strategy_string}_verified", 1)
+    setattr(db_user, f"{strategy_string}_verification_code", None)
 
     db.commit()
     db.refresh(db_user)
@@ -230,8 +239,7 @@ def verify_code(verification: CustomerValidationCode, strategy: str, db: Session
 
 
 async def generate_new_validation_code(
-    new_validation_code: customer_schema.CustomerNewValidationCodeInput,
-    db
+    new_validation_code: person_schema.PersonVerifyIdentifierInput,db
 ):
     """Generate a new validation code
 
@@ -243,29 +251,52 @@ async def generate_new_validation_code(
     Returns:
         None
     """
-    print("generate_new_validation_code")
-    random_code = security_service.generate_random_code()
 
-    user =  get_customer_by_email_or_phone(db=db,
-                                          email=new_validation_code.identifier,
-                                          phone_number=new_validation_code.identifier
-                                        )
-
-    if new_validation_code.strategy == person_schema.ValidationStrategyEnum.EMAIL:
-        print("1")
-        new_validation_code.redirect_url = parse_validation_email(
-            new_validation_code.redirect_url,
-            random_code,
-            new_validation_code.identifier,
-        )
+    strategy = person_schema.ValidationStrategyEnum.EMAIL if new_validation_code.identifier.count("@")==1 else person_schema.ValidationStrategyEnum.PHONE_NUMBER
     
-        await mail_service.send_validation_email(person=user, redirect_url=new_validation_code.redirect_url)
-    elif (
-        new_validation_code.strategy
-        == person_schema.ValidationStrategyEnum.PHONE_NUMBER
-    ):
-        print("2")
-        sms_service.send_verification_sms(new_validation_code.identifier, random_code)
-    else:
-        print("3")
-        raise HTTPException(status_code=400, detail="Unknown strategy")
+
+    user =  get_customer_by_email_or_phone(
+        db=db,
+        email=new_validation_code.identifier,
+        phone_number=new_validation_code.identifier)
+    
+    if user is not None :
+        random_code = security_service.generate_random_code()
+
+        if strategy == person_schema.ValidationStrategyEnum.EMAIL \
+            and not user.email_verified:
+            user.email_verification_code = random_code
+
+            user.email_verification_expiry = datetime.now() + timedelta(
+                minutes=settings.code_expiry_time
+            )
+
+            db.commit()
+            db.refresh(user)
+
+            new_validation_code.redirect_url = parse_validation_email(
+                new_validation_code.redirect_url,
+                random_code,
+                new_validation_code.identifier,
+            )
+
+            await mail_service.send_validation_email(person=user, redirect_url=new_validation_code.redirect_url)
+            return user
+        elif strategy == person_schema.ValidationStrategyEnum.PHONE_NUMBER \
+                and not user.phone_number_verified:
+
+            user.phone_number_verification_code = random_code
+            user.phone_number_verification_expiry = datetime.now() + timedelta(
+                minutes=settings.code_expiry_time
+            )
+
+            db.commit()
+            db.refresh(user)
+            
+            sms_service.send_verification_sms(new_validation_code.identifier, random_code)
+            return user
+        elif user.phone_number_verified or user.email_verified:
+            return None
+        else:
+            raise HTTPException(status_code=400, detail="Unknown strategy")
+    return None

@@ -1,6 +1,4 @@
-services:
-
-    
+services: 
   postgres:
     image: postgres
     container_name: postgresdb
@@ -49,6 +47,9 @@ services:
     command: ngrok http pressing_api:8000
       
 
+
 volumes:
   db:
     name: pressingdb
+  pgadmin-data:
+    name: pgadmin-data

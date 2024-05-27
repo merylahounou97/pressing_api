@@ -1,8 +1,6 @@
 from typing import Union
 
-from src.person.person_schema import (Person,
-                                      PersonGenerateNewvalidationCodeInput,
-                                      PersonInputBase, PersonVerificationInput)
+from src.person.person_schema import (Person,PersonInputBase, PersonVerificationInput)
 
 
 class CustomerOutput(Person):
@@ -20,9 +18,6 @@ class CustomerOutput(Person):
     """
 
     id: str
-    phone_number_verification_code: Union[str, None]
-
-    email_verification_code: Union[str, None]
 
 
 class CreateCustomerInput(PersonInputBase):
@@ -52,9 +47,3 @@ class CustomerValidationCode(PersonVerificationInput):
     """
 
 
-class CustomerNewValidationCodeInput(PersonGenerateNewvalidationCodeInput):
-    """Customer new validation code input model
-
-    Attributes:
-        identifier (str): The identifier of the customer
-    """

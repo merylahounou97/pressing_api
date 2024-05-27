@@ -76,14 +76,12 @@ class PersonVerificationInput(BaseModel):
     verification_code: str
 
 
-class PersonGenerateNewvalidationCodeInput(BaseModel):
+class PersonVerifyIdentifierInput(BaseModel):
     """Modèle de génération d'un nouveau code de validation
     Attributes:
         identifier (str): Identifiant de la personne
         strategy (ValidationStrategyEnum): Stratégie de validation
         redirect_url (str): URL de redirection
     """
-
     identifier: str
-    strategy: ValidationStrategyEnum
     redirect_url: str

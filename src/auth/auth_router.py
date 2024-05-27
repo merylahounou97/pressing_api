@@ -15,33 +15,6 @@ settings = Settings()
 router = APIRouter()
 
 
-# Créer une route pour la connexion
-@router.post("/login")
-async def login(login_input: LoginForm, db: Annotated[sessionmaker, Depends(get_db)]):
-    """Login a user
-
-    args:
-        login_input (Login_input): The login input
-        db (Session): The database session
-
-    Returns:
-        dict: The user data
-    """
-    user = auth_service.authenticate_user(
-        db, login_input.identifier, login_input.password
-    )
-    if user:
-        user_data = {
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "phone_number": user.phone_number,
-        }
-        return user_data
-    else:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-
 @router.post("/token")
 def create_login_token(
     login_form: Annotated[OAuth2PasswordRequestForm, Depends()],

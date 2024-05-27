@@ -18,12 +18,12 @@ class PhoneNumber(Base):
     iso_code = Column(String)
     dial_code = Column(String)
 
-    person: Mapped["PersonEntityModel"] = relationship(
+    person: Mapped["PersonModel"] = relationship(
         back_populates="phone_number", enable_typechecks=False
     )
 
 
-class PersonEntityModel(Base):
+class PersonModel(Base):
     """Person entity model.
 
     Attributes:
