@@ -19,7 +19,7 @@ class PhoneNumber(Base):
     dial_code = Column(String)
 
     person: Mapped["PersonModel"] = relationship(
-        back_populates="phone_number", enable_typechecks=False
+        back_populates="phone_number", enable_typechecks=False,uselist=False,
     )
 
 
@@ -44,10 +44,10 @@ class PersonModel(Base):
 
     __tablename__ = "persons"
     id = Column(String, primary_key=True)
-    email = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=True, default=None)  
     last_name = Column(String)
     first_name = Column(String)
-    phone_number_id = mapped_column(ForeignKey("phone_numbers.phone_text"))
+    phone_number_id = mapped_column(ForeignKey("phone_numbers.phone_text"),nullable=True, default=None)
     address = Column(String)
     password = Column(String)
     phone_number_verification_code = Column(String, default=None)
@@ -58,4 +58,5 @@ class PersonModel(Base):
         Integer, default=0
     )  # 0 pour non vérifié, 1 pour vérifié
     email_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
-    phone_number: Mapped["PhoneNumber"] = relationship(back_populates="person")
+    
+    phone_number = relationship("PhoneNumber", back_populates="person", uselist=False,)

@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Union
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -38,8 +39,8 @@ async def create_customers(
     return await customer_service.create_customer(db, customer, redirect_url)
 
 
-@router.patch("/", response_model=CustomerOutput)
-def edit_customer(
+@router.patch("/", response_model=Union[CustomerOutput, None])
+async def edit_customer(
     customer_edit_input: PersonBaseSchema,
     access_token: AccessTokenDep,
     db: Session = Depends(get_db),
@@ -54,9 +55,10 @@ def edit_customer(
     Returns:
         Customer_output: The customer output
     """
+    print(f"Edit customer {customer_edit_input}")
     user = customer_service.validate_token(access_token=access_token, db=db)
     return customer_service.edit_customer(
-        customer_id=user.id, customer_edit_input=customer_edit_input, db=db
+        customer_online=user, customer_edit_input=customer_edit_input, db=db
     )
 
 

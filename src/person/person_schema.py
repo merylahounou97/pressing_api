@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional, Union
 
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
@@ -45,12 +46,14 @@ class PersonBaseSchema(BaseModel):
         email (EmailStr): Adresse email
         phone_number (PhoneNumberModel): Numéro de téléphone
     """
-    last_name: str
-    first_name: str
-    address: str
-    email: EmailStr
-    phone_number: PhoneNumberSchema
-
+    last_name: Optional[str]=None
+    first_name: Optional[str]=None
+    address: Optional[str]=None
+    email: Optional[EmailStr]=None
+    phone_number: Optional[PhoneNumberSchema] = None
+    email_redirect_url: Optional[str]=None
+    phone_number_redirect_url: Optional[str]=None
+    
 
 class PersonSchema(PersonBaseSchema):
     """Modèle de personne

@@ -10,6 +10,7 @@ from src.mail import mail_service
 from src.mail.mail_service import parse_validation_email
 from src.person.person_model import PhoneNumber
 from src.sms import sms_service
+from src.utils.mail_constants import MailConstants
 
 from ..security import security_service
 from .customer_model import CustomerModel
@@ -74,48 +75,71 @@ async def create_customer(
     Returns:
         Customer_model: Customer object
     """
-    if check_existing_customer(
-        db, customer_create.email, customer_create.phone_number.phone_text
-    ):
+
+
+    if customer_create.phone_number  is None and customer_create.email is None:
         raise HTTPException(
-            status_code=400, detail="Phone number or email already registered"
+            status_code=400, detail="Phone number and email cannot be both empty"
         )
 
-    hashed_password = security_service.hash_text(customer_create.password)
+    try:
+        
+        hashed_password = security_service.hash_text(customer_create.password)
 
-    verification_code_email = security_service.generate_random_code()
-    verification_code_phone_number = security_service.generate_random_code()
-    expiry_time = datetime.now() + timedelta(minutes=settings.code_expiry_time)
+        verification_code_email = security_service.generate_random_code()
+        verification_code_phone_number = security_service.generate_random_code()
+        expiry_time = datetime.now() + timedelta(minutes=settings.code_expiry_time)
 
-    db_user = CustomerModel(
-        id=str(uuid.uuid4()),
-        email=customer_create.email,
-        last_name=customer_create.last_name,
-        first_name=customer_create.first_name,
-        phone_number=PhoneNumber(
-            iso_code=customer_create.phone_number.iso_code,
-            dial_code=customer_create.phone_number.dial_code,
-            phone_text=customer_create.phone_number.phone_text,
-        ),
-        phone_number_verification_code=verification_code_phone_number,
-        email_verification_code=verification_code_email,
-        address=customer_create.address,
-        password=hashed_password,
-        phone_number_verification_expiry=expiry_time,
-        email_verification_expiry=expiry_time,
-    )
+    
 
-    db.add(db_user)
+        db_user = CustomerModel(
+            id=str(uuid.uuid4()),
+            email=customer_create.email,
+            last_name=customer_create.last_name,
+            first_name=customer_create.first_name,
+            phone_number_verification_code=verification_code_phone_number,
+            email_verification_code=verification_code_email,
+            address=customer_create.address,
+            password=hashed_password,
+            phone_number_verification_expiry=expiry_time,
+            email_verification_expiry=expiry_time,
+        )
 
-    db.commit()
+        if customer_create.phone_number is not None:
+            db_user.phone_number = PhoneNumber(
+                iso_code=customer_create.phone_number.iso_code,
+                dial_code=customer_create.phone_number.dial_code,
+                phone_text=customer_create.phone_number.phone_text,
+            ),
 
-    # Envoyer le SMS de vérification
-    sms_service.send_welcome_sms(db_user)
+        db.add(db_user)
 
-    # Send welcome email
-    await mail_service.send_welcome_email(db_user, redirect_url)
+        db.commit()
 
-    return db_user
+        # Send welcome email
+        redirect_url=mail_service.parse_validation_email(redirect_url,db_user.email_verification_code,db_user.email)
+
+        mail_service.send_mail_from_template(MailConstants.WECOME_EMAIL, 
+                                            db_user.email, 
+                                            redirect_url=redirect_url,
+                                            app_name=settings.app_name,
+                                            person=db_user,
+                                            api_url=settings.api_url)
+
+        # Envoyer le SMS de vérification
+        sms_service.send_welcome_sms(db_user)
+
+        return db_user
+    except Exception as e:    
+        is_unique_violation = str(e).count("psycopg2.errors.UniqueViolation")==1
+        if is_unique_violation :
+            raise HTTPException(
+                status_code=400, detail="Phone number or email already registered"
+            )
+
+        raise HTTPException(
+            status_code=400, detail=str(e)
+        )
 
 
 def validate_token(access_token: str, db: Session):
@@ -152,8 +176,27 @@ def get_customers(db: Session, skip: int = 0, limit: int = 100):
     return db.query(CustomerModel).offset(skip).limit(limit).all()
 
 
+def set_new_email(customer_online: CustomerModel,email: str):
+        """Set a new email for a customer
+        Change the email of the customer and generate a new verification code for the new email.
+        put the new email to non verified
+        and add the expiration of the verification code
+
+        Args:
+            customer_online (Customer_model): Customer object
+            email (str): New email
+
+            Returns:
+                Customer_model: Customer object
+        """
+        customer_online.email = email
+        customer_online.email_verification_code = security_service.generate_random_code()
+        customer_online.email_verification_expiry = datetime.now() + timedelta(minutes=settings.code_expiry_time)
+        customer_online.email_verified = 0
+        return None
+
 def edit_customer(
-    customer_id: str, customer_edit_input: person_schema.PersonBaseSchema, db: Session
+    customer_online: CustomerModel, customer_edit_input: person_schema.PersonBaseSchema, db: Session
 ):
     """Edit a customer
 
@@ -165,12 +208,26 @@ def edit_customer(
     Returns:
         Customer_model: Customer object
     """
-    db_user = db.query(CustomerModel).get({"id": customer_id})
-    db_user.last_name = customer_edit_input.last_name
-    db_user.first_name = customer_edit_input.first_name
-    db_user.address = customer_edit_input.address
+
+    customer_old_mail = customer_online.email
+    if customer_edit_input.last_name is not None:
+        customer_online.last_name = customer_edit_input.last_name
+    if customer_edit_input.first_name is not None:
+        customer_online.first_name = customer_edit_input.first_name
+    if customer_edit_input.address is not None:
+        customer_online.address = customer_edit_input.address
+
+    if customer_edit_input.email != customer_online.email :
+        set_new_email(customer_online,customer_edit_input.email)
     db.commit()
-    return db_user
+
+    # Sent email if it has been changed
+    if customer_edit_input.email != customer_old_mail :
+        mail_service.send_mail_from_template(MailConstants.UPDATE_EMAIL,email=customer_edit_input.email 
+                                             ,customer=customer_online,redirect_url=customer_edit_input.email_redirect_url)
+
+
+    return customer_online
 
 
 def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
@@ -263,12 +320,7 @@ async def generate_new_validation_code(
 
         if strategy == person_schema.ValidationStrategyEnum.EMAIL \
             and not user.email_verified:
-            user.email_verification_code = random_code
-
-            user.email_verification_expiry = datetime.now() + timedelta(
-                minutes=settings.code_expiry_time
-            )
-
+            set_new_email(user,user.email)
             db.commit()
             db.refresh(user)
 
@@ -278,7 +330,9 @@ async def generate_new_validation_code(
                 new_validation_code.identifier,
             )
 
-            await mail_service.send_validation_email(person=user, redirect_url=new_validation_code.redirect_url)
+            redirect_url = mail_service.parse_validation_email(redirect_url=new_validation_code.redirect_url,verification_code_email=random_code,email=user.email)
+            mail_service.send_mail_from_template(MailConstants.EMAIL_VERIFICATION,email=user.email,person=user, redirect_url=redirect_url)
+
             return user
         elif strategy == person_schema.ValidationStrategyEnum.PHONE_NUMBER \
                 and not user.phone_number_verified:

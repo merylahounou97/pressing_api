@@ -6,9 +6,7 @@ from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
 
 from src.config import Settings
-from src.customer.customer_model import CustomerModel
 
-from ..customer.customer_model import PersonModel
 from ..dependencies.get_api_url import get_api_url
 
 settings = Settings()
@@ -17,47 +15,20 @@ api_url = get_api_url()
 
 templates = Jinja2Templates(directory="src/mail/templates")
 
-
-async def send_welcome_email(person: PersonModel, redirect_url):
-    """Send a welcome email to the user.
+def send_mail_from_template(template_name: str,email: str, **kwargs):
+    """Send an email from a template.
 
     Args:
-        person (Customer_create_input): The user information.
-        redirect_url (str): The URL to redirect the user to.
+        template_name (str): The name of the template.
+        **kwargs (dict): The template variables.
 
     Returns:
         dict: The status of the email sending.
     """
-    redirect_url = parse_validation_email(redirect_url=redirect_url,verification_code_email=person.email_verification_code,email=person.email)
-    mail_content = __get_parsed_template(
-        template_name="welcome.html",
-        person=person,
-        app_name="WashMan",
-        api_url=api_url,
-        redirect_url=redirect_url,
-    )
-    return __send_email(
-        person.email,
-        f"Bienvenue à WashMan, {person.first_name}! Prêt à simplifier votre routine de nettoyage ?",
-        mail_content,
-    )
 
+    mail_content = __get_parsed_template(template_name=template_name, **kwargs)
+    return __send_email(email, "WashMan", mail_content)
 
-async def send_validation_email(person: CustomerModel, redirect_url: str):
-
-    redirect_url = parse_validation_email(redirect_url=redirect_url,verification_code_email=person.email_verification_code,email=person.email)
-    mail_content = __get_parsed_template(
-        template_name="email_validation.html",
-        person=person,
-        app_name="WashMan",
-        api_url=api_url,
-        redirect_url=redirect_url,
-    )
-    return __send_email(
-        person.email,
-        f"Bienvenue à WashMan, {person.first_name}! Prêt à simplifier votre routine de nettoyage ?",
-        mail_content,
-    )
 
 
 def parse_validation_email(redirect_url: str, verification_code_email: str, email: str):
@@ -87,6 +58,7 @@ def __get_parsed_template(template_name: str, **kargs):
         str: The parsed template.
     """
     email_template = templates.get_template(template_name)
+    print(kargs)
     return email_template.render(kargs)
 
 
