@@ -1,0 +1,13 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: aiounouu@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: "pass"
+    ports:
+      - 80:80
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
