@@ -51,6 +51,8 @@ class PersonBaseSchema(BaseModel):
     address: Optional[str]=None
     email: Optional[EmailStr]=None
     phone_number: Optional[PhoneNumberSchema] = None
+
+class PersonBaseSchemaCreate(PersonBaseSchema):
     email_redirect_url: Optional[str]=None
     phone_number_redirect_url: Optional[str]=None
     
@@ -87,3 +89,13 @@ class SendVerifyIndentifierInput(BaseModel):
     """
     identifier: str
     redirect_url: str
+
+
+class ChangePersonPassword(BaseModel):
+    """Modèle de changement de mot de passe
+    Attributes:
+        old_password (str): Ancien mot de passe
+        new_password (str): Nouveau mot de passe
+    """
+    old_password: str
+    new_password: str

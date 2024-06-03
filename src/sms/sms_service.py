@@ -1,4 +1,5 @@
 
+from src.sms.templates import messages
 from twilio.rest import Client
 
 from src.config import Settings
@@ -28,9 +29,33 @@ def send_welcome_sms(customer: CustomerModel):
     Args:
         phone_number (str): Phone number
     """
-    return __send_sms(customer.phone_number_id, f"""Bienvenue chez ${settings.app_name}
+    return __send_sms(customer.phone_number.phone_text, f"""Bienvenue chez {settings.app_name}
                       Le code de vérification de votre numéro de téléphone est {customer.phone_number_verification_code}
                       """)
+
+
+def send_sms(phone_number: str, template_name: str,**kwargs):
+    """Send SMS
+
+    Args:
+        phone_number (str): Phone number
+        message (str): Message
+    """
+    # Envoyer le SMS de vérificatio
+    sms_template= __get_sms_template(template_name, **kwargs)
+    __send_sms(phone_number, sms_template)
+
+def __get_sms_template(template_name: str, **kwargs):
+    """Get SMS template
+
+    Args:
+        template_name (str): Template name
+
+    Returns:
+        str: SMS template
+    """
+    sms_template = messages.sms_messages [template_name](**kwargs)
+    return sms_template
 
 def __send_sms(phone_number: str, message: str):
     """Send SMS

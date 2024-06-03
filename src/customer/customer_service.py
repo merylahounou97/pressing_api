@@ -6,11 +6,15 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from src.config import Settings
+from src.customer import customer_service
+from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
 from src.mail.mail_service import parse_validation_email
 from src.person.person_model import PhoneNumber
+from src.security import security_service
 from src.sms import sms_service
 from src.utils.mail_constants import MailConstants
+from src.utils.sms_constants import SmsConstants
 
 from ..security import security_service
 from .customer_model import CustomerModel
@@ -37,6 +41,17 @@ def check_existing_customer(db: Session, email: str, phone_number: str):
     user = get_customer_by_email_or_phone(db, email, phone_number)
     return user is not None
 
+def get_customer_by_id( customer_id,db: Session):
+    """Get a customer by id
+
+    Args:
+        db (Session): Database session
+        customer_id (str): Customer id
+
+    Returns:
+        Customer_model: Customer object
+    """
+    return db.query(CustomerModel).filter(CustomerModel.id == customer_id).first()
 
 def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str) \
     -> CustomerModel|None:
@@ -50,14 +65,15 @@ def get_customer_by_email_or_phone(db: Session, email: str, phone_number: str) \
     Returns:
         Customer_model: Customer object or null
     """
+
+    user_by_phone = db.query(PhoneNumber).filter(PhoneNumber.phone_text == phone_number).first()
+
+    if user_by_phone is not None:
+        return user_by_phone.person
+    
     return (
         db.query(CustomerModel)
-        .filter(
-            or_(
-                CustomerModel.phone_number_id == phone_number,
-                CustomerModel.email == email,
-            )
-        )
+        .filter(CustomerModel.email == email)
         .first()
     )
 
@@ -90,10 +106,9 @@ async def create_customer(
         verification_code_phone_number = security_service.generate_random_code()
         expiry_time = datetime.now() + timedelta(minutes=settings.code_expiry_time)
 
-    
-
+        user_id= str(uuid.uuid4()),
         db_user = CustomerModel(
-            id=str(uuid.uuid4()),
+            id=user_id,
             email=customer_create.email,
             last_name=customer_create.last_name,
             first_name=customer_create.first_name,
@@ -105,38 +120,41 @@ async def create_customer(
             email_verification_expiry=expiry_time,
         )
 
+
         if customer_create.phone_number is not None:
-            db_user.phone_number = PhoneNumber(
-                iso_code=customer_create.phone_number.iso_code,
-                dial_code=customer_create.phone_number.dial_code,
-                phone_text=customer_create.phone_number.phone_text,
-            ),
+            phone_number = PhoneNumber(**customer_create.phone_number.model_dump(), person_id=user_id) 
+            db.add(phone_number)
+
+
 
         db.add(db_user)
 
         db.commit()
 
         # Send welcome email
-        redirect_url=mail_service.parse_validation_email(redirect_url,db_user.email_verification_code,db_user.email)
+        if customer_create.email is not None:
 
-        mail_service.send_mail_from_template(MailConstants.WECOME_EMAIL, 
-                                            db_user.email, 
+            api_url = get_api_url()
+            redirect_url=mail_service.parse_validation_email(redirect_url,db_user.email_verification_code,db_user.email)
+            mail_service.send_mail_from_template(MailConstants.WECOME_EMAIL,
+                                            db_user.email,
                                             redirect_url=redirect_url,
                                             app_name=settings.app_name,
                                             person=db_user,
-                                            api_url=settings.api_url)
+                                            api_url=api_url)
 
-        # Envoyer le SMS de vérification
-        sms_service.send_welcome_sms(db_user)
+
+        if customer_create.phone_number is not None:
+            # Envoyer le SMS de vérification
+            sms_service.send_welcome_sms(db_user)
 
         return db_user
-    except Exception as e:    
+    except Exception as e :    
         is_unique_violation = str(e).count("psycopg2.errors.UniqueViolation")==1
         if is_unique_violation :
             raise HTTPException(
                 status_code=400, detail="Phone number or email already registered"
             )
-
         raise HTTPException(
             status_code=400, detail=str(e)
         )
@@ -153,9 +171,7 @@ def validate_token(access_token: str, db: Session):
         Customer_model: Customer object
     """
     payload = security_service.decode_token(access_token)
-    user = get_customer_by_email_or_phone(
-        email=payload["sub"], phone_number=payload["phone_number"], db=db
-    )
+    user = get_customer_by_id(payload["sub"], db)
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     else:
@@ -265,7 +281,7 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
         db_user = (
             db.query(CustomerModel)
             .filter(
-                CustomerModel.phone_number_id == verification.identifier,
+                CustomerModel.phone_number.phone_text == verification.identifier,
                 CustomerModel.phone_number_verification_code
                 == verification.verification_code,
             )
@@ -352,3 +368,68 @@ async def generate_new_validation_code(
         else:
             raise HTTPException(status_code=400, detail="Unknown strategy")
     return None
+
+
+
+
+# Créer une fonction pour vérifier les informations de connexion
+def authenticate_user(db: Session, identifier: str, password: str):
+    """Authenticate a user by email or phone number
+
+    args:
+        db (Session): The database session
+        identifier (str): The identifier
+        password (str): The password
+
+    Returns:
+        Customer_model: The user
+    """
+    user = customer_service.get_customer_by_email_or_phone(
+        db=db, email=identifier, phone_number=identifier
+    )
+    if user is not None and security_service.compare_hashed_text(
+        password, user.password
+    ):
+        return user
+
+
+def change_password(customer_online: CustomerModel, change_password_input: person_schema.ChangePersonPassword, db: Session):
+    """Change the password
+
+    Args:
+        customer_online (Customer_model): Customer object
+        change_password_input (Customer_change_password_input): Change password input
+        db (Session): Database session
+
+        Returns:
+            Customer_model: Customer object
+    """
+
+
+    if not (customer_online.is_valid_email() or customer_online.is_valid_phone_number()):
+        raise HTTPException(status_code=400, detail="Email or phone number should be verified")
+        
+    if change_password_input.old_password == change_password_input.new_password:
+        raise HTTPException(status_code=400, detail="New password should be different from the old one")
+
+    if security_service.compare_hashed_text(
+        change_password_input.old_password, customer_online.password
+    ):
+        customer_online.password = security_service.hash_text(change_password_input.new_password)
+        db.commit()
+
+        if customer_online.is_valid_phone_number():
+            sms_service.send_sms(customer_online.phone_number.phone_text,
+                                template_name= SmsConstants.PASSWORD_CHANGED, 
+                                 customer= customer_online,
+                                 support_address=settings.support_address)
+            
+        if  customer_online.is_valid_email():
+            mail_service.send_mail_from_template(MailConstants.PASSWORD_CHANGED,
+                                                 email=customer_online.email,
+                                                 customer=customer_online,
+                                                 support_address=settings.support_address)
+        return customer_online
+
+    else:
+        raise HTTPException(status_code=400, detail="Wrong old password")

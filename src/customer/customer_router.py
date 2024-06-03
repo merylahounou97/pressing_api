@@ -7,10 +7,13 @@ from typing_extensions import Annotated
 
 from src.config import Settings
 from src.customer import  customer_service
+from src.customer.customer_model import CustomerModel
 from src.customer.customer_schema import (CreateCustomerInput,
                                            CustomerOutput)
 from src.dependencies.db import get_db
-from src.person.person_schema import PersonBaseSchema, VerifyIdentifierInput, SendVerifyIndentifierInput
+from src.person.person_schema import ChangePersonPassword, PersonBaseSchema, VerifyIdentifierInput, SendVerifyIndentifierInput
+
+from src.dependencies.get_customer_online import get_customer_online
 
 settings = Settings()
 
@@ -55,7 +58,6 @@ async def edit_customer(
     Returns:
         Customer_output: The customer output
     """
-    print(f"Edit customer {customer_edit_input}")
     user = customer_service.validate_token(access_token=access_token, db=db)
     return customer_service.edit_customer(
         customer_online=user, customer_edit_input=customer_edit_input, db=db
@@ -92,3 +94,23 @@ async def generate_new_email_validation_code(
     return await customer_service.generate_new_validation_code(db=db,
         new_validation_code=verify_input
     )
+
+
+@router.patch('/change_password', response_model=CustomerOutput)
+def change_password(
+        change_password_input: ChangePersonPassword,
+        user_online: CustomerModel = Depends(get_customer_online),
+        db: Session = Depends(get_db)
+    ):
+    """A router to Change a customer password
+
+    Args:
+        change_password_input (Change_password_input): The change password input
+        user_online (Customer_model, optional): The user online. Defaults to Depends(get_customer_online).
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+
+        Returns:
+            Customer_output: The customer output
+    """
+    
+    return customer_service.change_password(user_online, change_password_input,db=db)

@@ -17,7 +17,7 @@ class PhoneNumber(Base):
     phone_text = Column(String, primary_key=True)
     iso_code = Column(String)
     dial_code = Column(String)
-
+    person_id = Column(String, ForeignKey('persons.id'))
     person: Mapped["PersonModel"] = relationship(
         back_populates="phone_number", enable_typechecks=False,uselist=False,
     )
@@ -31,7 +31,6 @@ class PersonModel(Base):
         email (str): The email of the person
         last_name (str): The last name of the person
         first_name (str): The first name of the person
-        phone_number_id (str): The phone number of the person
         address (str): The address of the person
         password (str): The password of the person
         phone_number_verification_code (str): The verification code of the phone number
@@ -47,7 +46,6 @@ class PersonModel(Base):
     email = Column(String, unique=True, index=True, nullable=True, default=None)  
     last_name = Column(String)
     first_name = Column(String)
-    phone_number_id = mapped_column(ForeignKey("phone_numbers.phone_text"),nullable=True, default=None)
     address = Column(String)
     password = Column(String)
     phone_number_verification_code = Column(String, default=None)
@@ -59,4 +57,18 @@ class PersonModel(Base):
     )  # 0 pour non vérifié, 1 pour vérifié
     email_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
     
-    phone_number = relationship("PhoneNumber", back_populates="person", uselist=False,)
+    phone_number = relationship("PhoneNumber", back_populates="person",cascade="all", uselist=False,)
+
+    def is_valid_email(self):
+        """Check if the email is valid.
+        Returns:
+            bool: True if the email is valid, False otherwise
+        """
+        return self.email is not None and self.email_verified 
+    
+    def is_valid_phone_number(self):
+        """Check if the phone number is valid.
+        Returns:
+            bool: True if the phone number is valid, False otherwise
+        """
+        return self.phone_number is not None and self.phone_number_verified

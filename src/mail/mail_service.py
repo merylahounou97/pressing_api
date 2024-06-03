@@ -11,7 +11,6 @@ from ..dependencies.get_api_url import get_api_url
 
 settings = Settings()
 
-api_url = get_api_url()
 
 templates = Jinja2Templates(directory="src/mail/templates")
 

@@ -1,5 +1,5 @@
 
-from src.person.person_schema import (PersonSchema,PersonBaseSchema)
+from src.person.person_schema import (PersonBaseSchemaCreate, PersonSchema,PersonBaseSchema)
 
 
 class CustomerOutput(PersonSchema):
@@ -18,7 +18,7 @@ class CustomerOutput(PersonSchema):
     id: str
 
 
-class CreateCustomerInput(PersonBaseSchema):
+class CreateCustomerInput(PersonBaseSchemaCreate):
     """Create customer input model
 
     Attributes:
