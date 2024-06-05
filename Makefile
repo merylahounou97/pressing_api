@@ -2,7 +2,7 @@ install:
 	pipenv install
 
 test:
-	pipenv run pytest
+	export test_mode=True && pipenv run pytest
 
 dev:
 	pipenv run uvicorn src.main:app --reload

@@ -8,9 +8,8 @@ settings = Settings()
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{settings.database_user}:{settings.database_password}"
-    f"@{settings.database_host}/{settings.database_name}"
+    f"@{settings.database_host}/{ settings.database_name if settings.test_mode is False  else 'test'  }"
 )
-
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

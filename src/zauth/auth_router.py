@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from typing_extensions import Annotated
 
 from src.customer import customer_service
-from src.auth.auth_schema import LoginForm, Token
+from src.zauth.auth_schema import LoginForm, Token
 from src.config import Settings
 from src.security.security_service import create_access_token
 
@@ -29,6 +29,7 @@ def create_login_token(
     Returns:
         Token: The token
     """
+    print(login_form.username, login_form.password)
     user = customer_service.authenticate_user(db, login_form.username, login_form.password)
     if user:
         access_token = create_access_token(

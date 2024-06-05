@@ -13,6 +13,7 @@ phonenumbers = "*"
 jinja2 = "*"
 requests = "*"
 twilio = "*"
+pytest = "*"
 
 [dev-packages]
 
