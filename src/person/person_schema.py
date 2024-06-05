@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
-class ValidationStrategyEnum(Enum):
+class IdentifierEnum(Enum):
     """Stratégie de validation"""
 
     PHONE_NUMBER = "phone_number"
@@ -34,7 +34,7 @@ class PhoneNumberSchema(BaseModel):
         Returns:
             PhoneNumber: Numéro de téléphone sans préfixe 'tel:' et sans tirets
         """
-        return PhoneNumber.removeprefix(v, "tel:").replace("-", "")
+        return PhoneNumber.removeprefix(v, "tel:").replace("-", "").replace(" ", "")
 
 
 class PersonBaseSchema(BaseModel):
@@ -80,7 +80,7 @@ class VerifyIdentifierInput(BaseModel):
     verification_code: str
 
 
-class SendVerifyIndentifierInput(BaseModel):
+class ResetAndValidationInput(BaseModel):
     """Modèle de génération d'un nouveau code de validation
     Attributes:
         identifier (str): Identifiant de la personne
@@ -99,3 +99,11 @@ class ChangePersonPassword(BaseModel):
     """
     old_password: str
     new_password: str
+
+class ResetPasswordInput(VerifyIdentifierInput):
+    """Modèle de réinitialisation du mot de passe
+    Attributes:
+        new_password (str): Nouveau mot de passe
+    """
+    new_password: str
+

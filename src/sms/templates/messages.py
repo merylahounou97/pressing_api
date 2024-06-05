@@ -19,6 +19,25 @@ def password_changed(customer: CustomerModel,support_address: str):
     nous contacter à l'adresse {support_address}.
 """
 
+def password_reset(customer: CustomerModel):
+    """return email template when a password is reset
+
+    Args:
+        customer (Customer_model): Customer object
+        support_address (str): Support address  
+
+        Returns:
+            str: The email content
+    """
+    return f"""
+    Bonjour {customer.full_name()},
+    Vous avez demandé à réinitialiser votre mot de passe.
+    Votre code de réinitialisation est: {customer.reset_password_code}
+    Si vous n'êtes pas à l'origine de cette demande, veuillez
+    ignorer.
+"""
+
 sms_messages=dict({
-    SmsConstants.PASSWORD_CHANGED: password_changed
+    SmsConstants.PASSWORD_CHANGED: password_changed,
+    SmsConstants.PASSWORD_RESET: password_reset
 })

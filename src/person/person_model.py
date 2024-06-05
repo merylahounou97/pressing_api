@@ -52,12 +52,16 @@ class PersonModel(Base):
     phone_number_verification_expiry = Column(DateTime, default=None)
     email_verification_expiry = Column(DateTime, default=None)
     email_verification_code = Column(String, default=None)
+    reset_password_code = Column(String, default=None)
     phone_number_verified = Column(
         Integer, default=0
     )  # 0 pour non vérifié, 1 pour vérifié
     email_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
     
     phone_number = relationship("PhoneNumber", back_populates="person",cascade="all", uselist=False,)
+
+    def full_name(self):
+        return self.first_name + " " + self.last_name
 
     def is_valid_email(self):
         """Check if the email is valid.
@@ -72,3 +76,10 @@ class PersonModel(Base):
             bool: True if the phone number is valid, False otherwise
         """
         return self.phone_number is not None and self.phone_number_verified
+    
+    def is_valid_one_identifier(self):
+        """Check if the identifier is valid.
+        Returns:
+            bool: True if the identifier is valid, False otherwise
+        """
+        return self.is_valid_email() or self.is_valid_phone_number()

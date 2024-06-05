@@ -11,7 +11,7 @@ from src.customer.customer_model import CustomerModel
 from src.customer.customer_schema import (CreateCustomerInput,
                                            CustomerOutput)
 from src.dependencies.db import get_db
-from src.person.person_schema import ChangePersonPassword, PersonBaseSchema, VerifyIdentifierInput, SendVerifyIndentifierInput
+from src.person.person_schema import ChangePersonPassword, PersonBaseSchema, ResetPasswordInput, VerifyIdentifierInput, ResetAndValidationInput
 
 from src.dependencies.get_customer_online import get_customer_online
 
@@ -81,7 +81,7 @@ async def verify_verification_code(customer_validation_code: VerifyIdentifierInp
 
 @router.post("/send_verification_code", response_model=Union[CustomerOutput,None])
 async def generate_new_email_validation_code(
-    verify_input: SendVerifyIndentifierInput,
+    verify_input: ResetAndValidationInput,
      db: Session = Depends(get_db)):
     """Generate a validation code sent to the user by email or phone number
 
@@ -114,3 +114,38 @@ def change_password(
     """
     
     return customer_service.change_password(user_online, change_password_input,db=db)
+
+@router.patch('/reset_password', response_model=CustomerOutput)
+def reset_password(
+        identifier: str,
+        db: Session = Depends(get_db)
+    ):
+    """A router to reset a customer password
+    
+    Args:
+    
+        identifier (str): The customer identifier can be email or phone number
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+        
+        
+        Returns:
+            Customer_output: The customer output"""
+    identifier = identifier.replace(" ","")
+    return customer_service.reset_password(identifier,db=db)
+
+@router.patch('/submit_reset_password', response_model=CustomerOutput)
+def submit_reset_password(
+        reset_input: ResetPasswordInput,
+        db: Session = Depends(get_db)
+    ):
+    """A router to submit a new password
+    
+    Args:
+    
+        reset_input (VerifyIdentifierInput): The reset input
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+        
+        
+        Returns:
+            Customer_output: The customer output"""
+    return customer_service.submit_reset_password(reset_input,db=db)

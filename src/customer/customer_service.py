@@ -13,6 +13,7 @@ from src.mail.mail_service import parse_validation_email
 from src.person.person_model import PhoneNumber
 from src.security import security_service
 from src.sms import sms_service
+from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
 from src.utils.sms_constants import SmsConstants
 
@@ -258,13 +259,14 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
         Customer_model: Customer object
     """
 
-    strategy = person_schema.ValidationStrategyEnum.EMAIL if verification.identifier.count("@")==1 else person_schema.ValidationStrategyEnum.PHONE_NUMBER
+    strategy = get_identifier_type(verification.identifier)
+    
 
 
     strategy_string = strategy.name.lower()
 
 
-    if strategy == person_schema.ValidationStrategyEnum.EMAIL:
+    if strategy == person_schema.IdentifierEnum.EMAIL:
         db_user = (
             db.query(CustomerModel)
             .filter(
@@ -277,7 +279,7 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
         if db_user is not None:
             expiry_date_time = db_user.email_verification_expiry
 
-    elif strategy == person_schema.ValidationStrategyEnum.PHONE_NUMBER:
+    elif strategy == person_schema.IdentifierEnum.PHONE_NUMBER:
         db_user = (
             db.query(CustomerModel)
             .filter(
@@ -310,7 +312,7 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
 
 
 async def generate_new_validation_code(
-    new_validation_code: person_schema.SendVerifyIndentifierInput,db
+    new_validation_code: person_schema.ResetAndValidationInput,db
 ):
     """Generate a new validation code
 
@@ -323,7 +325,7 @@ async def generate_new_validation_code(
         None
     """
 
-    strategy = person_schema.ValidationStrategyEnum.EMAIL if new_validation_code.identifier.count("@")==1 else person_schema.ValidationStrategyEnum.PHONE_NUMBER
+    strategy = person_schema.IdentifierEnum.EMAIL if new_validation_code.identifier.count("@")==1 else person_schema.IdentifierEnum.PHONE_NUMBER
     
 
     user =  get_customer_by_email_or_phone(
@@ -334,7 +336,7 @@ async def generate_new_validation_code(
     if user is not None :
         random_code = security_service.generate_random_code()
 
-        if strategy == person_schema.ValidationStrategyEnum.EMAIL \
+        if strategy == person_schema.IdentifierEnum.EMAIL \
             and not user.email_verified:
             set_new_email(user,user.email)
             db.commit()
@@ -350,7 +352,7 @@ async def generate_new_validation_code(
             mail_service.send_mail_from_template(MailConstants.EMAIL_VERIFICATION,email=user.email,person=user, redirect_url=redirect_url)
 
             return user
-        elif strategy == person_schema.ValidationStrategyEnum.PHONE_NUMBER \
+        elif strategy == person_schema.IdentifierEnum.PHONE_NUMBER \
                 and not user.phone_number_verified:
 
             user.phone_number_verification_code = random_code
@@ -433,3 +435,66 @@ def change_password(customer_online: CustomerModel, change_password_input: perso
 
     else:
         raise HTTPException(status_code=400, detail="Wrong old password")
+    
+
+def reset_password(identifier: str , db: Session):
+    """Reset the password
+
+    Args:
+        identifier (str): The identifier
+        db (Session): Database session
+
+    Returns:
+        Customer_model: The user
+    """
+
+    user = get_customer_by_email_or_phone(db,identifier,identifier)
+
+    if user is None:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    random_code = security_service.generate_random_code()
+    user.reset_password_code = random_code
+    db.commit()
+
+    strategy = get_identifier_type(identifier)
+    if strategy == person_schema.IdentifierEnum.EMAIL and user.email is not None:
+        mail_service.send_mail_from_template(MailConstants.PASSWORD_RESET,
+                                                email=user.email,
+                                                customer=user)
+    elif strategy == person_schema.IdentifierEnum.PHONE_NUMBER and user.phone_number  is not None:
+        sms_service.send_sms(user.phone_number.phone_text,
+                            template_name= SmsConstants.PASSWORD_RESET, 
+                                customer= user)
+    else:
+        raise HTTPException(status_code=500, detail="Invalid user identifier")
+                                
+    return user
+
+
+
+
+    
+
+def submit_reset_password(reset_input: person_schema.ResetPasswordInput, db: Session):
+    """Submit the reset password
+
+    Args:
+        reset_input (ResetPasswordInput): The reset input
+        db (Session): Database session
+
+    Returns:
+        Customer_model: The user
+    """
+    user = get_customer_by_email_or_phone(db,reset_input.identifier,reset_input.identifier)
+    if user is None:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    if user.reset_password_code != reset_input.verification_code:
+        raise HTTPException(status_code=400, detail="Invalid verification code")
+
+    user.password = security_service.hash_text(reset_input.new_password)
+    user.reset_password_code = None
+    db.commit()
+
+    return user
