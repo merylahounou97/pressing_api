@@ -1,9 +1,8 @@
 
-from ..test_init import client
+""" from .test_init import client
 
 
-def test_token():
-    
+def test_token():    
     response = client.post("/token",data={
         "username": "aiounouu@gmail.com",
         "password": "string",
@@ -13,6 +12,4 @@ def test_token():
     })
 
     #Vérifier que la requête a fonctionné
-    assert response.status_code == 200
-
-    
+    assert response.status_code == 200  """

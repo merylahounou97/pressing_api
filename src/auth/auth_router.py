@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from typing_extensions import Annotated
 
 from src.customer import customer_service
-from src.zauth.auth_schema import LoginForm, Token
+from src.auth.auth_schema import LoginForm, Token
 from src.config import Settings
 from src.security.security_service import create_access_token
 

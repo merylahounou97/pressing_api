@@ -1,8 +1,7 @@
 from fastapi.testclient import TestClient
-import pytest
 from src.config import Settings
-from .database import Base, engine
-from .main import app
+from src.database import Base, engine
+from src.main import app
 
 
 Base.metadata.drop_all(bind=engine)

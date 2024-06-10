@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from src.zauth import auth_router
+from src.auth import auth_router
 from src.config import Settings
 from .customer import customer_router
 from .database import Base, engine
