@@ -1,5 +1,8 @@
-
-from src.person.person_schema import (PersonBaseSchemaCreate, PersonSchema,PersonBaseSchema)
+from src.person.person_schema import (
+    PersonBaseSchemaCreate,
+    PersonSchema,
+    PersonBaseSchema,
+)
 
 
 class CustomerOutput(PersonSchema):
@@ -15,6 +18,7 @@ class CustomerOutput(PersonSchema):
         is_active (bool): The status of the customer
         is_verified (bool): The verification status of the customer
     """
+
     id: str
 
 
@@ -24,4 +28,5 @@ class CreateCustomerInput(PersonBaseSchemaCreate):
     Attributes:
         password (str): The password of the customer
     """
+
     password: str

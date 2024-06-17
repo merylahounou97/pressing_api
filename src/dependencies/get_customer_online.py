@@ -10,6 +10,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 AccessTokenDep = Annotated[str, Depends(oauth2_scheme)]
 
+
 def get_customer_online(access_token: AccessTokenDep, db: Session = Depends(get_db)):
     """Get the user online
 
@@ -20,5 +21,5 @@ def get_customer_online(access_token: AccessTokenDep, db: Session = Depends(get_
         Returns:
             Customer_model: The user
 
-            """
+    """
     return customer_service.validate_token(access_token=access_token, db=db)

@@ -17,9 +17,11 @@ class PhoneNumber(Base):
     phone_text = Column(String, primary_key=True)
     iso_code = Column(String)
     dial_code = Column(String)
-    person_id = Column(String, ForeignKey('persons.id'))
+    person_id = Column(String, ForeignKey("persons.id"))
     person: Mapped["PersonModel"] = relationship(
-        back_populates="phone_number", enable_typechecks=False,uselist=False,
+        back_populates="phone_number",
+        enable_typechecks=False,
+        uselist=False,
     )
 
 
@@ -43,7 +45,7 @@ class PersonModel(Base):
 
     __tablename__ = "persons"
     id = Column(String, primary_key=True)
-    email = Column(String, unique=True, index=True, nullable=True, default=None)  
+    email = Column(String, unique=True, index=True, nullable=True, default=None)
     last_name = Column(String)
     first_name = Column(String)
     address = Column(String)
@@ -57,8 +59,13 @@ class PersonModel(Base):
         Integer, default=0
     )  # 0 pour non vérifié, 1 pour vérifié
     email_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
-    
-    phone_number = relationship("PhoneNumber", back_populates="person",cascade="all", uselist=False,)
+
+    phone_number = relationship(
+        "PhoneNumber",
+        back_populates="person",
+        cascade="all",
+        uselist=False,
+    )
 
     def full_name(self):
         return self.first_name + " " + self.last_name
@@ -68,15 +75,15 @@ class PersonModel(Base):
         Returns:
             bool: True if the email is valid, False otherwise
         """
-        return self.email is not None and self.email_verified 
-    
+        return self.email is not None and self.email_verified
+
     def is_valid_phone_number(self):
         """Check if the phone number is valid.
         Returns:
             bool: True if the phone number is valid, False otherwise
         """
         return self.phone_number is not None and self.phone_number_verified
-    
+
     def is_valid_one_identifier(self):
         """Check if the identifier is valid.
         Returns:

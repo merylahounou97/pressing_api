@@ -46,16 +46,18 @@ class PersonBaseSchema(BaseModel):
         email (EmailStr): Adresse email
         phone_number (PhoneNumberModel): Numéro de téléphone
     """
-    last_name: Optional[str]=None
-    first_name: Optional[str]=None
-    address: Optional[str]=None
-    email: Optional[EmailStr]=None
+
+    last_name: Optional[str] = None
+    first_name: Optional[str] = None
+    address: Optional[str] = None
+    email: Optional[EmailStr] = None
     phone_number: Optional[PhoneNumberSchema] = None
 
+
 class PersonBaseSchemaCreate(PersonBaseSchema):
-    email_redirect_url: Optional[str]=None
-    phone_number_redirect_url: Optional[str]=None
-    
+    email_redirect_url: Optional[str] = None
+    phone_number_redirect_url: Optional[str] = None
+
 
 class PersonSchema(PersonBaseSchema):
     """Modèle de personne
@@ -87,6 +89,7 @@ class ResetAndValidationInput(BaseModel):
         strategy (ValidationStrategyEnum): Stratégie de validation
         redirect_url (str): URL de redirection
     """
+
     identifier: str
     redirect_url: str
 
@@ -97,13 +100,15 @@ class ChangePersonPassword(BaseModel):
         old_password (str): Ancien mot de passe
         new_password (str): Nouveau mot de passe
     """
+
     old_password: str
     new_password: str
+
 
 class ResetPasswordInput(VerifyIdentifierInput):
     """Modèle de réinitialisation du mot de passe
     Attributes:
         new_password (str): Nouveau mot de passe
     """
-    new_password: str
 
+    new_password: str

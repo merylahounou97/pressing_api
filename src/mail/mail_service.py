@@ -12,7 +12,8 @@ from ..dependencies.get_api_url import get_api_url
 settings = Settings()
 templates = Jinja2Templates(directory="src/mail/templates")
 
-def send_mail_from_template(template_name: str,email: str, **kwargs):
+
+def send_mail_from_template(template_name: str, email: str, **kwargs):
     """Send an email from a template.
 
     Args:
@@ -24,8 +25,11 @@ def send_mail_from_template(template_name: str,email: str, **kwargs):
     """
 
     mail_content = __get_parsed_template(template_name=template_name, **kwargs)
-    return __send_email(email, "WashMan", mail_content) if settings.test_mode  is  False else None
-
+    return (
+        __send_email(email, "WashMan", mail_content)
+        if settings.test_mode is False
+        else None
+    )
 
 
 def parse_validation_email(redirect_url: str, verification_code_email: str, email: str):

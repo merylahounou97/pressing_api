@@ -10,12 +10,9 @@ settings = Settings()
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(
-    docs_url="/"
-)
+app = FastAPI(docs_url="/")
 
 app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 
 app.include_router(customer_router.router)
 app.include_router(auth_router.router)
-

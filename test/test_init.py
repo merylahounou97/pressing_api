@@ -9,5 +9,3 @@ Base.metadata.create_all(bind=engine)
 settings = Settings()
 
 client = TestClient(app)
-
-

@@ -5,9 +5,9 @@ from test.customer.mock_customer import mock_customer_with_email
 from ..test_init import client
 
 
-class TestAuthRouter():
+class TestAuthRouter:
     pass
-    
+
     # def test_login_customer(self,mock_customer_with_email):
     #     response = client.post("/token",data={
     #         "username": mock_customer_with_email["email"],

@@ -49,5 +49,3 @@ def get_user_by_identifier(db: Session, identifier: str):
         return get_user_by_tel_number(db, identifier)
     else:
         return user
-
-

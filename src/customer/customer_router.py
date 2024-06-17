@@ -6,12 +6,17 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 from src.config import Settings
-from src.customer import  customer_service
+from src.customer import customer_service
 from src.customer.customer_model import CustomerModel
-from src.customer.customer_schema import (CreateCustomerInput,
-                                           CustomerOutput)
+from src.customer.customer_schema import CreateCustomerInput, CustomerOutput
 from src.dependencies.db import get_db
-from src.person.person_schema import ChangePersonPassword, PersonBaseSchema, ResetPasswordInput, VerifyIdentifierInput, ResetAndValidationInput
+from src.person.person_schema import (
+    ChangePersonPassword,
+    PersonBaseSchema,
+    ResetPasswordInput,
+    VerifyIdentifierInput,
+    ResetAndValidationInput,
+)
 
 from src.dependencies.get_customer_online import get_customer_online
 
@@ -64,9 +69,10 @@ async def edit_customer(
     )
 
 
-@router.post("/verify_verification_code",response_model=CustomerOutput)
-async def verify_verification_code(customer_validation_code: VerifyIdentifierInput, \
-                                    db: Session = Depends(get_db)):
+@router.post("/verify_verification_code", response_model=CustomerOutput)
+async def verify_verification_code(
+    customer_validation_code: VerifyIdentifierInput, db: Session = Depends(get_db)
+):
     """Verify a phone number by code
 
     Args:
@@ -76,13 +82,13 @@ async def verify_verification_code(customer_validation_code: VerifyIdentifierInp
     Returns:
         bool: The verification result
     """
-    return customer_service.verify_code(verification=customer_validation_code,db=db)
+    return customer_service.verify_code(verification=customer_validation_code, db=db)
 
 
-@router.post("/send_verification_code", response_model=Union[CustomerOutput,None])
+@router.post("/send_verification_code", response_model=Union[CustomerOutput, None])
 async def generate_new_email_validation_code(
-    verify_input: ResetAndValidationInput,
-     db: Session = Depends(get_db)):
+    verify_input: ResetAndValidationInput, db: Session = Depends(get_db)
+):
     """Generate a validation code sent to the user by email or phone number
 
     Args:
@@ -91,17 +97,17 @@ async def generate_new_email_validation_code(
     Returns:
         bool: The result
     """
-    return await customer_service.generate_new_validation_code(db=db,
-        new_validation_code=verify_input
+    return await customer_service.generate_new_validation_code(
+        db=db, new_validation_code=verify_input
     )
 
 
-@router.patch('/change_password', response_model=CustomerOutput)
+@router.patch("/change_password", response_model=CustomerOutput)
 def change_password(
-        change_password_input: ChangePersonPassword,
-        user_online: CustomerModel = Depends(get_customer_online),
-        db: Session = Depends(get_db)
-    ):
+    change_password_input: ChangePersonPassword,
+    user_online: CustomerModel = Depends(get_customer_online),
+    db: Session = Depends(get_db),
+):
     """A router to Change a customer password
 
     Args:
@@ -112,40 +118,38 @@ def change_password(
         Returns:
             Customer_output: The customer output
     """
-    
-    return customer_service.change_password(user_online, change_password_input,db=db)
 
-@router.patch('/reset_password', response_model=CustomerOutput)
-def reset_password(
-        identifier: str,
-        db: Session = Depends(get_db)
-    ):
+    return customer_service.change_password(user_online, change_password_input, db=db)
+
+
+@router.patch("/reset_password", response_model=CustomerOutput)
+def reset_password(identifier: str, db: Session = Depends(get_db)):
     """A router to reset a customer password
-    
+
     Args:
-    
+
         identifier (str): The customer identifier can be email or phone number
         db (Session, optional): The database session. Defaults to Depends(get_db).
-        
-        
+
+
         Returns:
             Customer_output: The customer output"""
-    identifier = identifier.replace(" ","")
-    return customer_service.reset_password(identifier,db=db)
+    identifier = identifier.replace(" ", "")
+    return customer_service.reset_password(identifier, db=db)
 
-@router.patch('/submit_reset_password', response_model=CustomerOutput)
+
+@router.patch("/submit_reset_password", response_model=CustomerOutput)
 def submit_reset_password(
-        reset_input: ResetPasswordInput,
-        db: Session = Depends(get_db)
-    ):
+    reset_input: ResetPasswordInput, db: Session = Depends(get_db)
+):
     """A router to submit a new password
-    
+
     Args:
-    
+
         reset_input (VerifyIdentifierInput): The reset input
         db (Session, optional): The database session. Defaults to Depends(get_db).
-        
-        
+
+
         Returns:
             Customer_output: The customer output"""
-    return customer_service.submit_reset_password(reset_input,db=db)
+    return customer_service.submit_reset_password(reset_input, db=db)

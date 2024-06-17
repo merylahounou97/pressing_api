@@ -30,10 +30,18 @@ def create_login_token(
         Token: The token
     """
     print(login_form.username, login_form.password)
-    user = customer_service.authenticate_user(db, login_form.username, login_form.password)
+    user = customer_service.authenticate_user(
+        db, login_form.username, login_form.password
+    )
     if user:
         access_token = create_access_token(
-            data={"sub": user.id, "email": user.email, "phone_number": user.phone_number.phone_text if user.phone_number is not None else None}
+            data={
+                "sub": user.id,
+                "email": user.email,
+                "phone_number": user.phone_number.phone_text
+                if user.phone_number is not None
+                else None,
+            }
         )
         return Token(access_token=access_token, token_type="Bearer")
     else:
