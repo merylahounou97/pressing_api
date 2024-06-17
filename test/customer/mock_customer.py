@@ -25,6 +25,49 @@ def mock_customer_with_email():
   "password": "string"
 }
 
+
+@pytest.fixture
+def mock_edit_customer():
+    return {
+  "first_name": "Thomas",
+  }
+
+@pytest.fixture
+def mock_verify_identifier_input():
+    return {
+    "identifier": "ahounoumeryl@yahoo.fr",
+    "code": "123456"
+}
+
+@pytest.fixture
+def mock_reset_and_validation_input():
+    return {
+    "identifier": "ahounoumeryl@yahoo.fr"
+}
+
+@pytest.fixture
+def mock_change_password_input():
+    return {
+    "old_password": "oldpassword",
+    "new_password": "newpassword"
+}
+
+@pytest.fixture
+def mock_reset_password_input():
+    return {
+    "identifier": "ahounoumeryl@yahoo.fr"
+}
+
+
+@pytest.fixture
+def mock_submit_reset_password_input():
+    return {
+    "identifier": "ahounoumeryl@yahoo.fr",
+    "new_password": "newpassword",
+    "code": "123456"
+}
+
+
 @pytest.fixture
 def mock_customer_model(mock_customer_with_phone_number):
     return CustomerModel(**mock_customer_with_phone_number())

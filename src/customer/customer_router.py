@@ -39,7 +39,6 @@ async def create_customers(
     Returns:
         Customer_output: The customer output
     """
-    print(customer,redirect_url)
     return await customer_service.create_customer(db, customer, redirect_url)
 
 
