@@ -10,8 +10,6 @@ from src.config import Settings
 from ..dependencies.get_api_url import get_api_url
 
 settings = Settings()
-
-
 templates = Jinja2Templates(directory="src/mail/templates")
 
 def send_mail_from_template(template_name: str,email: str, **kwargs):
@@ -26,7 +24,7 @@ def send_mail_from_template(template_name: str,email: str, **kwargs):
     """
 
     mail_content = __get_parsed_template(template_name=template_name, **kwargs)
-    return __send_email(email, "WashMan", mail_content)
+    return __send_email(email, "WashMan", mail_content) if settings.test_mode  is  False else None
 
 
 
@@ -57,7 +55,6 @@ def __get_parsed_template(template_name: str, **kargs):
         str: The parsed template.
     """
     email_template = templates.get_template(template_name)
-    print(kargs)
     return email_template.render(kargs)
 
 

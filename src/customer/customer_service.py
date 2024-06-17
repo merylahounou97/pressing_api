@@ -126,8 +126,6 @@ async def create_customer(
             phone_number = PhoneNumber(**customer_create.phone_number.model_dump(), person_id=user_id) 
             db.add(phone_number)
 
-
-
         db.add(db_user)
 
         db.commit()
@@ -234,14 +232,14 @@ def edit_customer(
     if customer_edit_input.address is not None:
         customer_online.address = customer_edit_input.address
 
-    if customer_edit_input.email != customer_online.email :
+    if customer_edit_input.email  is  not None and  customer_edit_input.email != customer_online.email :
         set_new_email(customer_online,customer_edit_input.email)
     db.commit()
 
     # Sent email if it has been changed
-    if customer_edit_input.email != customer_old_mail :
+    if customer_edit_input.email  is not None and customer_edit_input.email != customer_old_mail :
         mail_service.send_mail_from_template(MailConstants.UPDATE_EMAIL,email=customer_edit_input.email 
-                                             ,customer=customer_online,redirect_url=customer_edit_input.email_redirect_url)
+                                             ,customer=customer_online,redirect_url="google.com")
 
 
     return customer_online
