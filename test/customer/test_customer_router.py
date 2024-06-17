@@ -1,4 +1,5 @@
 
+import logging
 import sqlalchemy.orm
 
 from test.customer.mock_customer import mock_customer_with_email, mock_customer_with_phone_number 
@@ -57,36 +58,34 @@ class TestCustomerRouter:
         )
         response_payload = response.json()
         assert response.status_code == 200, "Verification code verified failed"
-        assert response_payload["phone_number_verified"] == True
+        assert response_payload["phone_number_verified"] is True
 
-    # def test_edit_customer(self, access_token):
-    #     edit_input = {
-    #         "first_name": "first_name modified",
-    #         "last_name": "last_name modified",
-    #         "address": "address modified",
-    #         "email": "ahounoumeryl@yahoo.fr",
-    #         "phone_number": {
-    #             "iso_code": "string",
-    #             "dial_code": "string",
-    #             "phone_text": "+33751569562",
-    #         },
-    #         "email_redirect_url": "http://localhost",
-    #     }
-    #     response = client.patch(
-    #         "/customers",
-    #         json=edit_input,
-    #         headers={"Authorization": f"Bearer {access_token}"},
-    #     )
+    def test_edit_customer(self, access_token):       
+        edit_input = {
+            "first_name": "first_name modified",
+            "last_name": "last_name modified",
+            "address": "address modified",
+            "email": "ahounoumeryl@yahoo.fr",
+            "phone_number": "+33751569562",
+            "email_redirect_url": "http://localhost",
+        }
 
-    #     response_payload = response.json()
-    #     assert response.status_code == 200, "User with phone number edited successfully"
-    #     assert "id" in response_payload
-    #     assert response_payload["first_name"] == edit_input["first_name"]
-    #     assert response_payload["last_name"] == edit_input["last_name"]
-    #     assert response_payload["address"] == edit_input["address"]
-    #     assert response_payload["email"] == edit_input["email"]
-    #     assert response_payload["phone_number"] == edit_input["phone_number"]
-    #     assert response_payload["email_verified"] == False
+        response = client.patch(
+            "/customers",
+            json=edit_input,
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        print(response.content)
+        response_payload = response.json()
+        assert response.status_code == 200, "modification failed"
+        assert "id" in response_payload
+        assert response_payload["first_name"] == edit_input["first_name"]
+        assert response_payload["last_name"] == edit_input["last_name"]
+        assert response_payload["address"] == edit_input["address"]
+        assert response_payload["email"] == edit_input["email"]
+        assert response_payload["phone_number"] == edit_input["phone_number"]
+        assert response_payload["email_verified"] == False
         assert response_payload["phone_number_verified"] == False
 
     # def test_send_verification_code(self):

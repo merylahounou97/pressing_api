@@ -205,7 +205,6 @@ def set_new_email(customer_online: CustomerModel, email: str):
 
 
 def set_new_phone_number(customer_online: CustomerModel, phone_number: str):
-
     customer_online.phone_number = phone_number
     customer_online.phone_number_verification_code = (
         security_service.generate_random_code()
@@ -251,7 +250,7 @@ def edit_customer(
         customer_edit_input.phone_number is not None
         and customer_edit_input.phone_number != customer_online.phone_number
     ):
-        set_new_phone_number(customer_online, customer_online.phone_number)
+        set_new_phone_number(customer_online, customer_edit_input.phone_number)
 
     db.commit()
 
@@ -273,7 +272,7 @@ def edit_customer(
         and customer_edit_input.phone_number != customer_online.phone_number
     ):
         sms_service.send_sms(
-            customer_online.phone_number.phone_text,
+            customer_online.phone_number,
             template_name=SmsConstants.PHONE_NUMBER_CHANGED,
             customer=customer_online,
             support_address=settings.support_address,
@@ -363,11 +362,7 @@ async def generate_new_validation_code(
         else person_schema.IdentifierEnum.PHONE_NUMBER
     )
 
-    user = get_customer_by_identifier(
-        db=db,
-        email=new_validation_code.identifier,
-        phone_number=new_validation_code.identifier,
-    )
+    user = get_customer_by_identifier(db,new_validation_code.identifier )
 
     if user is not None:
         random_code = security_service.generate_random_code()
@@ -431,9 +426,7 @@ def authenticate_user(db: Session, identifier: str, password: str):
     Returns:
         Customer_model: The user
     """
-    user = customer_service.get_customer_by_identifier(
-        db=db, email=identifier, phone_number=identifier
-    )
+    user = customer_service.get_customer_by_identifier(db, identifier)
     if user is not None and security_service.compare_hashed_text(
         password, user.password
     ):
@@ -508,7 +501,7 @@ def reset_password(identifier: str, db: Session):
         Customer_model: The user
     """
 
-    user = get_customer_by_identifier(db, identifier, identifier)
+    user = get_customer_by_identifier(db, identifier)
 
     if user is None:
         raise HTTPException(status_code=400, detail="User not found")
@@ -547,9 +540,7 @@ def submit_reset_password(reset_input: person_schema.ResetPasswordInput, db: Ses
     Returns:
         Customer_model: The user
     """
-    user = get_customer_by_identifier(
-        db, reset_input.identifier, reset_input.identifier
-    )
+    user = get_customer_by_identifier(db, reset_input.identifier)
     if user is None:
         raise HTTPException(status_code=400, detail="User not found")
 
