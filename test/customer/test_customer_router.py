@@ -32,9 +32,9 @@ class TestCustomerRouter:
         assert response_payload["phone_number"] is not None
 
     def test_verify_verification_code(
-        self,get_customer_by_identifier , mock_customer_with_email, mock_customer_with_phone_number
+        self,get_customer_by_identifier_fix , mock_customer_with_email, mock_customer_with_phone_number
     ):
-        user_created = get_customer_by_identifier(mock_customer_with_email["email"])
+        user_created = get_customer_by_identifier_fix(mock_customer_with_email["email"])
         response = client.post(
             "/customers/verify_verification_code",
             json={
@@ -46,18 +46,18 @@ class TestCustomerRouter:
         assert response.status_code == 200, "Verification code verified failed"
         assert response_payload["email_verified"] == True
 
-
-    #     user_created = get_customer_by_identifier(mock_customer_with_phone_number["phone_number"]["phone_text"])
-    #     response = client.post(
-    #         "/customers/verify_verification_code",
-    #         json={
-    #             "identifier": user_created.phone_number.phone_text,
-    #             "verification_code": user_created.phone_number_verification_code,
-    #         },
-    #     )
-    #     response_payload = response.json()
-    #     assert response.status_code == 200, "Verification code verified failed"
-    #     assert response_payload["phone_number_verified"] == True
+        user_created = get_customer_by_identifier_fix(mock_customer_with_phone_number["phone_number"])
+        print(user_created)
+        response = client.post(
+            "/customers/verify_verification_code",
+            json={
+                "identifier": user_created.phone_number,
+                "verification_code": user_created.phone_number_verification_code,
+            },
+        )
+        response_payload = response.json()
+        assert response.status_code == 200, "Verification code verified failed"
+        assert response_payload["phone_number_verified"] == True
 
     # def test_edit_customer(self, access_token):
     #     edit_input = {

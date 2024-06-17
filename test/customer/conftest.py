@@ -6,10 +6,9 @@ from test.conftest import get_test_db_session
 
 
 @pytest.fixture
-def get_customer_by_identifier(get_test_db_session):
+def get_customer_by_identifier_fix(get_test_db_session):
     def _get_customer_by_identifier(identifier: str):
         return get_customer_by_identifier(
-            get_test_db_session, identifier, identifier
-        )
+            get_test_db_session, identifier)
 
     return _get_customer_by_identifier

@@ -27,16 +27,16 @@ class PersonBaseSchema(BaseModel):
     email: Optional[EmailStr] = None
     phone_number: Optional[PhoneNumber] = None
     
-    # @field_validator("phone_number")
-    # def remove_tel_prefix(cls, v):
-    #     """Supprime le préfixe 'tel:' et les tirets du numéro de téléphone
-    #     Args:
-    #         v (PhoneNumber): Numéro de téléphone
+    @field_validator("phone_number")
+    def remove_tel_prefix(cls, v):
+        """Supprime le préfixe 'tel:' et les tirets du numéro de téléphone
+        Args:
+            v (PhoneNumber): Numéro de téléphone
 
-    #     Returns:
-    #         PhoneNumber: Numéro de téléphone sans préfixe 'tel:' et sans tirets
-    #     """
-    #     return PhoneNumber.removeprefix(v, "tel:").replace("-", "").replace(" ", "")
+        Returns:
+            PhoneNumber: Numéro de téléphone sans préfixe 'tel:' et sans tirets
+        """
+        return v.replace("tel:","").replace("-", "").replace(" ", "")
 
 
 class PersonBaseSchemaCreate(PersonBaseSchema):
