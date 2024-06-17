@@ -32,7 +32,7 @@ def send_welcome_sms(customer: CustomerModel):
         phone_number (str): Phone number
     """
     return __send_sms(
-        customer.phone_number.phone_text,
+        customer.phone_number,
         f"""Bienvenue chez {settings.app_name}
                       Le code de vérification de votre numéro de téléphone est {customer.phone_number_verification_code}
                       """,

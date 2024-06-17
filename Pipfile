@@ -14,6 +14,7 @@ jinja2 = "*"
 requests = "*"
 twilio = "*"
 pytest = "*"
+pydantic-extra-types = "*"
 
 [dev-packages]
 

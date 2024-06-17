@@ -1,5 +1,8 @@
+from typing import Union
 import uuid
 from datetime import datetime, timedelta
+
+from pydantic import EmailStr
 
 from fastapi import HTTPException
 from sqlalchemy import or_
@@ -10,12 +13,12 @@ from src.customer import customer_service
 from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
 from src.mail.mail_service import parse_validation_email
-from src.person.person_model import PhoneNumber
 from src.security import security_service
 from src.sms import sms_service
 from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
 from src.utils.sms_constants import SmsConstants
+from pydantic_extra_types.phone_numbers import  PhoneNumber
 
 from ..security import security_service
 from .customer_model import CustomerModel
@@ -27,7 +30,7 @@ from .customer_schema import (
 settings = Settings()
 
 
-def check_existing_customer(db: Session, email: str, phone_number: str):
+def check_existing_customer(db: Session, identifier : Union[EmailStr, PhoneNumber]):
     """Check if a customer already exists in the database
 
     Args:
@@ -38,7 +41,7 @@ def check_existing_customer(db: Session, email: str, phone_number: str):
     Returns:
         bool: True if the customer exists, False otherwise
     """
-    user = get_customer_by_email_or_phone(db, email, phone_number)
+    user = get_customer_by_identifier(db, identifier)
     return user is not None
 
 
@@ -55,8 +58,10 @@ def get_customer_by_id(customer_id, db: Session):
     return db.query(CustomerModel).filter(CustomerModel.id == customer_id).first()
 
 
-def get_customer_by_email_or_phone(
-    db: Session, email: str, phone_number: str
+
+
+def get_customer_by_identifier(
+    db: Session, identifier: str
 ) -> CustomerModel | None:
     """Get a customer by email or phone number
 
@@ -68,15 +73,7 @@ def get_customer_by_email_or_phone(
     Returns:
         Customer_model: Customer object or null
     """
-
-    user_by_phone = (
-        db.query(PhoneNumber).filter(PhoneNumber.phone_text == phone_number).first()
-    )
-
-    if user_by_phone is not None:
-        return user_by_phone.person
-
-    return db.query(CustomerModel).filter(CustomerModel.email == email).first()
+    return db.query(CustomerModel).filter(or_(CustomerModel.phone_number==identifier,CustomerModel.email==identifier)).first() 
 
 
 async def create_customer(
@@ -109,6 +106,7 @@ async def create_customer(
         db_user = CustomerModel(
             id=user_id,
             email=customer_create.email,
+            phone_number = customer_create.phone_number,
             last_name=customer_create.last_name,
             first_name=customer_create.first_name,
             phone_number_verification_code=verification_code_phone_number,
@@ -118,12 +116,6 @@ async def create_customer(
             phone_number_verification_expiry=expiry_time,
             email_verification_expiry=expiry_time,
         )
-
-        if customer_create.phone_number is not None:
-            phone_number = PhoneNumber(
-                **customer_create.phone_number.model_dump(), person_id=user_id
-            )
-            db.add(phone_number)
 
         db.add(db_user)
 
@@ -212,19 +204,8 @@ def set_new_email(customer_online: CustomerModel, email: str):
     return None
 
 
-def set_new_phone_number(customer_online: CustomerModel, phone_number: PhoneNumber):
-    """Set a new phone number for a customer
-    Change the phone number of the customer and generate a new verification code for the new phone number.
-    put the new phone number to non verified
-    and add the expiration of the verification code
+def set_new_phone_number(customer_online: CustomerModel, phone_number: str):
 
-    Args:
-        customer_online (Customer_model): Customer object
-        phone_number (PhoneNumber): New phone number
-
-    Returns:
-        Customer_model: Customer object
-    """
     customer_online.phone_number = phone_number
     customer_online.phone_number_verification_code = (
         security_service.generate_random_code()
@@ -270,14 +251,7 @@ def edit_customer(
         customer_edit_input.phone_number is not None
         and customer_edit_input.phone_number != customer_online.phone_number
     ):
-        phone_number = PhoneNumber(
-            **customer_edit_input.phone_number.model_dump(),
-            person_id=customer_online.id,
-        )
-        db.query(PhoneNumber).filter(
-            PhoneNumber.person_id == customer_online.id
-        ).delete()
-        set_new_phone_number(customer_online, phone_number)
+        set_new_phone_number(customer_online, customer_online.phone_number)
 
     db.commit()
 
@@ -339,10 +313,10 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
 
     elif strategy == person_schema.IdentifierEnum.PHONE_NUMBER:
         db_user = (
-            db.query(PhoneNumber)
+            db.query(CustomerModel)
             .filter(
-                PhoneNumber.phone_number.phone_text == verification.identifier,
-                PhoneNumber.phone_number_verification_code
+                CustomerModel.phone_number == verification.identifier,
+                CustomerModel.phone_number_verification_code
                 == verification.verification_code,
             )
             .first()
@@ -389,7 +363,7 @@ async def generate_new_validation_code(
         else person_schema.IdentifierEnum.PHONE_NUMBER
     )
 
-    user = get_customer_by_email_or_phone(
+    user = get_customer_by_identifier(
         db=db,
         email=new_validation_code.identifier,
         phone_number=new_validation_code.identifier,
@@ -457,7 +431,7 @@ def authenticate_user(db: Session, identifier: str, password: str):
     Returns:
         Customer_model: The user
     """
-    user = customer_service.get_customer_by_email_or_phone(
+    user = customer_service.get_customer_by_identifier(
         db=db, email=identifier, phone_number=identifier
     )
     if user is not None and security_service.compare_hashed_text(
@@ -534,7 +508,7 @@ def reset_password(identifier: str, db: Session):
         Customer_model: The user
     """
 
-    user = get_customer_by_email_or_phone(db, identifier, identifier)
+    user = get_customer_by_identifier(db, identifier, identifier)
 
     if user is None:
         raise HTTPException(status_code=400, detail="User not found")
@@ -573,7 +547,7 @@ def submit_reset_password(reset_input: person_schema.ResetPasswordInput, db: Ses
     Returns:
         Customer_model: The user
     """
-    user = get_customer_by_email_or_phone(
+    user = get_customer_by_identifier(
         db, reset_input.identifier, reset_input.identifier
     )
     if user is None:

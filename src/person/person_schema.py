@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional, Union
 
 from pydantic import BaseModel, EmailStr, field_validator
-from pydantic_extra_types.phone_numbers import PhoneNumber
+from pydantic_extra_types.phone_numbers import  PhoneNumber
 
 
 class IdentifierEnum(Enum):
@@ -10,32 +10,6 @@ class IdentifierEnum(Enum):
 
     PHONE_NUMBER = "phone_number"
     EMAIL = "email"
-
-
-class PhoneNumberSchema(BaseModel):
-    """Modèle de numéro de téléphone
-    Attributes:
-        iso_code (str): Code ISO du pays
-        dial_code (str): Code de composition du numéro
-        phone_text (PhoneNumber): Numéro de téléphone
-    """
-
-    iso_code: str
-    dial_code: str
-    phone_text: PhoneNumber
-
-    # Ajout d'une méthode de validation personnalisée pour `phone_text`
-    @field_validator("phone_text")
-    def remove_tel_prefix(cls, v):
-        """Supprime le préfixe 'tel:' et les tirets du numéro de téléphone
-        Args:
-            v (PhoneNumber): Numéro de téléphone
-
-        Returns:
-            PhoneNumber: Numéro de téléphone sans préfixe 'tel:' et sans tirets
-        """
-        return PhoneNumber.removeprefix(v, "tel:").replace("-", "").replace(" ", "")
-
 
 class PersonBaseSchema(BaseModel):
     """Modèle de base pour les informations d'une personne
@@ -51,7 +25,18 @@ class PersonBaseSchema(BaseModel):
     first_name: Optional[str] = None
     address: Optional[str] = None
     email: Optional[EmailStr] = None
-    phone_number: Optional[PhoneNumberSchema] = None
+    phone_number: Optional[PhoneNumber] = None
+    
+    # @field_validator("phone_number")
+    # def remove_tel_prefix(cls, v):
+    #     """Supprime le préfixe 'tel:' et les tirets du numéro de téléphone
+    #     Args:
+    #         v (PhoneNumber): Numéro de téléphone
+
+    #     Returns:
+    #         PhoneNumber: Numéro de téléphone sans préfixe 'tel:' et sans tirets
+    #     """
+    #     return PhoneNumber.removeprefix(v, "tel:").replace("-", "").replace(" ", "")
 
 
 class PersonBaseSchemaCreate(PersonBaseSchema):
