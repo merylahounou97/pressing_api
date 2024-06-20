@@ -133,30 +133,63 @@ class TestCustomerRouter:
 
 
         
-"""
-    def test_change_password(self):
-        user_online = "mock_user_online"  # Mock a valid user online
+    def test_change_password(self,get_customer_online_fix,get_access_token,get_customer_by_identifier_fix,
+                                    mock_customer):
+        access_token = get_access_token()
+        user = get_customer_online_fix(access_token)
+        old_password = user.password
+
+
         response = client.patch(
             "/customers/change_password",
-            json=mock_change_password_input,
-            headers={"Authorization": f"Bearer {user_online}"}
+            json={
+                "old_password": old_password,
+                "new_password": "new_secure_password",
+            },
+                        headers={"Authorization": f"Bearer {access_token}"},
         )
-        response_payload = response.json()
+    
+        print("CONTENNNNNNNNNNNT", response.content)
         
-        assert response.status_code == 200, "Password changed successfully"
-        assert response_payload["password_changed"] == True
+        user = get_customer_online_fix(access_token)
+        new_password = user.password
+        
+        assert response.status_code == 200, "Password not changed"
+        assert old_password != new_password, "Password are the same"
+      
 
-    def test_reset_password(self):
-        identifier = "mock_identifier"  # Mock a valid identifier
-        response = client.patch(f"/customers/reset_password?identifier={identifier}")
-        response_payload = response.json()
-        
-        assert response.status_code == 200, "Password reset successfully"
-        assert response_payload["reset"] == True
+# def test_reset_password(self, get_customer_by_identifier_fix, mock_customer):
+#     # For email address
+#     identifier = mock_customer(IdentifierEnum.EMAIL)["email"]
+#     user = get_customer_by_identifier_fix(identifier)
+#     old_code = user.reset_password_code
 
-    def test_submit_reset_password(self):
-        response = client.patch("/customers/submit_reset_password", json=mock_submit_reset_password_input)
-        response_payload = response.json()
+#     response = client.post("/customers/reset_password", json={"identifier": identifier})
+#     assert response.status_code == 200, "Failed to send email verification"
+
+#     user = get_customer_by_identifier_fix(identifier)
+#     assert old_code != user.reset_password_code, "Codes are the same"
+
+#     # For phone number
+#     identifier = mock_customer(IdentifierEnum.PHONE_NUMBER)["phone_number"]
+#     user = get_customer_by_identifier_fix(identifier)
+#     old_code = user.reset_password_code
+
+#     response = client.post("/customers/reset_password", json={"identifier": identifier})
+#     assert response.status_code == 200, "Failed to send phone number verification"
+
+#     user = get_customer_by_identifier_fix(identifier)
+#     assert old_code != user.reset_password_code, "Codes are the same"
+
+
+#     def test_submit_reset_password(self):
+#         identifier =mock_customer()["email"]
+#         user_created = get_customer_by_identifier_fix(identifier)
+#         data = {
+#         "identifier": identifier,
+#         "verification_code": user_created.reset_password_code,
+#         "new_password": "new_secure_password"
+#     }
+#         response = client.patch("/customers/submit_reset_password", json=data)
         
-        assert response.status_code == 200, "Password submitted successfully"
-        assert response_payload["password_reset"] == True"""
+#         assert response.status_code == 200, "Password submitted successfully"

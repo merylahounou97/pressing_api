@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy import or_
 from src.customer.customer_model import CustomerModel
+from src.dependencies.get_customer_online import get_customer_online
 from src.person.person_schema import IdentifierEnum
 import uuid
 
@@ -13,6 +14,12 @@ def get_customer_by_identifier_fix(get_test_db_session):
             ).populate_existing().first() 
 
     return _get_customer_by_identifier
+
+@pytest.fixture
+def get_customer_online_fix(get_test_db_session):
+    def _get_customer_online(access_token):
+        return get_customer_online(access_token=access_token, db=get_test_db_session)
+    return _get_customer_online
 
 
 @pytest.fixture
