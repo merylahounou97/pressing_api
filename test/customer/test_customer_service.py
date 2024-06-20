@@ -1,8 +1,5 @@
 from src.customer import customer_service
-from test.customer.mock_customer import (
-    mock_customer_with_phone_number,
-    mock_customer_with_email,
-)
+
 from ..conftest import mock_db_session
 
 

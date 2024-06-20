@@ -182,7 +182,7 @@ def get_customers(db: Session, skip: int = 0, limit: int = 100):
     return db.query(CustomerModel).offset(skip).limit(limit).all()
 
 
-def set_new_email(customer_online: CustomerModel, email: str):
+def set_new_email(customer_online: CustomerModel, email: str,random_code: int):
     """Set a new email for a customer
     Change the email of the customer and generate a new verification code for the new email.
     put the new email to non verified
@@ -196,7 +196,7 @@ def set_new_email(customer_online: CustomerModel, email: str):
             Customer_model: Customer object
     """
     customer_online.email = email
-    customer_online.email_verification_code = security_service.generate_random_code()
+    customer_online.email_verification_code = random_code
     customer_online.email_verification_expiry = datetime.now() + timedelta(
         minutes=settings.code_expiry_time
     )
@@ -244,7 +244,8 @@ def edit_customer(
         customer_edit_input.email is not None
         and customer_edit_input.email != customer_online.email
     ):
-        set_new_email(customer_online, customer_edit_input.email)
+        random_code = security_service.generate_random_code()
+        set_new_email(customer_online, customer_edit_input.email,random_code)
 
     if (
         customer_edit_input.phone_number is not None
@@ -343,7 +344,7 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
 
 
 async def generate_new_validation_code(
-    new_validation_code: person_schema.ResetAndValidationInput, db
+    identifier: str, db: Session
 ):
     """Generate a new validation code
 
@@ -358,40 +359,29 @@ async def generate_new_validation_code(
 
     strategy = (
         person_schema.IdentifierEnum.EMAIL
-        if new_validation_code.identifier.count("@") == 1
+        if identifier.count("@") == 1
         else person_schema.IdentifierEnum.PHONE_NUMBER
     )
 
-    user = get_customer_by_identifier(db,new_validation_code.identifier )
+    user = get_customer_by_identifier(db,identifier)
 
     if user is not None:
         random_code = security_service.generate_random_code()
-
+        
         if strategy == person_schema.IdentifierEnum.EMAIL and not user.email_verified:
-            set_new_email(user, user.email)
+            print( "Generating new validation code +++++++++++++++")
+            set_new_email(user, user.email,random_code=random_code)
             db.commit()
-            db.refresh(user)
 
-            new_validation_code.redirect_url = parse_validation_email(
-                new_validation_code.redirect_url,
-                random_code,
-                new_validation_code.identifier,
-            )
-
-            redirect_url = mail_service.parse_validation_email(
-                redirect_url=new_validation_code.redirect_url,
-                verification_code_email=random_code,
-                email=user.email,
-            )
             mail_service.send_mail_from_template(
                 MailConstants.EMAIL_VERIFICATION,
                 email=user.email,
-                person=user,
-                redirect_url=redirect_url,
+                person=user
             )
 
             return user
-        elif (
+        
+        if (
             strategy == person_schema.IdentifierEnum.PHONE_NUMBER
             and not user.phone_number_verified
         ):
@@ -401,11 +391,9 @@ async def generate_new_validation_code(
             )
 
             db.commit()
-            db.refresh(user)
 
-            sms_service.send_verification_sms(
-                new_validation_code.identifier, random_code
-            )
+            sms_service.send_verification_sms(identifier, random_code)
+
             return user
         elif user.phone_number_verified or user.email_verified:
             return None

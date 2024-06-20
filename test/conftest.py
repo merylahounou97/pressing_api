@@ -1,8 +1,9 @@
 from unittest.mock import MagicMock
 import pytest
 from src.dependencies.db import get_db
-from .test_init import client
 from src.database import SessionLocal
+from .test_init import client
+
 
 
 @pytest.fixture
@@ -21,18 +22,21 @@ def get_test_db_session():
 
 
 @pytest.fixture
-def access_token(mock_customer_with_email):
-    response = client.post(
-        "/token",
-        data={
-            "username": mock_customer_with_email["email"],
-            "password": mock_customer_with_email["password"],
-        },
-        headers={
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json",
-        },
-    )
+def get_access_token(mock_customer_with_email):
+    def _access_token(identifier=mock_customer_with_email["email"],password=mock_customer_with_email["password"]):
+        response = client.post(
+            "/token",
+            data={
+                "username": identifier,
+                "password": password 
+            },
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json",
+            },
+        )
 
-    response_payload = response.json()
-    return response_payload["access_token"]
+        response_payload = response.json()
+        return response_payload["access_token"]
+    return _access_token
+

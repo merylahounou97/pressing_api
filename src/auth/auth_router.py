@@ -38,7 +38,7 @@ def create_login_token(
             data={
                 "sub": user.id,
                 "email": user.email,
-                "phone_number": user.phone_number.phone_text
+                "phone_number": user.phone_number
                 if user.phone_number is not None
                 else None,
             }

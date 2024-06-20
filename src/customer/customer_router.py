@@ -1,6 +1,5 @@
-from logging import Logger
 from typing import Union
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
@@ -15,7 +14,6 @@ from src.person.person_schema import (
     PersonBaseSchema,
     ResetPasswordInput,
     VerifyIdentifierInput,
-    ResetAndValidationInput,
 )
 
 from src.dependencies.get_customer_online import get_customer_online
@@ -87,7 +85,7 @@ async def verify_verification_code(
 
 @router.post("/send_verification_code", response_model=Union[CustomerOutput, None])
 async def generate_new_email_validation_code(
-    verify_input: ResetAndValidationInput, db: Session = Depends(get_db)
+    identifier: Annotated[str, Body(embed=True)] , db: Session = Depends(get_db)
 ):
     """Generate a validation code sent to the user by email or phone number
 
@@ -97,9 +95,7 @@ async def generate_new_email_validation_code(
     Returns:
         bool: The result
     """
-    return await customer_service.generate_new_validation_code(
-        db=db, new_validation_code=verify_input
-    )
+    return await customer_service.generate_new_validation_code(identifier=identifier, db=db)
 
 
 @router.patch("/change_password", response_model=CustomerOutput)
