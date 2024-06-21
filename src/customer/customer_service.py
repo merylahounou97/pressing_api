@@ -15,6 +15,7 @@ from src.mail import mail_service
 from src.mail.mail_service import parse_validation_email
 from src.security import security_service
 from src.sms import sms_service
+from src.utils.error_messages import ErrorMessages
 from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
 from src.utils.sms_constants import SmsConstants
@@ -77,14 +78,13 @@ def get_customer_by_identifier(
 
 
 async def create_customer(
-    db: Session, customer_create: CreateCustomerInput, redirect_url: str
+    db: Session, customer_create: CreateCustomerInput
 ):
     """Create a new customer
 
     Args:
         db (Session): Database session
         customerCreate (Customer_create_input): Customer object
-        redirect_url (str): Redirect URL
 
     Returns:
         Customer_model: Customer object
@@ -124,13 +124,10 @@ async def create_customer(
         # Send welcome email
         if customer_create.email is not None:
             api_url = get_api_url()
-            redirect_url = mail_service.parse_validation_email(
-                redirect_url, db_user.email_verification_code, db_user.email
-            )
+
             mail_service.send_mail_from_template(
                 MailConstants.WECOME_EMAIL,
                 db_user.email,
-                redirect_url=redirect_url,
                 app_name=settings.app_name,
                 person=db_user,
                 api_url=api_url,
@@ -233,6 +230,7 @@ def edit_customer(
     """
 
     customer_old_mail = customer_online.email
+    customer_old_sms = customer_online.phone_number
     if customer_edit_input.last_name is not None:
         customer_online.last_name = customer_edit_input.last_name
     if customer_edit_input.first_name is not None:
@@ -253,6 +251,7 @@ def edit_customer(
     ):
         set_new_phone_number(customer_online, customer_edit_input.phone_number)
 
+
     db.commit()
 
     # Sent email if it has been changed
@@ -270,7 +269,7 @@ def edit_customer(
     # Send SMS if it has been changed
     if (
         customer_edit_input.phone_number is not None
-        and customer_edit_input.phone_number != customer_online.phone_number
+        and customer_edit_input.phone_number != customer_old_sms
     ):
         sms_service.send_sms(
             customer_online.phone_number,
@@ -369,7 +368,6 @@ async def generate_new_validation_code(
         random_code = security_service.generate_random_code()
         
         if strategy == person_schema.IdentifierEnum.EMAIL and not user.email_verified:
-            print( "Generating new validation code +++++++++++++++")
             set_new_email(user, user.email,random_code=random_code)
             db.commit()
 
@@ -441,13 +439,11 @@ def change_password(
         customer_online.is_valid_email() or customer_online.is_valid_phone_number()
     ):
         raise HTTPException(
-            status_code=400, detail="Email or phone number should be verified"
+            status_code=400, detail=ErrorMessages.EMAIL_OR_PHONE_NUMBER_VERIFICATION_REQUIRED
         )
 
     if change_password_input.old_password == change_password_input.new_password:
-        raise HTTPException(
-            status_code=400, detail="New password should be different from the old one"
-        )
+        raise HTTPException(status_code=400, detail=ErrorMessages.NEW_PASSWORD_SAME_AS_OLD)
 
     if security_service.compare_hashed_text(
         change_password_input.old_password, customer_online.password
@@ -459,7 +455,7 @@ def change_password(
 
         if customer_online.is_valid_phone_number():
             sms_service.send_sms(
-                customer_online.phone_number.phone_text,
+                customer_online.phone_number,
                 template_name=SmsConstants.PASSWORD_CHANGED,
                 customer=customer_online,
                 support_address=settings.support_address,
@@ -475,7 +471,7 @@ def change_password(
         return customer_online
 
     else:
-        raise HTTPException(status_code=400, detail="Wrong old password")
+        raise HTTPException(status_code=400, detail=ErrorMessages.WRONG_OLD_PASSWORD)
 
 
 def reset_password(identifier: str, db: Session):
@@ -508,7 +504,7 @@ def reset_password(identifier: str, db: Session):
         and user.phone_number is not None
     ):
         sms_service.send_sms(
-            user.phone_number.phone_text,
+            user.phone_number,
             template_name=SmsConstants.PASSWORD_RESET,
             customer=user,
         )

@@ -15,17 +15,9 @@ def get_customer_by_identifier_fix(get_test_db_session):
 
     return _get_customer_by_identifier
 
-@pytest.fixture
-def get_customer_online_fix(get_test_db_session):
-    def _get_customer_online(access_token):
-        return get_customer_online(access_token=access_token, db=get_test_db_session)
-    return _get_customer_online
 
 
-@pytest.fixture
-def mock_customer_with_email():
-    return {
-        
+user_with_email={
         "last_name": "Aiounou",
         "first_name": "Ulrich",
         "address": "string",
@@ -34,8 +26,10 @@ def mock_customer_with_email():
     }
 
 @pytest.fixture
-def mock_customer_with_both():
-    return {
+def mock_customer_with_email():
+    return user_with_email
+
+user_with_both = {
         "last_name": "Ahounou",
         "first_name": "Méryl",
         "address": "string",
@@ -45,14 +39,27 @@ def mock_customer_with_both():
     }
 
 @pytest.fixture
-def mock_customer_with_phone_number():
-    return {
+def mock_customer_with_both():
+    return user_with_both
+
+user_with_phone_number ={
         "last_name": "Ahounou",
         "first_name": "Méryl",
         "address": "string",
         "phone_number": "+33666495244",
         "password": "string",
-    }
+    } 
+
+@pytest.fixture
+def mock_customer_with_phone_number():
+    return user_with_phone_number
+
+
+
+        
+        
+    
+
 
 @pytest.fixture
 def mock_customer(mock_customer_with_email

@@ -30,7 +30,7 @@ AccessTokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 @router.post("/", response_model=CustomerOutput)
 async def create_customers(
-    customer: CreateCustomerInput, redirect_url: str, db: Session = Depends(get_db)
+    customer: CreateCustomerInput,  db: Session = Depends(get_db)
 ):
     """Create a customer
 
@@ -42,7 +42,7 @@ async def create_customers(
     Returns:
         Customer_output: The customer output
     """
-    return await customer_service.create_customer(db, customer, redirect_url)
+    return await customer_service.create_customer(db, customer)
 
 
 @router.patch("/", response_model=Union[CustomerOutput, None])

@@ -40,8 +40,7 @@ class PersonBaseSchema(BaseModel):
 
 
 class PersonBaseSchemaCreate(PersonBaseSchema):
-    email_redirect_url: Optional[str] = None
-    phone_number_redirect_url: Optional[str] = None
+    pass
 
 
 class PersonSchema(PersonBaseSchema):

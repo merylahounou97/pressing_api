@@ -1,8 +1,12 @@
+from http.client import HTTPException
+import pytest
 from src.person.person_schema import IdentifierEnum
+from src.utils.error_messages import ErrorMessages
 
 from ..test_init import client
 
 class TestCustomerRouter:
+    updated_password = "new_secure_password"
     def test_create_customer(self, mock_customer):
         data = mock_customer(IdentifierEnum.EMAIL)
         response = client.post(
@@ -69,35 +73,6 @@ class TestCustomerRouter:
 
 
 
-    def test_edit_customer(self, get_access_token,mock_customer_with_both):       
-        access_token = get_access_token(mock_customer_with_both["email"])
-        edit_input = {
-            "first_name": "first_name modified",
-            "last_name": "last_name modified",
-            "address": "address modified",
-            "email": "ahounoumeryl@yahoo.fr",
-            "phone_number": "+33751569562",
-            "email_redirect_url": "http://localhost",
-        }
-
-        response = client.patch(
-            "/customers",
-            json=edit_input,
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-
-        response_payload = response.json()
-        assert response.status_code == 200, "modification failed"
-        assert "id" in response_payload
-        assert response_payload["first_name"] == edit_input["first_name"]
-        assert response_payload["last_name"] == edit_input["last_name"]
-        assert response_payload["address"] == edit_input["address"]
-        assert response_payload["email"] == edit_input["email"]
-        assert response_payload["phone_number"] == edit_input["phone_number"]
-        assert response_payload["email_verified"] is False
-        assert response_payload["phone_number_verified"] is False
-                
-
     def test_send_verification_code(self,get_customer_by_identifier_fix,
                                     mock_customer):
         #For email address
@@ -133,31 +108,74 @@ class TestCustomerRouter:
 
 
         
-    def test_change_password(self,get_customer_online_fix,get_access_token,get_customer_by_identifier_fix,
+    def test_change_password(self,get_access_token,
                                     mock_customer):
-        access_token = get_access_token()
-        user = get_customer_online_fix(access_token)
-        old_password = user.password
+        user = mock_customer()
+        access_token = get_access_token(user["email"],user["password"])
 
-
+        #Cannot change password with old password
         response = client.patch(
             "/customers/change_password",
             json={
-                "old_password": old_password,
-                "new_password": "new_secure_password",
+                "old_password": user["password"],
+                "new_password": user["password"],
             },
                         headers={"Authorization": f"Bearer {access_token}"},
         )
-    
-        print("CONTENNNNNNNNNNNT", response.content)
-        
-        user = get_customer_online_fix(access_token)
-        new_password = user.password
-        
+        print(response.json())
+        assert response.status_code == 400, "Password changed Failed"
+        assert response.json()["detail"] == ErrorMessages.NEW_PASSWORD_SAME_AS_OLD , "NEW_PASSWORD_SAME_AS_OLD error message not returned"
+
+
+        #Change password with new password
+        response = client.patch(
+            "/customers/change_password",
+            json={
+                "old_password": user["password"],
+                "new_password":self.updated_password,
+            },
+                        headers={"Authorization": f"Bearer {access_token}"},
+        )
+
         assert response.status_code == 200, "Password not changed"
-        assert old_password != new_password, "Password are the same"
+        new_access_token = get_access_token(user["email"],self.updated_password)
+        assert new_access_token is not None, "Access token not returned"
+
+
+        #Cannot change password with wrong old password
+        response = client.patch(
+            "/customers/change_password",
+            json={
+                "old_password": user["password"],
+                "new_password":self.updated_password,
+            },
+                        headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        assert response.status_code == 400, "Password changed Failed"
+        assert response.json()["detail"] == ErrorMessages.WRONG_OLD_PASSWORD, "Wrong password error message not returned"
+
+
+        #Cannot change password with wrong old password
+        user_with_email_not_verified = mock_customer(IdentifierEnum.EMAIL)
+        #We first relog the user to get the new access token
+        access_token = get_access_token(user_with_email_not_verified["email"],user_with_email_not_verified["password"])
+        response = client.patch(
+            "/customers/change_password",
+            json={
+                "old_password": user_with_email_not_verified["password"],
+                "new_password": self.updated_password,
+            },
+                        headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        assert response.status_code == 400, "Password changed Failed"
+        assert response.json()["detail"] == ErrorMessages.EMAIL_OR_PHONE_NUMBER_VERIFICATION_REQUIRED, "Email not verified error message not returned"
       
 
+
+    
+            
 # def test_reset_password(self, get_customer_by_identifier_fix, mock_customer):
 #     # For email address
 #     identifier = mock_customer(IdentifierEnum.EMAIL)["email"]
@@ -193,3 +211,34 @@ class TestCustomerRouter:
 #         response = client.patch("/customers/submit_reset_password", json=data)
         
 #         assert response.status_code == 200, "Password submitted successfully"
+
+
+
+    def test_edit_customer(self, get_access_token,mock_customer_with_both):       
+        access_token = get_access_token(mock_customer_with_both["email"],self.updated_password)
+        edit_input = {
+            "first_name": "first_name modified",
+            "last_name": "last_name modified",
+            "address": "address modified",
+            "email": "ahounoumeryl@yahoo.fr",
+            "phone_number": "+33751569562",
+            "email_redirect_url": "http://localhost",
+        }
+
+        response = client.patch(
+            "/customers",
+            json=edit_input,
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        response_payload = response.json()
+        assert response.status_code == 200, "modification failed"
+        assert "id" in response_payload
+        assert response_payload["first_name"] == edit_input["first_name"]
+        assert response_payload["last_name"] == edit_input["last_name"]
+        assert response_payload["address"] == edit_input["address"]
+        assert response_payload["email"] == edit_input["email"]
+        assert response_payload["phone_number"] == edit_input["phone_number"]
+        assert response_payload["email_verified"] is False
+        assert response_payload["phone_number_verified"] is False
+                

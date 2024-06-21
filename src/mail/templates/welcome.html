@@ -32,9 +32,10 @@
         </header>
         <section>
             <p>Cher/Chère {{ person.first_name}},</p>
-            <p>Merci de vous être inscrit à {{app_name}}. Avant de commencer, veuillez activer votre compte en cliquant
-                sur le bouton ci-dessous.</p>
-            <a href="{{redirect_url}}" class="button">Activer Mon Compte</a>
+            <p>Merci de vous être inscrit à {{app_name}}.Voici votre code de validation.</p>
+
+            <h1>{{person.email_verification_code}}</h1>
+           
             <p>Après activation, vous pourrez profiter de tous nos services sans restriction.</p>
             <p>Voici ce que vous pouvez attendre de notre service :</p>
             <ul>
