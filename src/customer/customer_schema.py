@@ -21,6 +21,7 @@ class CustomerOutput(PersonSchema):
 
     id: str
 
+
 class CreateCustomerInput(PersonBaseSchemaCreate):
     """Create customer input model
 

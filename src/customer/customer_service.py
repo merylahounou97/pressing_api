@@ -19,7 +19,7 @@ from src.utils.error_messages import ErrorMessages
 from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
 from src.utils.sms_constants import SmsConstants
-from pydantic_extra_types.phone_numbers import  PhoneNumber
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from ..security import security_service
 from .customer_model import CustomerModel
@@ -31,7 +31,7 @@ from .customer_schema import (
 settings = Settings()
 
 
-def check_existing_customer(db: Session, identifier : Union[EmailStr, PhoneNumber]):
+def check_existing_customer(db: Session, identifier: Union[EmailStr, PhoneNumber]):
     """Check if a customer already exists in the database
 
     Args:
@@ -59,27 +59,21 @@ def get_customer_by_id(customer_id, db: Session):
     return db.query(CustomerModel).filter(CustomerModel.id == customer_id).first()
 
 
+def get_customer_by_identifier(db: Session, identifier: str) -> CustomerModel | None:
+
+    return (
+        db.query(CustomerModel)
+        .filter(
+            or_(
+                CustomerModel.phone_number == identifier,
+                CustomerModel.email == identifier,
+            )
+        )
+        .first()
+    )
 
 
-def get_customer_by_identifier(
-    db: Session, identifier: str
-) -> CustomerModel | None:
-    """Get a customer by email or phone number
-
-    Args:
-        db (Session): Database session
-        email (str): Email of the customer
-        phone_number (str): Phone number of the customer
-
-    Returns:
-        Customer_model: Customer object or null
-    """
-    return db.query(CustomerModel).filter(or_(CustomerModel.phone_number==identifier,CustomerModel.email==identifier)).first() 
-
-
-async def create_customer(
-    db: Session, customer_create: CreateCustomerInput
-):
+async def create_customer(db: Session, customer_create: CreateCustomerInput):
     """Create a new customer
 
     Args:
@@ -106,7 +100,7 @@ async def create_customer(
         db_user = CustomerModel(
             id=user_id,
             email=customer_create.email,
-            phone_number = customer_create.phone_number,
+            phone_number=customer_create.phone_number,
             last_name=customer_create.last_name,
             first_name=customer_create.first_name,
             phone_number_verification_code=verification_code_phone_number,
@@ -179,7 +173,7 @@ def get_customers(db: Session, skip: int = 0, limit: int = 100):
     return db.query(CustomerModel).offset(skip).limit(limit).all()
 
 
-def set_new_email(customer_online: CustomerModel, email: str,random_code: int):
+def set_new_email(customer_online: CustomerModel, email: str, random_code: int):
     """Set a new email for a customer
     Change the email of the customer and generate a new verification code for the new email.
     put the new email to non verified
@@ -243,14 +237,13 @@ def edit_customer(
         and customer_edit_input.email != customer_online.email
     ):
         random_code = security_service.generate_random_code()
-        set_new_email(customer_online, customer_edit_input.email,random_code)
+        set_new_email(customer_online, customer_edit_input.email, random_code)
 
     if (
         customer_edit_input.phone_number is not None
         and customer_edit_input.phone_number != customer_online.phone_number
     ):
         set_new_phone_number(customer_online, customer_edit_input.phone_number)
-
 
     db.commit()
 
@@ -342,9 +335,7 @@ def verify_code(verification: person_schema.VerifyIdentifierInput, db: Session):
     return db_user
 
 
-async def generate_new_validation_code(
-    identifier: str, db: Session
-):
+async def generate_new_validation_code(identifier: str, db: Session):
     """Generate a new validation code
 
     Args:
@@ -362,23 +353,21 @@ async def generate_new_validation_code(
         else person_schema.IdentifierEnum.PHONE_NUMBER
     )
 
-    user = get_customer_by_identifier(db,identifier)
+    user = get_customer_by_identifier(db, identifier)
 
     if user is not None:
         random_code = security_service.generate_random_code()
-        
+
         if strategy == person_schema.IdentifierEnum.EMAIL and not user.email_verified:
-            set_new_email(user, user.email,random_code=random_code)
+            set_new_email(user, user.email, random_code=random_code)
             db.commit()
 
             mail_service.send_mail_from_template(
-                MailConstants.EMAIL_VERIFICATION,
-                email=user.email,
-                person=user
+                MailConstants.EMAIL_VERIFICATION, email=user.email, person=user
             )
 
             return user
-        
+
         if (
             strategy == person_schema.IdentifierEnum.PHONE_NUMBER
             and not user.phone_number_verified
@@ -439,11 +428,14 @@ def change_password(
         customer_online.is_valid_email() or customer_online.is_valid_phone_number()
     ):
         raise HTTPException(
-            status_code=400, detail=ErrorMessages.EMAIL_OR_PHONE_NUMBER_VERIFICATION_REQUIRED
+            status_code=400,
+            detail=ErrorMessages.EMAIL_OR_PHONE_NUMBER_VERIFICATION_REQUIRED,
         )
 
     if change_password_input.old_password == change_password_input.new_password:
-        raise HTTPException(status_code=400, detail=ErrorMessages.NEW_PASSWORD_SAME_AS_OLD)
+        raise HTTPException(
+            status_code=400, detail=ErrorMessages.NEW_PASSWORD_SAME_AS_OLD
+        )
 
     if security_service.compare_hashed_text(
         change_password_input.old_password, customer_online.password
@@ -486,6 +478,7 @@ def reset_password(identifier: str, db: Session):
     """
 
     user = get_customer_by_identifier(db, identifier)
+
 
     if user is None:
         raise HTTPException(status_code=400, detail="User not found")

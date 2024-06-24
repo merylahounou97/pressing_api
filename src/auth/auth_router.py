@@ -29,7 +29,6 @@ def create_login_token(
     Returns:
         Token: The token
     """
-    print(login_form.username, login_form.password)
     user = customer_service.authenticate_user(
         db, login_form.username, login_form.password
     )

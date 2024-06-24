@@ -30,7 +30,7 @@ AccessTokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 @router.post("/", response_model=CustomerOutput)
 async def create_customers(
-    customer: CreateCustomerInput,  db: Session = Depends(get_db)
+    customer: CreateCustomerInput, db: Session = Depends(get_db)
 ):
     """Create a customer
 
@@ -85,7 +85,7 @@ async def verify_verification_code(
 
 @router.post("/send_verification_code", response_model=Union[CustomerOutput, None])
 async def generate_new_email_validation_code(
-    identifier: Annotated[str, Body(embed=True)] , db: Session = Depends(get_db)
+    identifier: Annotated[str, Body(embed=True)], db: Session = Depends(get_db)
 ):
     """Generate a validation code sent to the user by email or phone number
 
@@ -95,7 +95,9 @@ async def generate_new_email_validation_code(
     Returns:
         bool: The result
     """
-    return await customer_service.generate_new_validation_code(identifier=identifier, db=db)
+    return await customer_service.generate_new_validation_code(
+        identifier=identifier, db=db
+    )
 
 
 @router.patch("/change_password", response_model=CustomerOutput)
@@ -119,7 +121,7 @@ def change_password(
 
 
 @router.patch("/reset_password", response_model=CustomerOutput)
-def reset_password(identifier: str, db: Session = Depends(get_db)):
+def reset_password(identifier: Annotated[str, Body(embed=True)], db: Session = Depends(get_db)):
     """A router to reset a customer password
 
     Args:
@@ -131,6 +133,7 @@ def reset_password(identifier: str, db: Session = Depends(get_db)):
         Returns:
             Customer_output: The customer output"""
     identifier = identifier.replace(" ", "")
+
     return customer_service.reset_password(identifier, db=db)
 
 

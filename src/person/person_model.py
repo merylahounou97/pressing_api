@@ -4,7 +4,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database import Base
 
 
-
 class PersonModel(Base):
     __tablename__ = "persons"
     id = Column(String, primary_key=True)
@@ -23,8 +22,6 @@ class PersonModel(Base):
         Integer, default=0
     )  # 0 pour non vérifié, 1 pour vérifié
     email_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
-
-
 
     def full_name(self):
         return self.first_name + " " + self.last_name

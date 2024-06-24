@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional, Union
 
 from pydantic import BaseModel, EmailStr, field_validator
-from pydantic_extra_types.phone_numbers import  PhoneNumber
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
 class IdentifierEnum(Enum):
@@ -10,6 +10,7 @@ class IdentifierEnum(Enum):
 
     PHONE_NUMBER = "phone_number"
     EMAIL = "email"
+
 
 class PersonBaseSchema(BaseModel):
     """Modèle de base pour les informations d'une personne
@@ -25,8 +26,8 @@ class PersonBaseSchema(BaseModel):
     first_name: Optional[str] = None
     address: Optional[str] = None
     email: Optional[EmailStr] = None
-    phone_number: Optional[PhoneNumber]=None
-    
+    phone_number: Optional[PhoneNumber] = None
+
     @field_validator("phone_number")
     def remove_tel_prefix(cls, v):
         """Supprime le préfixe 'tel:' et les tirets du numéro de téléphone
@@ -36,7 +37,11 @@ class PersonBaseSchema(BaseModel):
         Returns:
             PhoneNumber: Numéro de téléphone sans préfixe 'tel:' et sans tirets
         """
-        return  PhoneNumber.removeprefix(v,"tel:").replace("-", "").replace(" ", "") if v is not None else None
+        return (
+            PhoneNumber.removeprefix(v, "tel:").replace("-", "").replace(" ", "")
+            if v is not None
+            else None
+        )
 
 
 class PersonBaseSchemaCreate(PersonBaseSchema):
