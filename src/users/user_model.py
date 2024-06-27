@@ -1,10 +1,21 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+import enum
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.types import Enum
 
 from src.database import Base
 
 
-class PersonModel(Base):
+
+class UserRole(enum.Enum):
+    """The role of the users"""
+    CUSTOMER = "customer"
+    ADMIN = "admin"
+    SECRETARY = "secretary"
+    
+
+
+class UserModel(Base):
     __tablename__ = "persons"
     id = Column(String, primary_key=True)
     email = Column(String, unique=True, index=True, nullable=True, default=None)
@@ -18,6 +29,7 @@ class PersonModel(Base):
     email_verification_expiry = Column(DateTime, default=None)
     email_verification_code = Column(String, default=None)
     reset_password_code = Column(String, default=None)
+    role = Column(Enum(UserRole), default=UserRole.CUSTOMER)
     phone_number_verified = Column(
         Integer, default=0
     )  # 0 pour non vérifié, 1 pour vérifié

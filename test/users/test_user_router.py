@@ -1,116 +1,128 @@
-from http.client import HTTPException
-import pytest
-from src.person.person_schema import IdentifierEnum
+from test.test_init import client
+
+from src.users.user_model import UserModel
+from src.users.user_schemas import IdentifierEnum, UserOutput
 from src.utils.error_messages import ErrorMessages
 
-from ..test_init import client
+BASE_URL = "/users"
 
+class TestUsersRouter:
+    """Test the user router"""
 
-class TestCustomerRouter:
     updated_password = "new_secure_password"
 
-    def test_create_customer(self, mock_customer):
-        data = mock_customer(IdentifierEnum.EMAIL)
-        response = client.post("/customers?redirect_url=google.com", json=data)
-        response_payload = response.json()
+    def test_create_user(self, mock_user):
+        """
+        Test create user with email, phone number and both
+        """
+        data = mock_user(IdentifierEnum.EMAIL)
+        response = client.post(BASE_URL, json=data)
+        response_payload = UserOutput(**response.json())
+
         # Create user with phone number
         assert (
             response.status_code == 200
         ), "User with phone number created successfully"
-        assert response_payload["email_verified"] is False
-        assert response_payload["email"] is not None
+        assert response_payload.email_verified is False
+        assert response_payload.email is not None
 
-        data = mock_customer(IdentifierEnum.PHONE_NUMBER)
-        response = client.post("/customers?redirect_url=google.com", json=data)
-        response_payload = response.json()
+        data = mock_user(IdentifierEnum.PHONE_NUMBER)
+        response = client.post(BASE_URL, json=data)
+        response_payload = UserOutput(**response.json())
         assert response.status_code == 200, "User with email created successfully"
-        assert response_payload["phone_number_verified"] is False
-        assert response_payload["phone_number"] is not None
+        assert response_payload.phone_number_verified is False
+        assert response_payload.phone_number is not None
 
-        response = client.post(
-            "/customers?redirect_url=google.com", json=mock_customer()
-        )
-        response_payload = response.json()
+        response = client.post(BASE_URL, json=mock_user())
+        response_payload = UserOutput(**response.json())
         assert (
             response.status_code == 200
         ), "user with both email and phone number not created"
-        assert response_payload["phone_number_verified"] is False
-        assert response_payload["phone_number"] is not None
-        assert response_payload["email_verified"] is False
-        assert response_payload["email"] is not None
+        assert response_payload.phone_number_verified is False
+        assert response_payload.phone_number is not None
+        assert response_payload.email_verified is False
+        assert response_payload.email is not None
 
     def test_verify_verification_code(
-        self, get_customer_by_identifier_fix, mock_customer
+        self, get_user_by_identifier, mock_user
     ):
-        identifier = mock_customer()["email"]
-        user_created = get_customer_by_identifier_fix(identifier)
+        """
+        Test verify verification code with email and phone number
+        """
+        identifier = mock_user()["email"]
+        user_created = get_user_by_identifier(identifier)
         response = client.post(
-            "/customers/verify_verification_code",
+            f"{BASE_URL}/verify_verification_code",
             json={
                 "identifier": user_created.email,
                 "verification_code": user_created.email_verification_code,
             },
         )
-        response_payload = response.json()
         assert response.status_code == 200, "Verification code verified failed"
-        assert response_payload["email_verified"] == True
+        response_payload = UserModel(**response.json())
+        assert response_payload.email_verified is True
 
-        identifier = mock_customer()["phone_number"]
+        identifier = mock_user()["phone_number"]
 
-        user_created = get_customer_by_identifier_fix(identifier)
+        user_created = get_user_by_identifier(identifier)
         response = client.post(
-            "/customers/verify_verification_code",
+            f"{BASE_URL}/verify_verification_code",
             json={
                 "identifier": user_created.phone_number,
                 "verification_code": user_created.phone_number_verification_code,
             },
         )
-        response_payload = response.json()
         assert response.status_code == 200, "Verification code verified failed"
-        assert response_payload["phone_number_verified"] is True
+        response_payload = UserModel(**response.json())
+        assert response_payload.phone_number_verified is True
 
     def test_send_verification_code(
-        self, get_customer_by_identifier_fix, mock_customer
+        self, get_user_by_identifier, mock_user
     ):
+        """
+        Test send verification code with email and phone number
+        """
         # For email address
-        idenfifier = mock_customer(IdentifierEnum.EMAIL)["email"]
-        user = get_customer_by_identifier_fix(idenfifier)
+        identifier = mock_user(IdentifierEnum.EMAIL)["email"]
+        user = get_user_by_identifier(identifier)
 
         old_code = user.email_verification_code
         response = client.post(
-            "/customers/send_verification_code", json={"identifier": idenfifier}
+            f"{BASE_URL}/send_verification_code", json={"identifier": identifier}
         )
         assert response.status_code == 200, "Failed to send email verification"
 
-        user = get_customer_by_identifier_fix(idenfifier)
+        user = get_user_by_identifier(identifier)
 
         assert old_code != user.email_verification_code, "Code are the same"
         assert user.email_verified == 0, "Email verification should be false"
 
         # For phone number
-        idenfifier = mock_customer(IdentifierEnum.PHONE_NUMBER)["phone_number"]
-        user = get_customer_by_identifier_fix(idenfifier)
+        identifier = mock_user(IdentifierEnum.PHONE_NUMBER)["phone_number"]
+        user = get_user_by_identifier(identifier)
         old_code = user.phone_number_verification_code
 
         response = client.post(
-            "/customers/send_verification_code", json={"identifier": idenfifier}
+            f"{BASE_URL}/send_verification_code", json={"identifier": identifier}
         )
 
         assert response.status_code == 200, "Failed to send phone number verification"
 
-        user = get_customer_by_identifier_fix(idenfifier)
+        user = get_user_by_identifier(identifier)
         assert old_code != user.phone_number_verification_code, "Code are the same"
         assert (
             user.phone_number_verified == 0
         ), "Phone number verification should be false"
 
-    def test_change_password(self, get_access_token, mock_customer):
-        user = mock_customer()
+    def test_change_password(self, get_access_token, mock_user):
+        """ Test change password with old password and new password"""
+        user =  mock_user()
+
         access_token = get_access_token(user["email"], user["password"])
 
         # Cannot change password with old password
         response = client.patch(
-            "/customers/change_password",
+            f"{BASE_URL}/change_password",
             json={
                 "old_password": user["password"],
                 "new_password": user["password"],
@@ -124,7 +136,7 @@ class TestCustomerRouter:
 
         # Change password with new password
         response = client.patch(
-            "/customers/change_password",
+            f"{BASE_URL}/change_password",
             json={
                 "old_password": user["password"],
                 "new_password": self.updated_password,
@@ -138,7 +150,7 @@ class TestCustomerRouter:
 
         # Cannot change password with wrong old password
         response = client.patch(
-            "/customers/change_password",
+            f"{BASE_URL}/change_password",
             json={
                 "old_password": user["password"],
                 "new_password": self.updated_password,
@@ -152,14 +164,14 @@ class TestCustomerRouter:
         ), "Wrong password error message not returned"
 
         # Cannot change password with wrong old password
-        user_with_email_not_verified = mock_customer(IdentifierEnum.EMAIL)
+        user_with_email_not_verified = mock_user(IdentifierEnum.EMAIL)
         # We first relog the user to get the new access token
         access_token = get_access_token(
             user_with_email_not_verified["email"],
             user_with_email_not_verified["password"],
         )
         response = client.patch(
-            "/customers/change_password",
+            f"{BASE_URL}/change_password",
             json={
                 "old_password": user_with_email_not_verified["password"],
                 "new_password": self.updated_password,
@@ -173,34 +185,33 @@ class TestCustomerRouter:
             == ErrorMessages.EMAIL_OR_PHONE_NUMBER_VERIFICATION_REQUIRED
         ), "Email not verified error message not returned"
 
-
-    def test_reset_password(self, get_customer_by_identifier_fix, mock_customer):
+    def test_reset_password(self, mock_user):
+        """Test reset password with email and phone number"""
         # For email address
-        identifier = mock_customer(IdentifierEnum.EMAIL)["email"]
-        
-        response = client.patch(f"/customers/reset_password", json= {"identifier" : identifier})
+        identifier = mock_user(IdentifierEnum.EMAIL)["email"]       
+        response = client.patch(f"{BASE_URL}/reset_password", json= {"identifier" : identifier})
 
         assert response.status_code == 200, "Failed to send the code via email"
 
         # For phone number
-        identifier = mock_customer(IdentifierEnum.PHONE_NUMBER)["phone_number"]
-        
-        response = client.patch(f"/customers/reset_password", json= {"identifier" : identifier})
-
+        identifier = mock_user(IdentifierEnum.PHONE_NUMBER)["phone_number"]      
+        response = client.patch(f"{BASE_URL}/reset_password", json= {"identifier" : identifier})
 
         assert response.status_code == 200, "Failed to send the code via phone number"
 
 
-    def test_submit_reset_password(self, get_customer_by_identifier_fix, mock_customer, get_access_token):
+    def test_submit_reset_password(self, get_user_by_identifier, mock_user, get_access_token):
+        """Test submit reset password with email and phone number"""
+
         # For email address
-        identifier =mock_customer(IdentifierEnum.EMAIL)["email"]
-        user_created = get_customer_by_identifier_fix(identifier)
+        identifier =mock_user(IdentifierEnum.EMAIL)["email"]
+        user_created = get_user_by_identifier(identifier)
         data = {
         "identifier": identifier,
         "verification_code": user_created.reset_password_code,
-        "new_password": mock_customer(IdentifierEnum.EMAIL)["password"]
+        "new_password": mock_user(IdentifierEnum.EMAIL)["password"]
     }
-        response = client.patch("/customers/submit_reset_password", json=data)
+        response = client.patch(f"{BASE_URL}/submit_reset_password", json=data)
 
         assert response.status_code == 200, "Password not submitted successfully via email"
 
@@ -209,14 +220,14 @@ class TestCustomerRouter:
         assert access_token is not None, "Access token not returned"
 
         # For phone number
-        identifier =mock_customer(IdentifierEnum.PHONE_NUMBER)["phone_number"]
-        user_created = get_customer_by_identifier_fix(identifier)
+        identifier =mock_user(IdentifierEnum.PHONE_NUMBER)["phone_number"]
+        user_created = get_user_by_identifier(identifier)
         data = {
         "identifier": identifier,
         "verification_code": user_created.reset_password_code,
-        "new_password": mock_customer(IdentifierEnum.PHONE_NUMBER)["password"]
+        "new_password": mock_user(IdentifierEnum.PHONE_NUMBER)["password"]
     }
-        response = client.patch("/customers/submit_reset_password", json=data)
+        response = client.patch(f"{BASE_URL}/submit_reset_password", json=data)
 
         assert response.status_code == 200, "Password not submitted successfully via phone_number"
 
@@ -226,9 +237,10 @@ class TestCustomerRouter:
 
 
 
-    def test_edit_customer(self, get_access_token, mock_customer_with_both):
+    def test_edit_user(self, get_access_token ,mock_user):
+        """Test edit user with first name, last name, address, email, phone number and email redirect url"""
         access_token = get_access_token(
-            mock_customer_with_both["email"], self.updated_password
+            mock_user()["email"], self.updated_password
         )
         edit_input = {
             "first_name": "first_name modified",
@@ -236,15 +248,12 @@ class TestCustomerRouter:
             "address": "address modified",
             "email": "ahounoumeryl@yahoo.fr",
             "phone_number": "+33751569562",
-            "email_redirect_url": "http://localhost",
-        }
-
+        } 
         response = client.patch(
-            "/customers",
+            f"{BASE_URL}",
             json=edit_input,
             headers={"Authorization": f"Bearer {access_token}"},
         )
-
         response_payload = response.json()
         assert response.status_code == 200, "modification failed"
         assert "id" in response_payload

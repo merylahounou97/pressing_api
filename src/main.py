@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.auth import auth_router
 from src.config import Settings
-from .customer import customer_router
+from .users import user_router
 from .database import Base, engine
 
 settings = Settings()
@@ -14,5 +14,5 @@ app = FastAPI(docs_url="/")
 
 app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 
-app.include_router(customer_router.router)
+app.include_router(user_router.router)
 app.include_router(auth_router.router)

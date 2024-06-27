@@ -1,9 +1,8 @@
-from src.sms.templates import messages
+from src.users.user_model import UserModel
 from twilio.rest import Client
 
 from src.config import Settings
-from src.customer.customer_model import CustomerModel
-
+from src.sms.templates import messages
 
 settings = Settings()
 
@@ -25,17 +24,17 @@ def send_verification_sms(phone_number: str, verification_code: str):
     )
 
 
-def send_welcome_sms(customer: CustomerModel):
+def send_welcome_sms(user: UserModel):
     """Send welcome SMS
 
     Args:
         phone_number (str): Phone number
     """
     return __send_sms(
-        customer.phone_number,
+        user.phone_number,
         f"""Bienvenue chez {settings.app_name}
-                      Le code de vérification de votre numéro de téléphone est {customer.phone_number_verification_code}
-                      """,
+        Le code de vérification de votre numéro de téléphone est {user.phone_number_verification_code}
+        """,
     )
 
 

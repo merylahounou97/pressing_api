@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 import pytest
-from src.dependencies.db import get_db
 from src.database import SessionLocal
+from src.users.user_schemas import IdentifierEnum
 from .test_init import client
 
 
@@ -21,10 +21,14 @@ def get_test_db_session():
 
 
 @pytest.fixture
-def get_access_token(mock_customer_with_email):
+def get_access_token(mock_user):
+    """Fixture pour récupérer un token d'accès"""
+
+    user = mock_user(IdentifierEnum.EMAIL)
+
     def _access_token(
-        identifier=mock_customer_with_email["email"],
-        password=mock_customer_with_email["password"],
+        identifier=user["email"],
+        password=user["password"],
     ):
         response = client.post(
             "/token",
@@ -34,7 +38,6 @@ def get_access_token(mock_customer_with_email):
                 "Accept": "application/json",
             },
         )
-
         response_payload = response.json()
         return response_payload["access_token"]
 

@@ -1,9 +1,8 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
-
 
 class IdentifierEnum(Enum):
     """Stratégie de validation"""
@@ -12,7 +11,7 @@ class IdentifierEnum(Enum):
     EMAIL = "email"
 
 
-class PersonBaseSchema(BaseModel):
+class UserBaseSchema(BaseModel):
     """Modèle de base pour les informations d'une personne
     Attributes:
         last_name (str): Nom de famille
@@ -44,11 +43,7 @@ class PersonBaseSchema(BaseModel):
         )
 
 
-class PersonBaseSchemaCreate(PersonBaseSchema):
-    pass
-
-
-class PersonSchema(PersonBaseSchema):
+class UserSchema(UserBaseSchema):
     """Modèle de personne
     Attributes:
         id (str): Identifiant unique de la personne
@@ -83,7 +78,7 @@ class ResetAndValidationInput(BaseModel):
     redirect_url: str
 
 
-class ChangePersonPassword(BaseModel):
+class ChangeUserPassword(BaseModel):
     """Modèle de changement de mot de passe
     Attributes:
         old_password (str): Ancien mot de passe
@@ -101,3 +96,29 @@ class ResetPasswordInput(VerifyIdentifierInput):
     """
 
     new_password: str
+
+
+class UserCreateInput(UserBaseSchema):
+    """Create customer input model
+
+    Attributes:
+        password (str): The password of the customer
+    """
+
+    password: str
+
+class UserOutput(UserSchema):
+    """Customer output model
+
+    Attributes:
+        id (int): The customer id
+        first_name (str): The first name of the customer
+        last_name (str): The last name of the customer
+        email (str): The email of the customer
+        phone_number (str): The phone number of the customer
+        address (str): The address of the customer
+        is_active (bool): The status of the customer
+        is_verified (bool): The verification status of the customer
+    """
+
+    id: str
