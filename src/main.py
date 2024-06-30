@@ -5,12 +5,27 @@ from src.auth import auth_router
 from src.config import Settings
 from .customer import customer_router
 from .database import Base, engine
+from fastapi.middleware.cors import CORSMiddleware
 
 settings = Settings()
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url="/")
+
+# Configurer les paramètres CORS
+origins = [
+    "http://localhost:5173",
+    # vous pouvez ajouter d'autres origines si nécessaire
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 
