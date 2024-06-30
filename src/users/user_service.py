@@ -11,10 +11,9 @@ from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
 from src.security import security_service
 from src.sms import sms_service
-from src.users.user_model import UserModel
-from src.users.user_schemas import (ChangeUserPassword, IdentifierEnum,
-                                    ResetPasswordInput, UserBaseSchema,
-                                    UserCreateInput, VerifyIdentifierInput)
+from src.users.user_model import UserModel, UserRole
+from src.users.user_schemas import (ChangeUserPassword, IdentifierEnum, ResetPasswordInput,
+    UserBaseSchema, UserCreateInput, UserCreateMemberInput, VerifyIdentifierInput)
 from src.utils.error_messages import ErrorMessages
 from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
@@ -31,9 +30,8 @@ class UserService:
     def __init__(self,db: Session = Depends(get_db)):
         self.db = db
 
-    def create(self, user_create_input: UserCreateInput):
+    def create(self, user_create_input: UserCreateInput | UserCreateMemberInput):
         """Create a user in the database
-
 
         Args:
             user_create_input (UserCreateInput): User create input
@@ -54,6 +52,8 @@ class UserService:
             verification_code_phone_number = security_service.generate_random_code()
             expiry_time = datetime.now() + timedelta(minutes=settings.code_expiry_time)
 
+            print(type(user_create_input)==UserCreateMemberInput)
+            print(type(user_create_input))
             user_id = (str(uuid.uuid4()),)
             db_user = UserModel(
                 id=user_id,
@@ -67,6 +67,7 @@ class UserService:
                 password=hashed_password,
                 phone_number_verification_expiry=expiry_time,
                 email_verification_expiry=expiry_time,
+                role=user_create_input.role if isinstance(user_create_input, UserCreateMemberInput) else UserRole.CUSTOMER
             )
 
             self.db.add(db_user)
@@ -491,3 +492,26 @@ class UserService:
             minutes=settings.code_expiry_time
         )
         user_online.phone_number_verified = 0
+
+
+    async def create_default_admin_user(self):
+        """Create the default admin user"""
+        print("Creating default admin user",settings.default_admin_email)
+        admin_email = settings.default_admin_email
+        existing_admin = self.db.query(UserModel).filter(UserModel.email == admin_email).first()
+
+        if not existing_admin:
+            self.create(UserCreateInput(**UserService.get_default_admin_input()))
+    
+    @staticmethod
+    def get_default_admin_input():
+        return {
+            "email": settings.default_admin_email,
+            "phone_number": settings.default_admin_phone_number,
+            "last_name": settings.default_admin_last_name,
+            "first_name": settings.default_admin_first_name,
+            "address": settings.default_admin_address,
+            "password": settings.default_admin_password,
+            "role": UserRole.ADMIN
+        }
+        

@@ -1,6 +1,6 @@
 from test.test_init import client
 
-from src.users.user_model import UserModel
+from src.users.user_model import UserModel, UserRole
 from src.users.user_schemas import IdentifierEnum, UserOutput
 from src.utils.error_messages import ErrorMessages
 

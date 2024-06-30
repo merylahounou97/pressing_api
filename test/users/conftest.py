@@ -1,7 +1,14 @@
+import uuid
+from datetime import datetime, timedelta
+from typing import List
+
 import pytest
+from faker import Faker
 from sqlalchemy import or_
-from src.users.user_schemas import IdentifierEnum
+
 from src.users.user_model import UserModel, UserRole
+from src.users.user_schemas import IdentifierEnum, UserCreateInput, UserCreateMemberInput
+from src.users.user_service import UserService
 
 user_with_email = {
     "last_name": "Aiounou",
@@ -77,3 +84,44 @@ def get_user_by_identifier(get_test_db_session):
         )
 
     return _get_user_by_identifier
+
+
+
+
+fake = Faker()
+
+@pytest.fixture
+def generate_user_data():
+    def _generate_user_data(role: UserRole = None):
+        return {
+            "id": str(uuid.uuid4()),
+            "email": fake.unique.email(),
+            "phone_number": f"+22997{fake.random_number(digits=6)}",
+            "last_name": fake.last_name(),
+            "first_name": fake.first_name(),
+            "address": fake.address(),
+            "password": fake.password(),
+            "phone_number_verification_code": str(fake.random_number(digits=6)),
+            "phone_number_verification_expiry": str(datetime.now() + timedelta(days=1)),
+            "email_verification_expiry": str(datetime.now() + timedelta(days=1)),
+            "email_verification_code": str(fake.random_number(digits=6)),
+            "reset_password_code": str(fake.random_number(digits=6)),
+            "role":  role.value if role else fake.random_element(elements=[role.value for role in UserRole]),
+            "phone_number_verified": fake.random_element(elements=[0, 1]),
+            "email_verified": fake.random_element(elements=[0, 1])
+        }
+    return _generate_user_data
+
+@pytest.fixture
+def create_user(get_test_db_session):
+    """
+    Create users in the test database
+    user_data: dict The user data
+    """
+    def _create_user(user_data,is_member=False):
+        if is_member:
+            user = UserService(get_test_db_session).create(user_create_input=UserCreateMemberInput(**user_data))
+        else:
+            user = UserService(get_test_db_session).create(user_create_input=UserCreateInput(**user_data))
+        return user
+    return _create_user

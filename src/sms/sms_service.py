@@ -70,9 +70,13 @@ def __send_sms(phone_number: str, message: str):
         phone_number (str): Phone number
         message (str): Message
     """
-    # Envoyer le SMS de vérification
-    twilio_client.messages.create(
-        body=message,
-        from_=TWILIO_PHONE_NUMBER,
-        to=phone_number,
-    ) if settings.test_mode is False else None
+    try:
+        # Envoyer le SMS de vérification
+        twilio_client.messages.create(
+            body=message,
+            from_=TWILIO_PHONE_NUMBER,
+            to=phone_number,
+        ) if settings.test_mode is False else None
+    except Exception as e:
+        print(e)
+        return False

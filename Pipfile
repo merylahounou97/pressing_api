@@ -17,6 +17,7 @@ pytest = "*"
 pydantic-extra-types = "*"
 
 [dev-packages]
+faker = "*"
 
 [requires]
 python_version = "3.10"

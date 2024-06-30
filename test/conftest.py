@@ -1,8 +1,13 @@
 from unittest.mock import MagicMock
 import pytest
 from src.database import SessionLocal
+from src.lifespans.create_default_admin import create_default_admin_lifespan
 from src.users.user_schemas import IdentifierEnum
+from src.database import Base, engine
+from src.users.user_service import UserService
 from .test_init import client
+from src.main import app
+
 
 
 @pytest.fixture
@@ -11,7 +16,7 @@ def mock_db_session():
     return MagicMock()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def get_test_db_session():
     try:
         db = SessionLocal()
@@ -40,5 +45,12 @@ def get_access_token(mock_user):
         )
         response_payload = response.json()
         return response_payload["access_token"]
-
     return _access_token
+
+
+@pytest.fixture(scope="session",autouse=True)
+def setup_and_teardown():
+
+    yield
+    Base.metadata.drop_all(bind=engine)
+

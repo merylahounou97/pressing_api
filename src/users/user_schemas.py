@@ -3,6 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
+from src.users.user_model import UserRole
 
 class IdentifierEnum(Enum):
     """Stratégie de validation"""
@@ -104,11 +105,18 @@ class UserCreateInput(UserBaseSchema):
     Attributes:
         password (str): The password of the customer
     """
-
     password: str
+class UserCreateMemberInput(UserCreateInput):
+    """Create member (secretary or admin) input model
 
-class UserOutput(UserSchema):
-    """Customer output model
+    Attributes:
+        role (UserRole): The role of the member
+    """
+
+    role: UserRole
+
+class UserOutput(UserSchema,UserCreateMemberInput):
+    """User output model
 
     Attributes:
         id (int): The customer id

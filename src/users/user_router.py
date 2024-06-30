@@ -5,7 +5,8 @@ from fastapi.security import OAuth2PasswordBearer
 
 from src.config import Settings
 from src.users.user_service import UserService
-from src.users.user_schemas import ChangeUserPassword, ResetPasswordInput, UserBaseSchema, UserCreateInput, UserOutput, VerifyIdentifierInput
+from src.users.user_schemas import (ChangeUserPassword, ResetPasswordInput, UserBaseSchema,
+    UserCreateInput, UserCreateMemberInput, UserOutput, VerifyIdentifierInput)
 from src.users.user_model import UserModel, UserRole
 from src.dependencies.get_user_online import GetUserOnline
 
@@ -38,8 +39,23 @@ def create_users(
     Returns:
         UserOutput: The created user
     """
-        
     return user_service.create(user_create_input=user)
+
+@router.post("/member", response_model=UserOutput,tags=["admin"])
+def create_secretary(
+    member_input: UserCreateMemberInput, user_service: UserServiceDep,
+    user_online: UserModel = Depends(get_user_online_dep([UserRole.ADMIN]))
+):
+    """Create a secretary
+
+    Args:
+        user (UserCreateInput): The user input
+        user_online (User_model, optional): The user online. Defaults to Depends(get_user_online).
+
+    Returns:
+        UserOutput: The created user
+    """
+    return user_service.create(user_create_input=member_input)
 
 
 @router.post("/verify_verification_code", response_model=UserOutput)
@@ -138,3 +154,8 @@ async def edit_user(
     return user_service.edit_user(
         user_online=user, user_edit_input=user_edit_input
     )
+
+
+
+
+
