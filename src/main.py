@@ -3,7 +3,9 @@ from fastapi.staticfiles import StaticFiles
 
 from src.auth import auth_router
 from src.config import Settings
-from .customer import customer_router
+from src.lifespans.create_default_admin import create_default_admin_lifespan
+from .users import users_router
+from .users import member_router
 from .database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,7 +13,7 @@ settings = Settings()
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(docs_url="/")
+app = FastAPI(docs_url="/",lifespan=create_default_admin_lifespan)
 
 # Configurer les paramètres CORS
 origins = [
@@ -29,5 +31,6 @@ app.add_middleware(
 
 app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 
-app.include_router(customer_router.router)
+app.include_router(member_router.router)
+app.include_router(users_router.router)
 app.include_router(auth_router.router)
