@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from src.users.user_service import UserService
+from src.users.users_service import UserService
 from src.database import SessionLocal
 
 @asynccontextmanager

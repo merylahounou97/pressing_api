@@ -1,4 +1,4 @@
-from src.users.user_schemas import IdentifierEnum
+from src.users.users_schemas import IdentifierEnum
 
 
 def get_identifier_type(identifier: str):

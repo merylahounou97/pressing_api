@@ -11,9 +11,10 @@ from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
 from src.security import security_service
 from src.sms import sms_service
-from src.users.user_model import UserModel, UserRole
-from src.users.user_schemas import (ChangeUserPassword, IdentifierEnum, ResetPasswordInput,
-    UserBaseSchema, UserCreateInput, UserCreateMemberInput, VerifyIdentifierInput)
+from src.users.users_model import UserModel, UserRole
+from src.users.users_schemas import (ChangeUserPassword, IdentifierEnum, ResetPasswordInput,
+    UserBaseSchema, UserCreateInput, UserCreateMemberInput, UserOutput, UserQueryOptions,
+    VerifyIdentifierInput)
 from src.utils.error_messages import ErrorMessages
 from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
@@ -30,12 +31,26 @@ class UserService:
     def __init__(self,db: Session = Depends(get_db)):
         self.db = db
 
+    def get_all_users(self,user_query_options: UserQueryOptions):
+        """Get all users from the database
+
+        Returns:
+            List[UserModel]: The list of users
+        """
+        query = self.db.query(UserModel)
+        options_fields = user_query_options.model_dump(exclude_none=True).items()
+        for attr, value in options_fields:
+            if hasattr(UserModel, attr):
+                query = query.filter(getattr(UserModel, attr) == value)
+        return query.all()
+
     def create(self, user_create_input: UserCreateInput | UserCreateMemberInput):
         """Create a user in the database
 
-        Args:
-            user_create_input (UserCreateInput): User create input
+        Can create any type of user, admin, customer, secretary
 
+        Args:
+            user_create_input (UserCreateInput | UserCreateMemberInput): The user input
         Returns:
             UserModel: The created user
         """
@@ -52,8 +67,6 @@ class UserService:
             verification_code_phone_number = security_service.generate_random_code()
             expiry_time = datetime.now() + timedelta(minutes=settings.code_expiry_time)
 
-            print(type(user_create_input)==UserCreateMemberInput)
-            print(type(user_create_input))
             user_id = (str(uuid.uuid4()),)
             db_user = UserModel(
                 id=user_id,
@@ -496,12 +509,11 @@ class UserService:
 
     async def create_default_admin_user(self):
         """Create the default admin user"""
-        print("Creating default admin user",settings.default_admin_email)
         admin_email = settings.default_admin_email
         existing_admin = self.db.query(UserModel).filter(UserModel.email == admin_email).first()
 
         if not existing_admin:
-            self.create(UserCreateInput(**UserService.get_default_admin_input()))
+            self.create(UserCreateMemberInput(**UserService.get_default_admin_input()))
     
     @staticmethod
     def get_default_admin_input():

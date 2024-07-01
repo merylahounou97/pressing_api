@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 from src.auth.auth_schema import Token
 from src.config import Settings
 from src.security.security_service import create_access_token
-from src.users.user_service import UserService
+from src.users.users_service import UserService
 
 
 settings = Settings()

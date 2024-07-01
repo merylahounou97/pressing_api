@@ -1,8 +1,6 @@
 from fastapi import Depends, HTTPException
-from typing_extensions import Annotated
-from src.dependencies.get_customer_online import AccessTokenDep, get_user_online
-from src.users.user_service import UserService
-from src.users.user_model import UserModel, UserRole
+from src.dependencies.get_customer_online import get_user_online
+from src.users.users_model import UserModel, UserRole
 
 
 class GetUserOnline:
@@ -21,8 +19,6 @@ class GetUserOnline:
         self.roles = roles
 
     def __call__(self,user_online: UserModel =Depends(get_user_online) ):
-        print(user_online.__dict__)
-        print(user_online.role)
         if self.roles and  user_online.role not in self.roles:
             raise HTTPException(
                 status_code=401,

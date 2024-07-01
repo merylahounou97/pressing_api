@@ -1,4 +1,4 @@
-from src.users.user_model import UserModel
+from src.users.users_model import UserModel
 from twilio.rest import Client
 
 from src.config import Settings

@@ -1,16 +1,13 @@
 from unittest.mock import MagicMock
 import pytest
 from src.database import SessionLocal
-from src.lifespans.create_default_admin import create_default_admin_lifespan
-from src.users.user_schemas import IdentifierEnum
+from src.users.users_schemas import IdentifierEnum
 from src.database import Base, engine
-from src.users.user_service import UserService
 from .test_init import client
-from src.main import app
 
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def mock_db_session():
     """Fixture pour simuler une session de base de données"""
     return MagicMock()
@@ -50,7 +47,5 @@ def get_access_token(mock_user):
 
 @pytest.fixture(scope="session",autouse=True)
 def setup_and_teardown():
-
-    yield
     Base.metadata.drop_all(bind=engine)
-
+    Base.metadata.create_all(bind=engine)

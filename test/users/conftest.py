@@ -6,9 +6,9 @@ import pytest
 from faker import Faker
 from sqlalchemy import or_
 
-from src.users.user_model import UserModel, UserRole
-from src.users.user_schemas import IdentifierEnum, UserCreateInput, UserCreateMemberInput
-from src.users.user_service import UserService
+from src.users.users_model import UserModel, UserRole
+from src.users.users_schemas import IdentifierEnum, UserCreateInput, UserCreateMemberInput
+from src.users.users_service import UserService
 
 user_with_email = {
     "last_name": "Aiounou",
@@ -96,7 +96,7 @@ def generate_user_data():
         return {
             "id": str(uuid.uuid4()),
             "email": fake.unique.email(),
-            "phone_number": f"+22997{fake.random_number(digits=6)}",
+            "phone_number": f"+22997{fake.random_number(digits=6, fix_len=True)}",
             "last_name": fake.last_name(),
             "first_name": fake.first_name(),
             "address": fake.address(),
@@ -125,3 +125,8 @@ def create_user(get_test_db_session):
             user = UserService(get_test_db_session).create(user_create_input=UserCreateInput(**user_data))
         return user
     return _create_user
+
+@pytest.fixture(scope="class")
+def mock_users_service(request, mock_db_session):
+    """ This fixture creates a user service mock and injects it into the test class"""
+    request.cls.users_service = UserService(mock_db_session)

@@ -1,19 +1,20 @@
-from typing import Union
+from typing import Optional, Union
 from typing_extensions import Annotated
 from fastapi import APIRouter, Body, Depends
 from fastapi.security import OAuth2PasswordBearer
 
 from src.config import Settings
-from src.users.user_service import UserService
-from src.users.user_schemas import (ChangeUserPassword, ResetPasswordInput, UserBaseSchema,
-    UserCreateInput, UserCreateMemberInput, UserOutput, VerifyIdentifierInput)
-from src.users.user_model import UserModel, UserRole
+from src.users.users_service import UserService
+from src.users.users_schemas import (ChangeUserPassword, ResetPasswordInput, UserBaseSchema,
+    UserCreateInput, UserCreateMemberInput, UserOutput, UserQueryOptions, VerifyIdentifierInput)
+from src.users.users_model import UserModel, UserRole
 from src.dependencies.get_user_online import GetUserOnline
+from src.utils.constants import Constants
 
 
 settings = Settings()
 
-router = APIRouter(prefix="/users",tags=["users"])
+router = APIRouter(prefix=f"/{Constants.USERS}",tags=[Constants.USERS])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -41,22 +42,6 @@ def create_users(
     """
     return user_service.create(user_create_input=user)
 
-@router.post("/member", response_model=UserOutput,tags=["admin"])
-def create_secretary(
-    member_input: UserCreateMemberInput, user_service: UserServiceDep,
-    user_online: UserModel = Depends(get_user_online_dep([UserRole.ADMIN]))
-):
-    """Create a secretary
-
-    Args:
-        user (UserCreateInput): The user input
-        user_online (User_model, optional): The user online. Defaults to Depends(get_user_online).
-
-    Returns:
-        UserOutput: The created user
-    """
-    return user_service.create(user_create_input=member_input)
-
 
 @router.post("/verify_verification_code", response_model=UserOutput)
 async def verify_verification_code(
@@ -70,7 +55,6 @@ async def verify_verification_code(
     Returns:
         UserOutput: The verified user
     """
- 
     return user_service.verify_code(verification=user_validation_code)
 
 @router.post("/send_verification_code", response_model=Union[UserOutput, None])
@@ -159,3 +143,14 @@ async def edit_user(
 
 
 
+
+@router.get("/", response_model=list[UserOutput],
+            dependencies=[Depends(get_user_online_dep(
+                roles=[UserRole.ADMIN,UserRole.SECRETARY]))])
+def get_all_users(user_service: UserServiceDep, user_query_options: UserQueryOptions=Depends(None)):
+    """Get all users
+    Only an admin or a secretary can get all users
+    Returns:
+        List[UserOutput]: The list of users
+    """
+    return user_service.get_all_users(user_query_options)

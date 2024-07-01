@@ -2,7 +2,7 @@ from typing_extensions import Annotated
 
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends
-from src.users.user_service import UserService
+from src.users.users_service import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

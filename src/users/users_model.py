@@ -4,6 +4,7 @@ from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.types import Enum
 
 from src.database import Base
+from src.utils.constants import Constants
 
 
 
@@ -16,7 +17,7 @@ class UserRole(enum.Enum):
 
 
 class UserModel(Base):
-    __tablename__ = "persons"
+    __tablename__ = Constants.USERS
     id = Column(String, primary_key=True)
     email = Column(String, unique=True, index=True, nullable=True, default=None)
     phone_number = Column(String, unique=True, index=True, nullable=True, default=None)
