@@ -22,6 +22,6 @@ class GetUserOnline:
         if self.roles and  user_online.role not in self.roles:
             raise HTTPException(
                 status_code=401,
-                detail="You do not have permission to access this resource",
+                detail="You do not have permission to do this action",
             )
         return user_online

@@ -1,6 +1,6 @@
 
 import enum
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.types import Enum
 
 from src.database import Base
@@ -32,9 +32,9 @@ class UserModel(Base):
     reset_password_code = Column(String, default=None)
     role = Column(Enum(UserRole), default=UserRole.CUSTOMER)
     phone_number_verified = Column(
-        Integer, default=0
+        Boolean, default=False
     )  # 0 pour non vérifié, 1 pour vérifié
-    email_verified = Column(Integer, default=0)  # 0 pour non vérifié, 1 pour vérifié
+    email_verified = Column(Boolean, default=False)  # 0 pour non vérifié, 1 pour vérifié
 
     def full_name(self):
         return self.first_name + " " + self.last_name
