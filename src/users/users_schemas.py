@@ -100,7 +100,7 @@ class UserCreateMemberInput(UserCreateInput):
     """
     role: UserRole
 
-class UserOutput(UserSchema,UserCreateMemberInput):
+class UserOutput(UserSchema):
     """User output of any user
     Attributes:
         id (int): The customer id
@@ -113,6 +113,7 @@ class UserOutput(UserSchema,UserCreateMemberInput):
         is_verified (bool): The verification status of the customer
     """
     id: str
+    role: UserRole
 
 class UserQueryOptions(UserSchema):
     """User query options
