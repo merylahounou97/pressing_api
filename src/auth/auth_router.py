@@ -13,7 +13,7 @@ settings = Settings()
 router = APIRouter(tags=["auth"])
 
 
-@router.post("/token")
+@router.post("/token", response_model=Token)
 def create_login_token(
     login_form: Annotated[OAuth2PasswordRequestForm, Depends()],
     user_service: Annotated[UserService, Depends()],

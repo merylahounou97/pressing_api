@@ -155,7 +155,7 @@ def get_all_users(user_service: UserServiceDep, user_query_options: UserQueryOpt
     """
     return user_service.get_all_users(user_query_options)
 
-@router.get("/me", response_model=UserOutput)
+@router.get("/me", response_model=UserOutput, tags=["me"])
 def me( user =  Depends(get_user_online_dep())
 ):
     """Get the current user
