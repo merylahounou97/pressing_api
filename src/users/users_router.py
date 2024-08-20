@@ -1,6 +1,5 @@
 from typing import Optional, Union
 from typing_extensions import Annotated
-from fastapi import APIRouter, Body, Depends
 from fastapi.security import OAuth2PasswordBearer
 
 from src.config import Settings
@@ -10,6 +9,8 @@ from src.users.users_schemas import (ChangeUserPassword, ResetPasswordInput, Use
 from src.users.users_model import UserModel, UserRole
 from src.dependencies.get_user_online import GetUserOnline
 from src.utils.constants import Constants
+from src.utils.error_messages import ErrorMessages
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 
 
 settings = Settings()
@@ -123,7 +124,8 @@ def submit_reset_password(reset_input: ResetPasswordInput, user_service: UserSer
 async def edit_user(
     user_edit_input: UserBaseSchema,
     user_service: UserServiceDep,
-    user =  Depends(get_user_online_dep())
+    user =  Depends(get_user_online_dep()),
+    user_id: Annotated[Optional[str], Query(description="The user id if the user online is a secretary or an admin",embed=False)] = None
 ):
     """Edit a user by id
 
@@ -135,12 +137,47 @@ async def edit_user(
     Returns:
         User_output: The user output
     """
+    
+
+    
+    if user.role == UserRole.ADMIN:
+        # If the user is an admin or a secretary, they can edit any user
+        if user_id is None:
+            raise HTTPException(status_code=400, detail=ErrorMessages.USER_ID_NOT_PROVIDED)
+        
+        # Get the user to edit by id and edit it
+        user_editing = user_service.get_user_by_id(user_id)
+
+        if user_editing is None:
+            raise HTTPException(status_code=404, detail=ErrorMessages.USER_NOT_FOUND)
+        elif user_editing.role == UserRole.ADMIN:
+            raise HTTPException(status_code=400, detail=ErrorMessages.ADMIN_CANNOT_EDIT_ADMIN)
+        else:
+            return user_service.edit_user(
+                user_editing=user_editing, user_edit_input=user_edit_input
+            )
+    elif user.role == UserRole.SECRETARY:
+        # If the user is a secretary, they can only edit a member
+        if user_id is None:
+            raise HTTPException(status_code=400, detail=ErrorMessages.USER_ID_NOT_PROVIDED)
+        
+        # Get the user to edit by id and edit it
+        user_editing = user_service.get_user_by_id(user_id)
+
+        if user_editing is None:
+            raise HTTPException(status_code=404, detail=ErrorMessages.USER_NOT_FOUND)
+        elif user_editing.role == UserRole.ADMIN:
+            raise HTTPException(status_code=400, detail=ErrorMessages.SECRETARY_CANNOT_EDIT_ADMIN)
+        elif user_editing.role == UserRole.SECRETARY:
+            raise HTTPException(status_code=400, detail=ErrorMessages.SECRETARY_CANNOT_EDIT_SECRETARY)
+        else:
+            return user_service.edit_user(
+                user_editing=user_editing, user_edit_input=user_edit_input
+            )
+    
     return user_service.edit_user(
-        user_online=user, user_edit_input=user_edit_input
+        user_editing=user, user_edit_input=user_edit_input
     )
-
-
-
 
 
 

@@ -361,6 +361,7 @@ class UserService:
         Returns:
             Customer_model: The user object
         """
+        print("++++++++++++++ user_id", user_id)
         return self.db.query(UserModel).filter(UserModel.id == user_id).first()
     
     def reset_password(self,identifier: str):
@@ -424,7 +425,7 @@ class UserService:
         return user
     
     def edit_user(self,
-        user_online: UserModel,
+        user_editing: UserModel,
         user_edit_input: UserBaseSchema
     ):
         """Edit a user
@@ -438,27 +439,27 @@ class UserService:
             Customer_model: Customer object
         """
 
-        user_old_mail = user_online.email
-        user_old_sms = user_online.phone_number
+        user_old_mail = user_editing.email
+        user_old_sms = user_editing.phone_number
         if user_edit_input.last_name is not None:
-            user_online.last_name = user_edit_input.last_name
+            user_editing.last_name = user_edit_input.last_name
         if user_edit_input.first_name is not None:
-            user_online.first_name = user_edit_input.first_name
+            user_editing.first_name = user_edit_input.first_name
         if user_edit_input.address is not None:
-            user_online.address = user_edit_input.address
+            user_editing.address = user_edit_input.address
 
         if (
             user_edit_input.email is not None
-            and user_edit_input.email != user_online.email
+            and user_edit_input.email != user_editing.email
         ):
             random_code = security_service.generate_random_code()
-            self.set_new_email(user_online, user_edit_input.email, random_code)
+            self.set_new_email(user_editing, user_edit_input.email, random_code)
 
         if (
             user_edit_input.phone_number is not None
-            and user_edit_input.phone_number != user_online.phone_number
+            and user_edit_input.phone_number != user_editing.phone_number
         ):
-            self.set_new_phone_number(user_online, user_edit_input.phone_number)
+            self.set_new_phone_number(user_editing, user_edit_input.phone_number)
 
         self.db.commit()
 
@@ -470,7 +471,7 @@ class UserService:
             mail_service.send_mail_from_template(
                 MailConstants.UPDATE_EMAIL,
                 email=user_edit_input.email,
-                user=user_online,
+                user=user_editing,
                 redirect_url="google.com",
             )
 
@@ -480,14 +481,14 @@ class UserService:
             and user_edit_input.phone_number != user_old_sms
         ):
             sms_service.send_sms(
-                user_online.phone_number,
+                user_editing.phone_number,
                 template_name=SmsConstants.PHONE_NUMBER_CHANGED,
-                user=user_online,
+                user=user_editing,
                 support_address=settings.support_address,
             )
 
 
-        return user_online
+        return user_editing
 
     def set_new_phone_number(self,user_online: UserModel, phone_number: str):
         """Set a new phone number for a user
@@ -511,9 +512,11 @@ class UserService:
         """Create the default admin user"""
         admin_email = settings.default_admin_email
         existing_admin = self.db.query(UserModel).filter(UserModel.email == admin_email).first()
-
         if not existing_admin:
+            self.create(UserCreateMemberInput(**UserService.get_default_secretary_input()))
+            self.create(UserCreateMemberInput(**UserService.get_default_customer_input()))
             self.create(UserCreateMemberInput(**UserService.get_default_admin_input()))
+
     
     @staticmethod
     def get_default_admin_input():
@@ -526,4 +529,27 @@ class UserService:
             "password": settings.default_admin_password,
             "role": UserRole.ADMIN
         }
+    
+    @staticmethod
+    def get_default_secretary_input():
+        return {
+            "email": "merylahounou@gmail.com",
+            "phone_number": "+33666495244",
+            "last_name": "AHOUNOU",
+            "first_name": "Senou",
+            "address": "Cotonou",
+            "password": settings.default_admin_password,
+            "role": UserRole.SECRETARY
+        }
         
+    @staticmethod
+    def get_default_customer_input():
+        return {
+            "email": "ahounoumeryl@yahoo.fr",
+            "phone_number": None,
+            "last_name": "AHOUNOU",
+            "first_name": "Meryl",
+            "address": "Cotonou",
+            "password": settings.default_admin_password,
+            "role": UserRole.CUSTOMER
+        }
