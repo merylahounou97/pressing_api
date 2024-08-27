@@ -3,3 +3,5 @@ class Constants():
     USERS="users"
     MEMBER="members"
     ARTICLES="articles"
+    ORDERS="orders"
+    ORDER_DETAILS="order_details"

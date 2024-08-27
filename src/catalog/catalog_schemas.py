@@ -11,7 +11,7 @@ class ArticleCreateInputSchema(BaseModel):
 
 class ArticleOutputSchema(ArticleCreateInputSchema):
     id: str
-
+""" 
     @computed_field
     @property
     def price_discount_5(self):
@@ -26,3 +26,4 @@ class ArticleOutputSchema(ArticleCreateInputSchema):
     @property
     def price_discount_10(self):
         return self.price * 0.90
+ """

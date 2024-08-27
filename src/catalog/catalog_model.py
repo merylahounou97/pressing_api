@@ -12,5 +12,5 @@ class ArticleModel(Base):
     name = Column(String)
     description = Column(String)
     price = Column(Float)
-    price_express = Column(Float)
+    express_price = Column(Float)
     

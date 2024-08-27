@@ -1,39 +1,36 @@
 
 
-class OrderModel(BaseModel):
-    id: str
-    date: datetime
-    num_command: str
-    type_command: TypeCommandEnum
-    customer_id: str
-    collect: bool
-    delivery: bool
-    code_article: str
-    details_article: str
-    specificity: str
-    coef_1: int
-    coef_2: int
-    cat_remise: int
-    quantity: int
-    number_of_pieces: int
-    cintre: int
-    delivery_unit: int
-    delivery_amount: int
-    touch_ups: int
-    discount: float
+from enum import Enum
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
+
+from src.catalog.catalog_enums import ArticleSpecificityEnum
+from src.database import Base
+from src.order.order_enums import OrderStatusEnum
+from src.order.order_schemas import TypeOrderEnum
+from src.utils.constants import Constants
 
 
-class OrderCreateOutputSchema(OrderCreateInputSchema):
-    delivery_date: datetime
-    payment_due: float
-    customer_name: str
-    client_status: str
-    subscription: str
-    distance: float
-    Price: float
-    Price_discount: float
-    delivery_price: float
-    total_before_discount: float
-    total_after_discount: float
-    total_net: float
+class OrderModel(Base):
+    __tablename__ = Constants.ORDERS
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    order_date = Column(DateTime)
+    delivery_date = Column(DateTime)
+    type_order = Column(Enum(TypeOrderEnum),default=TypeOrderEnum.Normal)
+    collect = Column(Boolean)
+    delivery = Column(Boolean)
+    discount_order= Column(Float)
+    customer_id = Column(String, ForeignKey(f"{Constants.USERS}.id"))
+    status = Column(Enum(OrderStatusEnum), default=OrderStatusEnum.PENDING)
+
+class OrderDetailsModel(Base):
+    __tablename__ = Constants.ORDER_DETAILS
+    order_id = Column(String, ForeignKey(f"{Constants.ORDERS}.id"), primary_key=True)
+    article_id = Column(String,ForeignKey(f"{Constants.ORDER_DETAILS}.id") , primary_key=True)
+    specificity = Column(Enum(ArticleSpecificityEnum),
+                         default=ArticleSpecificityEnum.NONE)
+    divider_coef = Column(Float)
+    multiplier_coef = Column(Float)
+    discount_article = Column(Float)
+    quantity = Column(Integer)
+    
 

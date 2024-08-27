@@ -1,39 +1,32 @@
 import datetime
-from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
-
-class TypeCommandEnum(Enum):
-    Normal = "normal"
-    Express = "express"
-
+from src.catalog.catalog_schemas import ArticleOutputSchema
+from src.order.order_enums import OrderStatusEnum, TypeOrderEnum
 
 
 class OrderCreateInputSchema(BaseModel):
-    id: str
     date: datetime
-    num_command: str
-    type_command: TypeCommandEnum
     customer_id: str
     collect: bool
     delivery: bool
-    code_article: str
-    details_article: str
-    specificity: str
-    coef_1: int
-    coef_2: int
-    cat_remise: int
-    quantity: int
-    number_of_pieces: int
-    cintre: int
-    delivery_unit: int
-    delivery_amount: int
-    touch_ups: int
-    discount: float
+    type_order: TypeOrderEnum
+    delivery_date: datetime
+    order_details: list[ArticleOutputSchema]
+
 
 
 class OrderCreateOutputSchema(OrderCreateInputSchema):
+    id: str
+    status: OrderStatusEnum
+    @computed_field
+    @property
+    def num_order(self):
+        return self.id+"/"+self.customer_id+self.date
+
+
+    """ 
     delivery_date: datetime
     payment_due: float
     customer_name: str
@@ -46,4 +39,4 @@ class OrderCreateOutputSchema(OrderCreateInputSchema):
     total_before_discount: float
     total_after_discount: float
     total_net: float
-
+    type_order: TypeOrderEnum """
