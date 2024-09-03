@@ -27,6 +27,7 @@ class  TestSecretaryRouter():
 
         #Log in an admin to create a secretary
         admin_data = UserService.get_default_admin_input()
+        
         #First create the admin
         admin=create_user(admin_data,is_member=True)
         admin_token = get_access_token(admin.email, admin_data["password"])

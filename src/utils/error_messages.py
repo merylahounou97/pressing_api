@@ -9,3 +9,4 @@ class ErrorMessages:
     ADMIN_CANNOT_EDIT_ADMIN = "An admin cannot edit another admin"
     SECRETARY_CANNOT_EDIT_ADMIN = "A secretary cannot edit an admin"
     SECRETARY_CANNOT_EDIT_SECRETARY = "A secretary cannot edit another secretary"
+    ACTION_NOT_ALLOWED = "You do not have permission to do this action"

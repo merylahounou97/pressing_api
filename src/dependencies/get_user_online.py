@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException
 from src.dependencies.get_customer_online import get_user_online
 from src.users.users_model import UserModel, UserRole
+from src.utils.error_messages import ErrorMessages
 
 
 class GetUserOnline:
@@ -22,6 +23,6 @@ class GetUserOnline:
         if self.roles and  user_online.role not in self.roles:
             raise HTTPException(
                 status_code=401,
-                detail="You do not have permission to do this action",
+                detail=ErrorMessages.ACTION_NOT_ALLOWED ,
             )
         return user_online

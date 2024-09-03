@@ -7,6 +7,8 @@ from src.config import Settings
 from src.lifespans.create_default_admin import create_default_admin_lifespan
 from .users import users_router
 from .users import member_router
+from .order import order_router
+from .catalog import catalog_router
 from .database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -40,3 +42,5 @@ app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 app.include_router(member_router.router)
 app.include_router(users_router.router)
 app.include_router(auth_router.router)
+app.include_router(order_router.router)
+app.include_router(catalog_router.router)

@@ -6,7 +6,7 @@ class ArticleCreateInputSchema(BaseModel):
     name: str
     description: str
     price: float
-    price_express: float
+    express_price: float
 
 
 class ArticleOutputSchema(ArticleCreateInputSchema):

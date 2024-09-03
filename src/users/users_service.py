@@ -361,7 +361,6 @@ class UserService:
         Returns:
             Customer_model: The user object
         """
-        print("++++++++++++++ user_id", user_id)
         return self.db.query(UserModel).filter(UserModel.id == user_id).first()
     
     def reset_password(self,identifier: str):
