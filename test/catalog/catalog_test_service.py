@@ -1,8 +1,9 @@
 
-from src.utils.constants import Constants
 from test.base_test_service import BaseTestService
+from src.utils.constants import Constants
 from test.test_init import client
 from src.utils.error_messages import ErrorMessages
+from src.users.users_router import get_all_users
 
 
 class CatalogTestService(BaseTestService):
@@ -15,9 +16,12 @@ class CatalogTestService(BaseTestService):
     """
     base_url = f"/{Constants.ARTICLES}"
 
-    def __init__(self, generate_user_data, create_user, get_access_token, generate_article):
-        super().__init__(generate_user_data, create_user, get_access_token)
+    def __init__(self,  get_access_token, generate_article,get_all_secretaries,get_all_admins,get_all_users):
         self.generate_article = generate_article
+        self.get_access_token = get_access_token
+        self.secretaries = get_all_secretaries
+        self.admins = get_all_admins
+        self.customers = get_all_users
 
    
     def check_article_creation(self, response):
@@ -33,7 +37,7 @@ class CatalogTestService(BaseTestService):
         Args:
             user (dict): The user data  to create the article
         """
-        access_token = self.get_access_token(user["email"], user["password"])
+        access_token = self.get_access_token(user["email"], self.password_all_users)
         # Generate data for article
         item_to_add = self.generate_article()
 

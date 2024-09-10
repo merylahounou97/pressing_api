@@ -10,9 +10,9 @@ from src.utils.constants import Constants
 
 class UserRole(enum.Enum):
     """The role of the users"""
-    CUSTOMER = "customer"
-    ADMIN = "admin"
-    SECRETARY = "secretary"
+    CUSTOMER = "CUSTOMER"
+    ADMIN = "ADMIN"
+    SECRETARY = "SECRETARY"
     
 
 

@@ -3,6 +3,7 @@ from faker import Faker
 import random
 
 from test.catalog.catalog_test_service import CatalogTestService
+from src.users.users_router import get_all_users
 fake = Faker()
 
 
@@ -21,5 +22,5 @@ def generate_article():
 
 
 @pytest.fixture
-def catalog_test_service(generate_user_data,create_user,get_access_token,generate_article):
-    return CatalogTestService(generate_user_data,create_user,get_access_token,generate_article)
+def catalog_test_service(get_access_token,generate_article,get_all_secretaries,get_all_admins,get_all_users):
+    return CatalogTestService(get_access_token,generate_article,get_all_secretaries,get_all_admins,get_all_users)

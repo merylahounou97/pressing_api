@@ -1,3 +1,9 @@
+    """
+    Créer une classe de *service pour les membres (exemple user_test_service)
+    Enlever toutes créations de user dans les tests
+    Et remplacer par les users crées à l'intilisation des tests
+    """
+
 from src.users.users_service import UserService
 from test.test_init import client
 
