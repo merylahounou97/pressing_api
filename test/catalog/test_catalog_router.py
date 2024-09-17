@@ -1,5 +1,11 @@
-from test.catalog.conftest import catalog_test_service
+"""Test catalog router
+Ecrire le test pour modifier les informations d'un article
+Ecrire le test pour supprimer un article
+Ecrire le test pour récupérer un article
+Ecrire le test pour récupérer tous les articles
+"""
 
+from test.catalog.conftest import catalog_test_service
 
 class TestCatalogRouter:
     """Test catalog router
