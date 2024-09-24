@@ -13,6 +13,6 @@ async def create_default_admin_lifespan(app: FastAPI):
     """Create the default admin user in the database"""
     db = SessionLocal()
     user_service = UserService(db)
-    await user_service.create_default_admin_user()
+    # await user_service.create_default_admin_user()
     yield
     db.close()

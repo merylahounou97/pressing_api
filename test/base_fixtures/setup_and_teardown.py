@@ -1,10 +1,12 @@
 import pytest
+from src.catalog.catalog_model import ArticleModel
 from src.users.users_model import UserModel, UserRole
 from src.database import Base, engine,SessionLocal
 from test.users.fixtures.session.seed import *
+from test.catalog.fixtures.session.seed import *
 
 @pytest.fixture(scope="session",autouse=True)
-def setup_and_teardown(generate_user_data):
+def setup_and_teardown(generate_user_data, generate_article):
     """Fixture pour configurer et détruire la base de données"""
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -22,3 +24,13 @@ def setup_and_teardown(generate_user_data):
     secretaries.extend(_secretaries) # type: ignore
     admins.extend(_admins) # type: ignore
     
+
+    #Insérer des articles dans la base de donnée
+    _articles = [generate_article() for _ in range(2)]
+    with SessionLocal() as db:
+        for article in _articles:
+            db.add(ArticleModel(**article))
+        db.commit()
+
+    articles.extend(_articles) # type: ignore
+

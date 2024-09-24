@@ -1,11 +1,11 @@
-"""Test catalog router
-Ecrire le test pour modifier les informations d'un article
-Ecrire le test pour supprimer un article
-Ecrire le test pour récupérer un article
-Ecrire le test pour récupérer tous les articles
+"""
+Ecrie un test pour recupérer tous les articles
+Ecrire un test pour rcupérer un article  par son id
+Ecrire un test pour supprimer un article par son id
+Ecrire un test pour rechercher un article par son nom ou son code
 """
 
-from test.catalog.conftest import catalog_test_service
+from src.users.users_model import UserRole
 
 class TestCatalogRouter:
     """Test catalog router
@@ -23,4 +23,18 @@ class TestCatalogRouter:
 
         #échouer à un article avec un utilisateur customer
         catalog_test_service.fail_to_create_with_customer()
+
+    def test_catalog_edit(self,catalog_test_service):
+        """Test edit article
+        When the user is an admin or a secretary, he can edit an article
+        But a customer can't edit an article
+        """
+        #Créer un utilisateur secretaire 
+        catalog_test_service.edit_article(role=UserRole.SECRETARY)
+
+        # créer un utilisateur admin
+        catalog_test_service.edit_article(role=UserRole.ADMIN)
+
+        #échouer à un article avec un utilisateur customer
+        catalog_test_service.fail_to_edit_article_with_customer()
         

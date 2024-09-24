@@ -1,4 +1,4 @@
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field, computed_field
 
 
 class ArticleCreateInputSchema(BaseModel):
@@ -7,6 +7,14 @@ class ArticleCreateInputSchema(BaseModel):
     description: str
     price: float
     express_price: float
+
+class ArticleEditInputSchema(BaseModel):
+    code: str = Field(default=None)
+    name: str= Field(default=None)
+    description: str= Field(default=None)
+    price: float= Field(default=None)
+    express_price: float= Field(default=None)
+
 
 
 class ArticleOutputSchema(ArticleCreateInputSchema):
