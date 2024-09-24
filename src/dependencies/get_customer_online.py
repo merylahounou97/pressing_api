@@ -9,8 +9,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 AccessTokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 
-def get_user_online(access_token: AccessTokenDep, 
-                    user_service: Annotated[UserService, Depends()]):
+def get_user_online(
+    access_token: AccessTokenDep, user_service: Annotated[UserService, Depends()]
+):
     """This is a dependency that  decode the access token of a user and return the instance of the user
     Args:
         access_token (str): The access token.
@@ -25,5 +26,5 @@ def get_user_online(access_token: AccessTokenDep,
     Returns:
         UserModel: The user instance.
     """
-    user= user_service.validate_token(access_token=access_token)
+    user = user_service.validate_token(access_token=access_token)
     return user

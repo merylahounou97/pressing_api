@@ -12,9 +12,17 @@ from src.mail import mail_service
 from src.security import security_service
 from src.sms import sms_service
 from src.users.users_model import UserModel, UserRole
-from src.users.users_schemas import (ChangeUserPassword, IdentifierEnum, ResetPasswordInput,
-    UserBaseSchema, UserCreateInput, UserCreateMemberInput, UserOutput, UserQueryOptions,
-    VerifyIdentifierInput)
+from src.users.users_schemas import (
+    ChangeUserPassword,
+    IdentifierEnum,
+    ResetPasswordInput,
+    UserBaseSchema,
+    UserCreateInput,
+    UserCreateMemberInput,
+    UserOutput,
+    UserQueryOptions,
+    VerifyIdentifierInput,
+)
 from src.utils.error_messages import ErrorMessages
 from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
@@ -28,10 +36,10 @@ class UserService:
 
     db: Session
 
-    def __init__(self,db: Session = Depends(get_db)):
+    def __init__(self, db: Session = Depends(get_db)):
         self.db = db
 
-    def get_all_users(self,user_query_options: UserQueryOptions):
+    def get_all_users(self, user_query_options: UserQueryOptions):
         """Get all users from the database
 
         Returns:
@@ -80,7 +88,9 @@ class UserService:
                 password=hashed_password,
                 phone_number_verification_expiry=expiry_time,
                 email_verification_expiry=expiry_time,
-                role=user_create_input.role if isinstance(user_create_input, UserCreateMemberInput) else UserRole.CUSTOMER
+                role=user_create_input.role
+                if isinstance(user_create_input, UserCreateMemberInput)
+                else UserRole.CUSTOMER,
             )
 
             self.db.add(db_user)
@@ -112,7 +122,7 @@ class UserService:
                 ) from e
             raise HTTPException(status_code=400, detail=str(e)) from e
 
-    def verify_code(self,verification: VerifyIdentifierInput):
+    def verify_code(self, verification: VerifyIdentifierInput):
         """Verify the code
 
         Args:
@@ -148,7 +158,8 @@ class UserService:
                     UserModel.phone_number == verification.identifier,
                     UserModel.phone_number_verification_code
                     == verification.verification_code,
-                ).first()
+                )
+                .first()
             )
             if db_user is not None:
                 expiry_date_time = db_user.phone_number_verification_expiry
@@ -170,8 +181,8 @@ class UserService:
         self.db.commit()
         self.db.refresh(db_user)
         return db_user
-    
-    def generate_new_validation_code(self,identifier: str):
+
+    def generate_new_validation_code(self, identifier: str):
         """Generate a new validation code
 
         Args:
@@ -219,9 +230,8 @@ class UserService:
             else:
                 raise HTTPException(status_code=400, detail="Unknown strategy")
         return None
-    
 
-    def get_user_by_identifier(self,identifier: str) -> UserModel | None:
+    def get_user_by_identifier(self, identifier: str) -> UserModel | None:
         """Get a user by identifier from the database
         Args:
             identifier (str): The user identifier can be email or phone number
@@ -239,9 +249,8 @@ class UserService:
             )
             .first()
         )
-    
 
-    def set_new_email(self,user_online: UserModel, email: str, random_code: int):
+    def set_new_email(self, user_online: UserModel, email: str, random_code: int):
         """Set a new email for a user
         Change the email of the user and generate a new verification code for the new email.
         put the new email to non verified
@@ -261,7 +270,7 @@ class UserService:
         )
         user_online.email_verified = 0
         return None
-    
+
     def authenticate_user(self, identifier: str, password: str):
         """Authenticate a user by email or phone number
 
@@ -273,16 +282,15 @@ class UserService:
         Returns:
             Customer_model: The user
         """
-        user = self.get_user_by_identifier( identifier)
+        user = self.get_user_by_identifier(identifier)
         if user is not None and security_service.compare_hashed_text(
             password, user.password
         ):
             return user
         return None
-        
-    def change_password(self,
-        user_online: UserModel,
-        change_password_input: ChangeUserPassword
+
+    def change_password(
+        self, user_online: UserModel, change_password_input: ChangeUserPassword
     ):
         """Change the password
 
@@ -294,9 +302,7 @@ class UserService:
                 Customer_model: Customer object
         """
 
-        if not (
-            user_online.is_valid_email() or user_online.is_valid_phone_number()
-        ):
+        if not (user_online.is_valid_email() or user_online.is_valid_phone_number()):
             raise HTTPException(
                 status_code=400,
                 detail=ErrorMessages.EMAIL_OR_PHONE_NUMBER_VERIFICATION_REQUIRED,
@@ -334,7 +340,7 @@ class UserService:
 
         raise HTTPException(status_code=400, detail=ErrorMessages.WRONG_OLD_PASSWORD)
 
-    def validate_token(self,access_token: str):
+    def validate_token(self, access_token: str):
         """Validate the access token
 
         Args:
@@ -350,8 +356,8 @@ class UserService:
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
         return user
-        
-    def get_user_by_id(self,user_id: str):
+
+    def get_user_by_id(self, user_id: str):
         """Get a user by id
 
         Args:
@@ -362,8 +368,8 @@ class UserService:
             Customer_model: The user object
         """
         return self.db.query(UserModel).filter(UserModel.id == user_id).first()
-    
-    def reset_password(self,identifier: str):
+
+    def reset_password(self, identifier: str):
         """Reset the password
 
         Args:
@@ -374,8 +380,7 @@ class UserService:
             Customer_model: The user
         """
 
-        user = self.get_user_by_identifier( identifier)
-
+        user = self.get_user_by_identifier(identifier)
 
         if user is None:
             raise HTTPException(status_code=400, detail="User not found")
@@ -389,10 +394,7 @@ class UserService:
             mail_service.send_mail_from_template(
                 MailConstants.PASSWORD_RESET, email=user.email, user=user
             )
-        elif (
-            strategy == IdentifierEnum.PHONE_NUMBER
-            and user.phone_number is not None
-        ):
+        elif strategy == IdentifierEnum.PHONE_NUMBER and user.phone_number is not None:
             sms_service.send_sms(
                 user.phone_number,
                 template_name=SmsConstants.PASSWORD_RESET,
@@ -402,8 +404,8 @@ class UserService:
             raise HTTPException(status_code=500, detail="Invalid user identifier")
 
         return user
-    
-    def submit_reset_password(self,reset_input: ResetPasswordInput):
+
+    def submit_reset_password(self, reset_input: ResetPasswordInput):
         """Submit the reset password
 
         Args:
@@ -411,7 +413,7 @@ class UserService:
         Returns:
             Customer_model: The user
         """
-        user = self.get_user_by_identifier( reset_input.identifier)
+        user = self.get_user_by_identifier(reset_input.identifier)
         if user is None:
             raise HTTPException(status_code=400, detail="User not found")
 
@@ -422,11 +424,8 @@ class UserService:
         user.reset_password_code = None
         self.db.commit()
         return user
-    
-    def edit_user(self,
-        user_editing: UserModel,
-        user_edit_input: UserBaseSchema
-    ):
+
+    def edit_user(self, user_editing: UserModel, user_edit_input: UserBaseSchema):
         """Edit a user
 
         Args:
@@ -463,10 +462,7 @@ class UserService:
         self.db.commit()
 
         # Sent email if it has been changed
-        if (
-            user_edit_input.email is not None
-            and user_edit_input.email != user_old_mail
-        ):
+        if user_edit_input.email is not None and user_edit_input.email != user_old_mail:
             mail_service.send_mail_from_template(
                 MailConstants.UPDATE_EMAIL,
                 email=user_edit_input.email,
@@ -486,12 +482,11 @@ class UserService:
                 support_address=settings.support_address,
             )
 
-
         return user_editing
 
-    def set_new_phone_number(self,user_online: UserModel, phone_number: str):
+    def set_new_phone_number(self, user_online: UserModel, phone_number: str):
         """Set a new phone number for a user
-        Change the phone number of the user 
+        Change the phone number of the user
         and generate a new verification code for the new phone number.
         put the new phone number to non verified
         and add the expiration of the verification code
@@ -506,17 +501,21 @@ class UserService:
         )
         user_online.phone_number_verified = 0
 
-
     async def create_default_admin_user(self):
         """Create the default admin user"""
         admin_email = settings.default_admin_email
-        existing_admin = self.db.query(UserModel).filter(UserModel.email == admin_email).first()
+        existing_admin = (
+            self.db.query(UserModel).filter(UserModel.email == admin_email).first()
+        )
         if not existing_admin:
-            self.create(UserCreateMemberInput(**UserService.get_default_secretary_input()))
-            self.create(UserCreateMemberInput(**UserService.get_default_customer_input()))
+            self.create(
+                UserCreateMemberInput(**UserService.get_default_secretary_input())
+            )
+            self.create(
+                UserCreateMemberInput(**UserService.get_default_customer_input())
+            )
             self.create(UserCreateMemberInput(**UserService.get_default_admin_input()))
 
-    
     @staticmethod
     def get_default_admin_input():
         return {
@@ -526,9 +525,9 @@ class UserService:
             "first_name": settings.default_admin_first_name,
             "address": settings.default_admin_address,
             "password": settings.default_admin_password,
-            "role": UserRole.ADMIN
+            "role": UserRole.ADMIN,
         }
-    
+
     @staticmethod
     def get_default_secretary_input():
         return {
@@ -538,9 +537,9 @@ class UserService:
             "first_name": "Senou",
             "address": "Cotonou",
             "password": settings.default_admin_password,
-            "role": UserRole.SECRETARY
+            "role": UserRole.SECRETARY,
         }
-        
+
     @staticmethod
     def get_default_customer_input():
         return {
@@ -550,5 +549,5 @@ class UserService:
             "first_name": "Meryl",
             "address": "Cotonou",
             "password": settings.default_admin_password,
-            "role": UserRole.CUSTOMER
+            "role": UserRole.CUSTOMER,
         }

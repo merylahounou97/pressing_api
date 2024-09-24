@@ -12,11 +12,10 @@ from src.utils.constants import Constants
 from src.users.users_schemas import UserCreateMemberInput
 
 
+class TestSecretaryRouter:
 
-class  TestSecretaryRouter():
-    
-    """"Test all the path in user related to the secretary actions"""
-    def test_create_member(self,member_test_service):
+    """ "Test all the path in user related to the secretary actions"""
+
+    def test_create_member(self, member_test_service):
         """Test the creation of a secretary"""
         member_test_service.create_member()
-

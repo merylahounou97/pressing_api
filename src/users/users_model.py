@@ -1,4 +1,3 @@
-
 import enum
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.types import Enum
@@ -7,13 +6,12 @@ from src.database import Base
 from src.utils.constants import Constants
 
 
-
 class UserRole(enum.Enum):
     """The role of the users"""
+
     CUSTOMER = "CUSTOMER"
     ADMIN = "ADMIN"
     SECRETARY = "SECRETARY"
-    
 
 
 class UserModel(Base):
@@ -34,7 +32,9 @@ class UserModel(Base):
     phone_number_verified = Column(
         Boolean, default=False
     )  # 0 pour non vérifié, 1 pour vérifié
-    email_verified = Column(Boolean, default=False)  # 0 pour non vérifié, 1 pour vérifié
+    email_verified = Column(
+        Boolean, default=False
+    )  # 0 pour non vérifié, 1 pour vérifié
 
     def full_name(self):
         return self.first_name + " " + self.last_name

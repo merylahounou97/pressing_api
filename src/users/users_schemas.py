@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from src.users.users_model import UserRole
 
+
 class IdentifierEnum(Enum):
     """Stratégie de validation"""
 
@@ -52,6 +53,7 @@ class UserSchema(UserBaseSchema):
         phone_number_verified (bool): Indique si le numéro de téléphone a été vérifié
         email_verified (bool): Indique si l'adresse email a été vérifiée
     """
+
     phone_number_verified: bool
     email_verified: bool
 
@@ -62,8 +64,10 @@ class VerifyIdentifierInput(BaseModel):
         identifier (str): Identifiant de la personne
         verification_code (str): Code de vérification
     """
+
     identifier: str
     verification_code: str
+
 
 class ChangeUserPassword(BaseModel):
     """Modèle de changement de mot de passe
@@ -71,6 +75,7 @@ class ChangeUserPassword(BaseModel):
         old_password (str): Ancien mot de passe
         new_password (str): Nouveau mot de passe
     """
+
     old_password: str
     new_password: str
 
@@ -90,7 +95,9 @@ class UserCreateInput(UserBaseSchema):
     Attributes:
         password (str): The password of the customer
     """
+
     password: str
+
 
 class UserCreateMemberInput(UserCreateInput):
     """Create member (secretary or admin) input model
@@ -98,7 +105,9 @@ class UserCreateMemberInput(UserCreateInput):
     Attributes:
         role (UserRole): The role of the member
     """
+
     role: UserRole
+
 
 class UserOutput(UserSchema):
     """User output of any user
@@ -112,8 +121,10 @@ class UserOutput(UserSchema):
         is_active (bool): The status of the customer
         is_verified (bool): The verification status of the customer
     """
+
     id: str
     role: UserRole
+
 
 class UserQueryOptions(UserSchema):
     """User query options
@@ -121,8 +132,9 @@ class UserQueryOptions(UserSchema):
         limit (int): The limit of the query
         offset (int): The offset of the query
     """
-    role: Optional[UserRole]=None
-    email_verified: Optional[bool]=None
-    phone_number_verified: Optional[bool]=None
-    limit: int=30
-    offset: int=0
+
+    role: Optional[UserRole] = None
+    email_verified: Optional[bool] = None
+    phone_number_verified: Optional[bool] = None
+    limit: int = 30
+    offset: int = 0

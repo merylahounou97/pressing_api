@@ -1,5 +1,3 @@
-
-
 from sqlalchemy import Column, Float, String
 from src.database import Base
 from src.utils.constants import Constants
@@ -13,4 +11,3 @@ class ArticleModel(Base):
     description = Column(String)
     price = Column(Float)
     express_price = Column(Float)
-    

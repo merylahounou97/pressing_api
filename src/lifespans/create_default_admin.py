@@ -8,7 +8,7 @@ from src.auth.auth_router import settings
 
 
 @asynccontextmanager
-#Giving the app as an argument to the function is mandatory to have the lifespan working
+# Giving the app as an argument to the function is mandatory to have the lifespan working
 async def create_default_admin_lifespan(app: FastAPI):
     """Create the default admin user in the database"""
     db = SessionLocal()

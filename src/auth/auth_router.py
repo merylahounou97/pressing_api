@@ -40,6 +40,5 @@ def create_login_token(
             }
         )
         return Token(access_token=access_token, token_type="Bearer")
-    
-    raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    raise HTTPException(status_code=401, detail="Invalid credentials")

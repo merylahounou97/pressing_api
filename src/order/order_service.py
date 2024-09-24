@@ -18,16 +18,17 @@ from src.utils.sms_constants import SmsConstants
 from src.order.order_schemas import OrderCreateInputSchema, OrderCreateOutputSchema
 
 
-
 class OrderService:
     """User service class"""
 
     db: Session
 
-    def __init__(self,db: Session = Depends(get_db)):
+    def __init__(self, db: Session = Depends(get_db)):
         self.db = db
 
-    def create(self, user_create_input: OrderCreateInputSchema) -> OrderCreateOutputSchema:
+    def create(
+        self, user_create_input: OrderCreateInputSchema
+    ) -> OrderCreateOutputSchema:
         """Create a user
 
         Args:

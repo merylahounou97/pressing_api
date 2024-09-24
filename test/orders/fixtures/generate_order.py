@@ -1,13 +1,18 @@
 from faker import Faker
 from src.order.order_enums import OrderTypeEnum
+
 fake = Faker()
+
+
 def generate_order():
     date = fake.date()
     return {
         "date": date,
         "collect": fake.boolean(),
         "delivery": fake.boolean(),
-        "type_order": list([OrderTypeEnum.Express,OrderTypeEnum.Normal])[fake.random_int(min=0,max=1)],
+        "type_order": list([OrderTypeEnum.Express, OrderTypeEnum.Normal])[
+            fake.random_int(min=0, max=1)
+        ],
         "delivery_date": fake.date_between(date),
         "order_items": [
             {

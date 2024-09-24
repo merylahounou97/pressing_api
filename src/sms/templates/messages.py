@@ -1,6 +1,7 @@
 from src.utils.sms_constants import SmsConstants
 from src.users.users_model import UserModel
 
+
 def password_changed(user: UserModel, support_address: str):
     """return email template when a password is changed
 

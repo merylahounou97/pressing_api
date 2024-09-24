@@ -10,15 +10,14 @@ import typing_extensions
 
 class OrderCreateInputSchema(BaseModel):
     date: datetime
-    customer_id:str | None = Field(default=None, json_schema_extra={
-        "description": "The customer id"
-    })
+    customer_id: str | None = Field(
+        default=None, json_schema_extra={"description": "The customer id"}
+    )
     collect: bool
     delivery: bool
     type_order: OrderTypeEnum
     delivery_date: datetime
     order_details: list[ArticleOutputSchema]
-
 
 
 class OrderCreateOutputSchema(OrderCreateInputSchema):
@@ -27,9 +26,8 @@ class OrderCreateOutputSchema(OrderCreateInputSchema):
 
     @computed_field
     @property
-    def num_order(self)->str:
-        return self.id+"/"+self.customer_id+self.date
-
+    def num_order(self) -> str:
+        return self.id + "/" + self.customer_id + self.date
 
     """ 
     delivery_date: datetime

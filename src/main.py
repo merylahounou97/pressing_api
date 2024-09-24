@@ -16,12 +16,17 @@ settings = Settings()
 
 Base.metadata.create_all(bind=engine)
 
+
 def generate_unique_function_id(route: APIRoute):
     print(f"{route.tags[0]}-{route.name}")
     return f"{route.tags[0]}-{route.name}"
 
 
-app = FastAPI(docs_url="/",lifespan=create_default_admin_lifespan,generate_unique_id_function=generate_unique_function_id)
+app = FastAPI(
+    docs_url="/",
+    lifespan=create_default_admin_lifespan,
+    generate_unique_id_function=generate_unique_function_id,
+)
 
 # Configurer les paramètres CORS
 origins = [

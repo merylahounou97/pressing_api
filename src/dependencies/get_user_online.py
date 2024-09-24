@@ -16,13 +16,14 @@ class GetUserOnline:
     Returns:
         UserModel: The user instance.
     """
-    def __init__(self,roles: list[UserRole] = None):
+
+    def __init__(self, roles: list[UserRole] = None):
         self.roles = roles
 
-    def __call__(self,user_online: UserModel =Depends(get_user_online) ):
-        if self.roles and  user_online.role not in self.roles:
+    def __call__(self, user_online: UserModel = Depends(get_user_online)):
+        if self.roles and user_online.role not in self.roles:
             raise HTTPException(
                 status_code=401,
-                detail=ErrorMessages.ACTION_NOT_ALLOWED ,
+                detail=ErrorMessages.ACTION_NOT_ALLOWED,
             )
         return user_online

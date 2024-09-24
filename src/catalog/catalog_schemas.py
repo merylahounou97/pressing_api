@@ -8,17 +8,19 @@ class ArticleCreateInputSchema(BaseModel):
     price: float
     express_price: float
 
+
 class ArticleEditInputSchema(BaseModel):
     code: str = Field(default=None)
-    name: str= Field(default=None)
-    description: str= Field(default=None)
-    price: float= Field(default=None)
-    express_price: float= Field(default=None)
-
+    name: str = Field(default=None)
+    description: str = Field(default=None)
+    price: float = Field(default=None)
+    express_price: float = Field(default=None)
 
 
 class ArticleOutputSchema(ArticleCreateInputSchema):
     id: str
+
+
 """ 
     @computed_field
     @property

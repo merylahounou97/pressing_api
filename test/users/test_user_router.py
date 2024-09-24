@@ -11,7 +11,7 @@ BASE_URL = f"/{Constants.USERS}"
 
 class TestUsersRouter:
     """Test the user router"""
-    
+
     def test_create_user(self, user_test_service):
         """
         Test create user with email, phone number and both
@@ -22,9 +22,7 @@ class TestUsersRouter:
 
         user_test_service.create_user_with_phone_number_and_email()
 
-    def test_verify_verification_code(
-        self, user_test_service
-    ):
+    def test_verify_verification_code(self, user_test_service):
         """
         Test verify verification code with email and phone number
         """
@@ -32,8 +30,7 @@ class TestUsersRouter:
         user_test_service.request_verify_verification_code_email()
         user_test_service.request_verify_verification_code_phone_number()
 
-    def test_send_verification_code(
-            self, user_test_service):
+    def test_send_verification_code(self, user_test_service):
         """
         Test send verification code with email and phone number
         """
@@ -41,7 +38,7 @@ class TestUsersRouter:
         user_test_service.sent_verification_code_for_phone_number()
 
     def test_change_password(self, user_test_service):
-        """ Test change password with old password and new password"""
+        """Test change password with old password and new password"""
 
         user_test_service.change_password()
 
@@ -54,13 +51,10 @@ class TestUsersRouter:
         user_test_service.submit_reset_password_with_email()
         # user_test_service.submit_reset_password_with_phone_number()
 
-
-    
-    
-    def test_edit_user(self,user_test_service):
+    def test_edit_user(self, user_test_service):
         """Test edit user with first name, last name, address, email, phone number and email redirect url"""
         user_test_service.edit_user()
-  
+
     def test_get_all_users(self, user_test_service):
         """Test get all users"""
         user_test_service.get_all_users()

@@ -1,6 +1,7 @@
 import pytest
 from test.test_init import client
 
+
 @pytest.fixture
 def get_access_token():
     """Fixture pour récupérer un token d'accès"""
@@ -19,4 +20,5 @@ def get_access_token():
         )
         response_payload = response.json()
         return response_payload["access_token"]
+
     return _access_token

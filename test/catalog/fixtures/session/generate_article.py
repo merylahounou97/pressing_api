@@ -4,7 +4,6 @@ from faker import Faker
 import random
 
 
-
 fake = Faker()
 
 
@@ -19,4 +18,5 @@ def generate_article():
             "express_price": random.randint(100, 1000),
             "code": fake.word(),
         }
+
     return _generate_article
