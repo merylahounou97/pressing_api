@@ -5,6 +5,7 @@ from src.config import Settings
 
 settings = Settings()
 
+print(settings.database_name)
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{settings.database_user}:{settings.database_password}"

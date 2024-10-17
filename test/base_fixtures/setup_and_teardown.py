@@ -33,7 +33,7 @@ def setup_and_teardown(generate_user_data, generate_article):
     admins.extend(_admins)  # type: ignore
 
     # Insérer des articles dans la base de donnée
-    _articles = [generate_article() for _ in range(2)]
+    _articles = [generate_article() for _ in range(4)]
     with SessionLocal() as db:
         for article in _articles:
             db.add(ArticleModel(**article))

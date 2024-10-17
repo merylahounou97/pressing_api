@@ -14,6 +14,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 settings = Settings()
 
+
+print("++++++++++++++++settings.database_name", settings.database_name)
+
 Base.metadata.create_all(bind=engine)
 
 

@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file="src/.env", env_file_encoding="utf-8", extra="allow"
     )
+    
     app_name: str
     database_name: str
     database_user: str

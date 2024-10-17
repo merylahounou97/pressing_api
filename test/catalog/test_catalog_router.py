@@ -1,10 +1,3 @@
-"""
-Ecrie un test pour recupérer tous les articles
-Ecrire un test pour rcupérer un article  par son id
-Ecrire un test pour supprimer un article par son id
-Ecrire un test pour rechercher un article par son nom ou son code
-"""
-
 from src.users.users_model import UserRole
 
 
@@ -38,3 +31,21 @@ class TestCatalogRouter:
 
         # échouer à un article avec un utilisateur customer
         catalog_test_service.fail_to_edit_article_with_customer()
+
+    def test_catalog_get_all(self, catalog_test_service):
+        """Test get all articles"""
+        catalog_test_service.get_all_articles()
+
+    def test_catalog_get_by_id(self, catalog_test_service):
+        """Test get article by id"""
+        catalog_test_service.get_article_by_id()
+
+    def test_catalog_delete(self, catalog_test_service):
+        """Test delete article"""
+        catalog_test_service.delete_article_by_id(role=UserRole.ADMIN)
+        catalog_test_service.delete_article_by_id(role=UserRole.SECRETARY)
+        catalog_test_service.delete_article_customer_by_id()
+
+    def test_catalog_search(self, catalog_test_service):
+        """Test search article by name or code"""
+        catalog_test_service.search_article_by_name_or_code()
