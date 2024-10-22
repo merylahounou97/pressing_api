@@ -1,38 +1,57 @@
-from typing_extensions import Annotated
-from fastapi import HTTPException, Depends, APIRouter
-from fastapi.security import OAuth2PasswordBearer
-
-from src.config import Settings
+from fastapi import APIRouter, Depends, HTTPException
 from src.users.users_router import get_user_online_dep
 from src.users.users_model import UserRole
 from src.utils.constants import Constants
+from src.order.order_schemas import (
+    OrderCreateInputSchema,
+    OrderCreateOutputSchema
+)
 from src.order.order_service import OrderService
-from src.order.order_schemas import OrderCreateInputSchema, OrderCreateOutputSchema
-
-
-settings = Settings()
 
 router = APIRouter(prefix=f"/{Constants.ORDERS}", tags=[Constants.ORDERS])
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-AccessTokenDep = Annotated[str, Depends(oauth2_scheme)]
-
-OrderServiceDep = Annotated[OrderService, Depends()]
-
-
 @router.post("/", response_model=OrderCreateOutputSchema)
-def create_order(
-    create_order_input: OrderCreateInputSchema,
-    order_service: OrderServiceDep,
-    user=Depends(get_user_online_dep()),
+async def create_order(
+    order_input: OrderCreateInputSchema,
+    order_service=Depends(OrderService),
+    user=Depends(get_user_online_dep())
 ):
-    """Create an order"""
-    if user.role in (UserRole.SECRETARY, UserRole.ADMIN):
-        if create_order_input.customer_id is None:
-            raise HTTPException(status_code=400, detail="The customer_id is required")
-        return order_service.create(create_order_input=create_order_input)
-    # If the user is a customer, we set the customer_id to the user id
-    create_order_input.customer_id = user.id
-    return order_service.create(create_order_input=create_order_input, user_id=user.id)
+    """Create an order. The customer can create an order for themselves, admins and secretaries can create for any customer."""
+    if user.role == UserRole.CUSTOMER:
+        order_input.customer_id = user.id  # Set the customer ID to the logged-in customer
+    elif not order_input.customer_id:
+        raise HTTPException(status_code=400, detail="Customer ID is required for admins and secretaries")
+    
+    return order_service.create_order(order_input)
+
+# @router.get("/", response_model=list[OrderCreateOutputSchema])
+# async def get_all_orders(order_service=Depends(OrderService), user=Depends(get_user_online_dep())):
+#     """Get all orders. Customers get their own, admins and secretaries get all orders."""
+#     if user.role == UserRole.CUSTOMER:
+#         return order_service.get_order_history(user.id)
+#     return order_service.get_all_orders()
+
+# @router.get("/{order_id}", response_model=OrderCreateOutputSchema)
+# async def get_order_by_id(order_id: str, order_service=Depends(OrderService), user=Depends(get_user_online_dep())):
+#     """Get order by ID."""
+#     return order_service.get_order_by_id(order_id)
+
+# @router.delete("/{order_id}")
+# async def delete_order(order_id: str, order_service=Depends(OrderService), user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY]))):
+#     """Delete an order. Only admins and secretaries can delete orders."""
+#     return order_service.delete_order(order_id)
+
+# @router.patch("/{order_id}", response_model=OrderCreateOutputSchema)
+# async def edit_order(
+#     order_id: str,
+#     order_edit_input: OrderEditInputSchema,
+#     order_service=Depends(OrderService),
+#     user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY]))
+# ):
+#     """Edit an order. Only admins and secretaries can edit orders."""
+#     return order_service.edit_order(order_id, order_edit_input)
+
+# @router.get("/{order_id}/quote")
+# async def get_order_quote(order_id: str, order_service=Depends(OrderService), user=Depends(get_user_online_dep())):
+#     """Get the quote of an order."""
+#     return order_service.get_order_quote(order_id)

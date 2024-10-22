@@ -1,13 +1,15 @@
 import pytest
 from src.catalog.catalog_model import ArticleModel
+from src.order.order_model import OrderModel
 from src.users.users_model import UserModel, UserRole
 from src.database import Base, engine, SessionLocal
 from test.users.fixtures.session.seed import *
 from test.catalog.fixtures.session.seed import *
+from test.orders.fixtures.session.seed import *
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_and_teardown(generate_user_data, generate_article):
+def setup_and_teardown(generate_user_data, generate_article, generate_order):
     """Fixture pour configurer et détruire la base de données"""
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -24,19 +26,25 @@ def setup_and_teardown(generate_user_data, generate_article):
     ]
 
     users = _customers + _secretaries + _admins
+        # Insérer des articles dans la base de donnée
+    _articles = [generate_article() for _ in range(4)]
+        #Insrer des commandes dans la base de donnée
+    _orders = [generate_order() for _ in range(4)]
     with SessionLocal() as db:
         for user in users:
             db.add(UserModel(**user))
-        db.commit()
-    customers.extend(_customers)  # type: ignore
-    secretaries.extend(_secretaries)  # type: ignore
-    admins.extend(_admins)  # type: ignore
-
-    # Insérer des articles dans la base de donnée
-    _articles = [generate_article() for _ in range(4)]
-    with SessionLocal() as db:
         for article in _articles:
             db.add(ArticleModel(**article))
+        for order in _orders:
+            # print(order)
+            continue
         db.commit()
 
+
+    customers.extend(_customers)  # type: ignore
+    secretaries.extend(_secretaries)  # type: ignore
+    admins.extend(_admins)  # type: ignor
+
     articles.extend(_articles)  # type: ignore
+    orders.extend(_orders)  # type: ignore
+

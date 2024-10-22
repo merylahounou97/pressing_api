@@ -11,3 +11,4 @@ class OrderStatusEnum(Enum):
     CONFIRMED = "confirmed"
     CANCELED = "canceled"
     FINISHED = "finished"
+    values = [PENDING, CONFIRMED, CANCELED, FINISHED]

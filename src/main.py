@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.auth import auth_router
 from src.config import Settings
-from src.lifespans.create_default_admin import create_default_admin_lifespan
+from src.lifespans.create_default_admin import initialize_app
 from .users import users_router
 from .users import member_router
 from .order import order_router
@@ -14,8 +14,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 settings = Settings()
 
-
-print("++++++++++++++++settings.database_name", settings.database_name)
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,7 +25,7 @@ def generate_unique_function_id(route: APIRoute):
 
 app = FastAPI(
     docs_url="/",
-    lifespan=create_default_admin_lifespan,
+    lifespan=initialize_app,
     generate_unique_id_function=generate_unique_function_id,
 )
 
@@ -52,3 +50,5 @@ app.include_router(users_router.router)
 app.include_router(auth_router.router)
 app.include_router(order_router.router)
 app.include_router(catalog_router.router)
+
+

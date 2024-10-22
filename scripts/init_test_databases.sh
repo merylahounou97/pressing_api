@@ -4,7 +4,9 @@ set -e
 # Nom de la base de données
 DATABASE="test"
 
-
+echo $DATABASE
+echo $POSTGRES_USER
+echo $POSTGRES_DB
 echo "on est dans le test"
 
 # Crée la base de données

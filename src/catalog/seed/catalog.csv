@@ -1,38 +1,25 @@
-;N°;Code;Articles;Détails;Catégorie; Prix  ;Statut;Fréquence;; Description Fact ;;-5%;-7%;-10%;; Express ;; Coef 2 ; Coef 4 
-;1;SV;Boxer homme;Toutes matières ;Homme; 500 ;Inchangé;Rare;; Sous-vêtement  (SV) ;; 475 ; 465 ; 450 ;; 725 ;;;
-;2;SV;Culotte femme;Toutes matières ;Femme; 500 ;Inchangé;Rare;; Sous-vêtement  (SV) ;; 475 ; 465 ; 450 ;; 725 ;;;
-;3;SV;Collant Petit/Grand;Toutes matières ;Femme; 500 ;Inchangé;Rare;; Sous-vêtement  (SV) ;; 475 ; 465 ; 450 ;; 725 ;;;
-;4;SV;Débardeur homme;Toutes matières ;Femme; 500 ;Inchangé;Rare;; Sous-vêtement  (SV) ;; 475 ; 465 ; 450 ;; 725 ;;;
-;42;RO v8;Robe - traitement délicat-v8;RO crt/Lg avec lav et repassage à faire avec beaucoup de soin;Femme; 2 550 ;Revu;Fréquent;; Robe (RO v8) ;; 2 425 ; 2 375 ; 2 295 ;; 3 700 ;;;
-;43;RO v9;Robe - traitement très délicat-v9;RO tte mat, délicat à traiter et pas robe de mariée;Femme; 5 000 ;Revu;Fréquent;; Robe (RO v9) ;; 4 750 ; 4 650 ; 4 500 ;; 7 250 ;;;
-;44;RO v10;Robe de Mariage/Courte/Longue;Toutes matières;Femme; 10 000 ;Inchangé;Fréquent;; Robe (RO v10) ;; 9 500 ; 9 300 ; 9 000 ;; 14 500 ;;;
-;45;TL;Tenue locale- v1;Haut ou Bas en tissu local ordi,TC crt/ Lg. TL Blanc crt;Unisex; 700 ;Inchangé;Fréquent;; Tenue Locale (TL) ;; 665 ; 650 ; 630 ;; 1 015 ;;;
-;46;TL v2;Tenue locale- v2;TL Blanc long .;Unisex; 850 ;Nouveau;Fréquent;; Tenue Locale (TL v2) ;; 810 ; 790 ; 765 ;; 1 235 ;;;
-;47;TL v3;Tenue locale- v3;TL en tissu lourd ou pas simple;Unisex; 1 050 ;Nouveau;Fréquent;; Tenue Locale (TL v3) ;; 1 000 ; 980 ; 950 ;; 1 525 ;;;
-;48;TL v3;Pagne atchoke/Zédédji-v3;Pagne atchoke grand;Femme; 1 050 ;Nouveau;Rare;; Tenue Locale (TL v3) ;; 1 000 ; 980 ; 950 ;; 1 525 ;;;
-;49;TL v4;Bisht/Hijab_v4;Manteau/Tunique musulman;Unisex; 1 250 ;Nouveau;Rare;; Tenue Locale (TL v4) ;; 1 190 ; 1 165 ; 1 125 ;; 1 815 ;;;
-;88;DR v2;Drap 1 place -v2;Coton, lin ou autres;Maison; 700 ;Inchangé;Fréquent;; Drap/Couette (DR v2) ;; 665 ; 650 ; 630 ;; 1 015 ;;;
-;89;DR v3;Couette 2-3 place -v3;Coton, lin ou autres;Maison; 2 050 ;Revu;Rare;; Drap/Couette (DR v3) ;; 1 950 ; 1 910 ; 1 845 ;; 2 975 ;;;
-;90;ED;Ensemble drap 6 pièces -v1;Ensemble  1 Drap 2/3 places + 1 couverture  + 4 taies ;Maison; 2 700 ;Nouveau;Fréquent;; Ensemble Drap (ED) ;; 2 565 ; 2 515 ; 2 430 ;; 3 915 ;;;
-;91;ED v2;Ensemble drap 3 pièces -v2;Ensemble  1Drap 2/3 places + 2 taies ;Maison; 1 500 ;;;; Ensemble Drap (ED v2) ;; 1 425 ; 1 395 ; 1 350 ;; 2 175 ;;;
-;92;ED v3;Ensemble drap 6 pièces -v3;Ensemble  1 Drap 2/3 places + 1 couette + 4 taies ;Maison; 3 500 ;;;; Ensemble Drap (ED v3) ;; 3 325 ; 3 255 ; 3 150 ;; 5 075 ;;;
-;93;ED v4;Ensemble drap 5 pièces -v4;Ensemble  1 Drap 2/3 places  + 4 taies ;Maison; 2 050 ;;;; Ensemble Drap (ED v4) ;; 1 948 ; 1 907 ; 1 845 ;; 2 973 ;;;
-;129;KG;Lavage au kg;Lavage ;; 600 ;;;; Lavage au Kg (KG) ;; 590 ; 580 ; 570 ;; 870 ;;;
-;130;KR;Lavage au kg avec repassage;Traitement + Lavage + Repassage de drap, serviette, rideaux…;; 1 050 ;;;; Lavage au Kg avec option Repassage (KR) ;; 1 000 ; 980 ; 950 ;; 1 525 ;;;
-;131;KT;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu pas blancs;; 850 ;;;; Lavage au Kg avec option Traitement (KT ) ;; 810 ; 790 ; 765 ;; 1 235 ;;;
-;132;KT v2;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu  blancs ;; 1 050 ;;;; Lavage au Kg avec option Traitement (KT v2) ;; 1 000 ; 980 ; 950 ;; 1 525 ;;;
-;133;KT v3;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu  blancs ;; 1 250 ;;;; Lavage au Kg avec option Traitement (KT v3) ;; 1 190 ; 1 165 ; 1 125 ;; 1 815 ;;;
-;134;KT v4;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu  blancs ;; 1 500 ;;;; Lavage au Kg avec option Traitement (KT v4) ;; 1 425 ; 1 395 ; 1 350 ;; 2 175 ;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;   ;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;; 1 260 ;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;
+ï»¿NÂ°;Code;Articles;DÃ©tails;CatÃ©gorie; Prix  ;Statut;FrÃ©quence; Description Fact ; Express 
+1;SV;Boxer homme;Toutes matiÃ¨res ;Homme; 500 ;InchangÃ©;Rare; Sous-vÃªtement  (SV) ; 725 
+2;SV;Culotte femme;Toutes matiÃ¨res ;Femme; 500 ;InchangÃ©;Rare; Sous-vÃªtement  (SV) ; 725 
+3;SV;Collant Petit/Grand;Toutes matiÃ¨res ;Femme; 500 ;InchangÃ©;Rare; Sous-vÃªtement  (SV) ; 725 
+4;SV;DÃ©bardeur homme;Toutes matiÃ¨res ;Femme; 500 ;InchangÃ©;Rare; Sous-vÃªtement  (SV) ; 725 
+42;RO v8;Robe - traitement dÃ©licat-v8;RO crt/Lg avec lav et repassage Ã  faire avec beaucoup de soin;Femme; 2 550 ;Revu;FrÃ©quent; Robe (RO v8) ; 3 700 
+43;RO v9;Robe - traitement trÃ¨s dÃ©licat-v9;RO tte mat, dÃ©licat Ã  traiter et pas robe de mariÃ©e;Femme; 5 000 ;Revu;FrÃ©quent; Robe (RO v9) ; 7 250 
+44;RO v10;Robe de Mariage/Courte/Longue;Toutes matiÃ¨res;Femme; 10 000 ;InchangÃ©;FrÃ©quent; Robe (RO v10) ; 14 500 
+45;TL;Tenue locale- v1;Haut ou Bas en tissu local ordi,TC crt/ Lg. TL Blanc crt;Unisex; 700 ;InchangÃ©;FrÃ©quent; Tenue Locale (TL) ; 1 015 
+46;TL v2;Tenue locale- v2;TL Blanc long .;Unisex; 850 ;Nouveau;FrÃ©quent; Tenue Locale (TL v2) ; 1 235 
+47;TL v3;Tenue locale- v3;TL en tissu lourd ou pas simple;Unisex; 1 050 ;Nouveau;FrÃ©quent; Tenue Locale (TL v3) ; 1 525 
+48;TL v3;Pagne atchoke/ZÃ©dÃ©dji-v3;Pagne atchoke grand;Femme; 1 050 ;Nouveau;Rare; Tenue Locale (TL v3) ; 1 525 
+49;TL v4;Bisht/Hijab_v4;Manteau/Tunique musulman;Unisex; 1 250 ;Nouveau;Rare; Tenue Locale (TL v4) ; 1 815 
+88;DR v2;Drap 1 place -v2;Coton, lin ou autres;Maison; 700 ;InchangÃ©;FrÃ©quent; Drap/Couette (DR v2) ; 1 015 
+89;DR v3;Couette 2-3 place -v3;Coton, lin ou autres;Maison; 2 050 ;Revu;Rare; Drap/Couette (DR v3) ; 2 975 
+90;ED;Ensemble drap 6 piÃ¨ces -v1;Ensemble  1 Drap 2/3 places + 1 couverture  + 4 taies ;Maison; 2 700 ;Nouveau;FrÃ©quent; Ensemble Drap (ED) ; 3 915 
+91;ED v2;Ensemble drap 3 piÃ¨ces -v2;Ensemble  1Drap 2/3 places + 2 taies ;Maison; 1 500 ;;; Ensemble Drap (ED v2) ; 2 175 
+92;ED v3;Ensemble drap 6 piÃ¨ces -v3;Ensemble  1 Drap 2/3 places + 1 couette + 4 taies ;Maison; 3 500 ;;; Ensemble Drap (ED v3) ; 5 075 
+93;ED v4;Ensemble drap 5 piÃ¨ces -v4;Ensemble  1 Drap 2/3 places  + 4 taies ;Maison; 2 050 ;;; Ensemble Drap (ED v4) ; 2 973 
+129;KG;Lavage au kg;Lavage ;; 600 ;;; Lavage au Kg (KG) ; 870 
+130;KR;Lavage au kg avec repassage;Traitement + Lavage + Repassage de drap, serviette, rideauxâ€¦;; 1 050 ;;; Lavage au Kg avec option Repassage (KR) ; 1 525 
+131;KT;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu pas blancs;; 850 ;;; Lavage au Kg avec option Traitement (KT ) ; 1 235 
+132;KT v2;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu  blancs ;; 1 050 ;;; Lavage au Kg avec option Traitement (KT v2) ; 1 525 
+133;KT v3;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu  blancs ;; 1 250 ;;; Lavage au Kg avec option Traitement (KT v3) ; 1 815 
+134;KT v4;Lavage au kg avec traitement ;Traitement + Lavage sans repassage_tissu  blancs ;; 1 500 ;;; Lavage au Kg avec option Traitement (KT v4) ; 2 175 
