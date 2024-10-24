@@ -13,14 +13,14 @@ fake = Faker()
 def generate_article():
     def _generate_article():
         return {
-            "id": random.randint(1, 1000),
+            "id": str(uuid.uuid4()),
             "name": fake.word(),
             "code": fake.word(),
             "description": fake.text(),
             "details": fake.text(),
-            "category": fake.enum(ArticleCategoryEnum) ,
-            "status": fake.enum(ArticleStatusEnum),
-            "freq": fake.enum(ArticleFreqEnum),
+            "category": fake.enum(ArticleCategoryEnum).value,
+            "status": fake.enum(ArticleStatusEnum).value,
+            "freq": fake.enum(ArticleFreqEnum).value,
             "price": random.randint(100, 1000),
             "express_price": random.randint(100, 1000),
         }

@@ -12,6 +12,7 @@ class OrderModel(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     order_date = Column(DateTime)
     delivery_date = Column(DateTime)
+    collect_date = Column(DateTime)
     type_order = Column(Enum(OrderTypeEnum), default=OrderTypeEnum.Normal)
     collect = Column(Boolean)
     delivery = Column(Boolean)
@@ -24,7 +25,7 @@ class OrderDetailsModel(Base):
     __tablename__ = Constants.ORDER_DETAILS
     order_id = Column(Integer, ForeignKey(f"{Constants.ORDERS}.id"), primary_key=True)
     article_id = Column(
-        Integer, ForeignKey(f"{Constants.ARTICLES}.id"), primary_key=True
+        String, ForeignKey(f"{Constants.ARTICLES}.id"), primary_key=True
     )
     specificity = Column(
         Enum(ArticleSpecificityEnum), default=ArticleSpecificityEnum.NONE

@@ -1,3 +1,3 @@
-from .fixtures.others import *
+from .fixtures import *
 
 

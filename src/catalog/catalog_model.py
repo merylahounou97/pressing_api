@@ -6,7 +6,7 @@ from src.utils.constants import Constants
 
 class ArticleModel(Base):
     __tablename__ = Constants.ARTICLES
-    id = Column(Integer, primary_key=True)
+    id = Column(String, primary_key=True)
     code = Column(String, index=True)
     name = Column(String)
     details = Column(String)

@@ -1,5 +1,7 @@
-from .base_fixtures import *
-from test.users.fixtures.session import *
+from test.catalog.fixtures import *
 
-from test.orders.fixtures.session import *
-from test.catalog.fixtures.session import *
+from .base_fixtures import *
+
+from test.users.fixtures import *
+
+from test.orders.fixtures import *

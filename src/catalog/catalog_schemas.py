@@ -18,7 +18,7 @@ class ArticleEditInputSchema(BaseModel):
 
 
 class ArticleOutputSchema(ArticleCreateInputSchema):
-    id: int
+    id: str
     
     @computed_field
     @property

@@ -18,10 +18,10 @@ def generate_order():
             ],
             "delivery_date":  fake.future_date(collect_date) ,
             "collect_date": collect_date ,
-            
+            "collect": fake.boolean(),
+            "delivery": fake.boolean(),
             "discount_order": random.uniform(0.0, 1),
             "customer_id":customer_id,
             "status": fake.random_element(elements=OrderStatusEnum),
         }
     return __generate_order    
-

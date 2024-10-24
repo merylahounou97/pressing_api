@@ -1,18 +1,18 @@
 from src.utils.constants import Constants
 from src.users.users_model import UserRole
-from test.generate_order import generate_order  # Importation de la fonction generate_order
 
 class OrderTestService:
     base_url = f"/{Constants.ORDERS}"
 
-    def __init__(self, client, get_access_token):
+    def __init__(self, client, get_access_token, generate_order):
         self.client = client
         self.get_access_token = get_access_token
+        self.generate_order = generate_order
 
     def create_order_as_customer(self):
         """Create an order as a customer."""
         access_token = self.get_access_token(self.customer[0]["email"])
-        order_data = generate_order()  # Générer des données de commande avec la fonction generate_order
+        order_data = self.generate_order()  # Générer des données de commande avec la fonction generate_order
         response = self.client.post(
             self.base_url,
             json=order_data,
@@ -53,7 +53,6 @@ class OrderTestService:
                 self.admins[0]["email"], self.password_all_users
             )
         edit_data = {"delivery": True, "collect": False}
-        order_id = 
 
 
 

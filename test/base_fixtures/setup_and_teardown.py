@@ -3,9 +3,10 @@ from src.catalog.catalog_model import ArticleModel
 from src.order.order_model import OrderModel
 from src.users.users_model import UserModel, UserRole
 from src.database import Base, engine, SessionLocal
-from test.users.fixtures.session.seed import *
-from test.catalog.fixtures.session.seed import *
-from test.orders.fixtures.session.seed import *
+from test.users.fixtures.seed import customers, secretaries, admins
+from test.catalog.fixtures import articles
+from test.orders.fixtures.seed import orders, get_all_orders
+
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -36,14 +37,15 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order):
         for article in _articles:
             db.add(ArticleModel(**article))
         for order in _orders:
-            # print(order)
+            print(order)
+            db.add(OrderModel(**order)) 
             continue
         db.commit()
 
 
     customers.extend(_customers)  # type: ignore
     secretaries.extend(_secretaries)  # type: ignore
-    admins.extend(_admins)  # type: ignor
+    admins.extend(_admins)  # type: ignore
 
     articles.extend(_articles)  # type: ignore
     orders.extend(_orders)  # type: ignore

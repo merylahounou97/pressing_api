@@ -20,12 +20,15 @@ def load_default_catalog_fun(db):
             articles.fieldnames = colunms   
             for article in articles:
                 if articles.line_num > 1:
-                    print(article)
+                    article["id"] = str(article["id"])
                     article["price"] = int(article["price"].replace(' ',''))
                     article["express_price"] = int(article["express_price"].replace(' ',''))
-                    article["category"] = ArticleCategoryEnum(article["category"].replace(' ','').lower())
-                    article["status"] = ArticleStatusEnum(article["status"].replace('é','e').lower())
-                    article["freq"] = ArticleFreqEnum(article["freq"].replace('é','e').lower())
+                    for key in ["category","status","freq"]:
+                        if article[key] == "":
+                            article[key] = "NONE"
+                    article["category"] = ArticleCategoryEnum(article["category"].replace(' ','').upper())
+                    article["status"] = ArticleStatusEnum(article["status"].replace('é','e').upper())
+                    article["freq"] = ArticleFreqEnum(article["freq"].replace('é','e').upper())
                     article_mod = ArticleModel(**article)
                     db.add(article_mod)
             db.commit()

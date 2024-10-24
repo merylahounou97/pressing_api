@@ -96,7 +96,6 @@ class CatalogTestService(BaseTestService):
         )
 
         response_payload = response.json()
-
         assert response.status_code == 200, "Article edition failed"
 
         assert response_payload["id"] == id_item_to_edit, "Article id should not change"

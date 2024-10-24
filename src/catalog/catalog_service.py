@@ -43,9 +43,7 @@ class CatalogService:
         article = (
             self.db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
         )
-        print("avant", article)
         article_input_data = article_input.model_dump()
-        print("apres", article_input_data)
         if article is not None:
             for key, value in article_input_data.items():
                 if value is not None:
