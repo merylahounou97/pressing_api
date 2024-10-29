@@ -19,19 +19,18 @@ class ArticleEditInputSchema(BaseModel):
 
 class ArticleOutputSchema(ArticleCreateInputSchema):
     id: str
-    
-    @computed_field
-    @property
-    def price_discount_5(self)->int:
-        return  int(self.price * 0.95)
-    
-    @computed_field
-    @property
-    def price_discount_7(self)->int:
-        return int(self.price * 0.93)
-    
-    @computed_field
-    @property
-    def price_discount_10(self)->int:
-        return int(self.price * 0.90)
 
+    @computed_field
+    @property
+    def price_discount_5(self) -> int:
+        return int(self.price * 0.95)
+
+    @computed_field
+    @property
+    def price_discount_7(self) -> int:
+        return int(self.price * 0.93)
+
+    @computed_field
+    @property
+    def price_discount_10(self) -> int:
+        return int(self.price * 0.90)

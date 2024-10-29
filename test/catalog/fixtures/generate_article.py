@@ -3,7 +3,11 @@ import pytest
 from faker import Faker
 import random
 
-from src.catalog.catalog_enums import ArticleCategoryEnum, ArticleFreqEnum, ArticleStatusEnum
+from src.catalog.catalog_enums import (
+    ArticleCategoryEnum,
+    ArticleFreqEnum,
+    ArticleStatusEnum,
+)
 
 
 fake = Faker()

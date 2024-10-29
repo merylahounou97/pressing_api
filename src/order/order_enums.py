@@ -2,13 +2,13 @@ from enum import Enum
 
 
 class OrderTypeEnum(Enum):
-    Normal = "normal"
-    Express = "express"
+    NORMAL = "NORMAL"
+    EXPRESS = "EXPRESS"
 
 
 class OrderStatusEnum(Enum):
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
-    CANCELED = "canceled"
-    FINISHED = "finished"
-    values = [PENDING, CONFIRMED, CANCELED, FINISHED]
+    PENDING = "PENDING"
+    CONFIRMED = "CONFIRMED"
+    CANCELED = "CANCELED"
+    FINISHED = "FINISHED"
+    # values = [PENDING, CONFIRMED, CANCELED, FINISHED]

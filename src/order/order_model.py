@@ -13,7 +13,7 @@ class OrderModel(Base):
     order_date = Column(DateTime)
     delivery_date = Column(DateTime)
     collect_date = Column(DateTime)
-    type_order = Column(Enum(OrderTypeEnum), default=OrderTypeEnum.Normal)
+    type_order = Column(Enum(OrderTypeEnum), default=OrderTypeEnum.NORMAL)
     collect = Column(Boolean)
     delivery = Column(Boolean)
     discount_order = Column(Float)

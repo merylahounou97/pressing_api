@@ -101,12 +101,11 @@ class CatalogService:
         """
         return (
             self.db.query(ArticleModel)
-            .filter(or_(ArticleModel.name.ilike(f"%{search_term}%"),
-                         ArticleModel.code.ilike(f"%{search_term}%")))
+            .filter(
+                or_(
+                    ArticleModel.name.ilike(f"%{search_term}%"),
+                    ArticleModel.code.ilike(f"%{search_term}%"),
+                )
+            )
             .all()
         )
-
-
-
-
-        

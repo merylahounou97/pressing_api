@@ -8,4 +8,3 @@ orders = []
 def get_all_orders():
     """Fixture to get all orders."""
     return orders
-

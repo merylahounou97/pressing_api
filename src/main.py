@@ -50,5 +50,3 @@ app.include_router(users_router.router)
 app.include_router(auth_router.router)
 app.include_router(order_router.router)
 app.include_router(catalog_router.router)
-
-

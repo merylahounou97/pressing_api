@@ -1,12 +1,11 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.dependencies.db import get_db
-from src.order.order_model import OrderModel
-from src.order.order_schemas import (
-    OrderCreateInputSchema,
-    OrderCreateOutputSchema
-)
+from src.order.order_enums import OrderStatusEnum
+from src.order.order_model import OrderDetailsModel, OrderModel
+from src.order.order_schemas import OrderCreateInputSchema, OrderCreateOutputSchema
 from uuid import uuid4
+
 
 class OrderService:
     db: Session
@@ -14,22 +13,39 @@ class OrderService:
     def __init__(self, db: Session = Depends(get_db)):
         self.db = db
 
-    def create_order(self, order_input: OrderCreateInputSchema) -> OrderCreateOutputSchema:
+    def create_order(
+        self, order_input: OrderCreateInputSchema
+    ) -> OrderCreateOutputSchema:
         """Create a new order."""
+        order_input_dict = order_input.model_dump()
         new_order = OrderModel(
-            id=str(uuid4()),
-            order_date=order_input.date,
+            # id=str(uuid4()),
+            order_date=order_input.order_date,
             delivery_date=order_input.delivery_date,
             type_order=order_input.type_order,
             collect=order_input.collect,
             delivery=order_input.delivery,
             customer_id=order_input.customer_id,
-            status="PENDING"
+            status=OrderStatusEnum.PENDING,
         )
         self.db.add(new_order)
         self.db.commit()
         self.db.refresh(new_order)
-        return OrderCreateOutputSchema(**new_order.__dict__)
+
+        for order_detail in order_input.order_details:
+            new_order_detail = OrderDetailsModel(
+                order_id=new_order.id,
+                article_id=order_detail.article_id,
+                specificity=order_detail.specificity,
+                divider_coef=order_detail.divider_coef,
+                multiplier_coef=order_detail.multiplier_coef,
+                discount_article=order_detail.discount_article,
+                quantity=order_detail.quantity,
+            )
+            self.db.add(new_order_detail)
+        
+        self.db.commit()
+        return OrderCreateOutputSchema(**order_input_dict,id=new_order.id,status=new_order.status)
 
     # def get_order_by_id(self, order_id: str) -> OrderCreateOutputSchema:
     #     """Get order by ID."""

@@ -60,3 +60,5 @@ Exemple: ci: ajouter la configuration Travis pour les tests automatiques
 
 revert: Revenir à un commit précédent.
 Exemple: revert: revenir au commit 12345abcd pour corriger une régression
+
+
