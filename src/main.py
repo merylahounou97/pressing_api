@@ -24,9 +24,11 @@ def generate_unique_function_id(route: APIRoute):
 
 
 app = FastAPI(
+    title = "Pressing API" ,
     docs_url="/",
     lifespan=initialize_app,
     generate_unique_id_function=generate_unique_function_id,
+
 )
 
 # Configurer les paramètres CORS
