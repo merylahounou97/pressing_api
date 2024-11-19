@@ -19,7 +19,6 @@ Base.metadata.create_all(bind=engine)
 
 
 def generate_unique_function_id(route: APIRoute):
-    print(f"{route.tags[0]}-{route.name}")
     return f"{route.tags[0]}-{route.name}"
 
 

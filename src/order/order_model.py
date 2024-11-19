@@ -17,7 +17,7 @@ class OrderModel(Base):
     collect = Column(Boolean)
     delivery = Column(Boolean)
     discount_order = Column(Float)
-    customer_id = Column(String, ForeignKey(f"{Constants.USERS}.id"))
+    customer_id = Column(String, ForeignKey(f"{Constants.USERS}.id"), nullable=False)
     status = Column(Enum(OrderStatusEnum), default=OrderStatusEnum.PENDING)
 
 

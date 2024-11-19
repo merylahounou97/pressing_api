@@ -19,9 +19,10 @@ async def initialize_app(app: FastAPI):
 
     user_service = UserService(db)
 
-    await user_service.create_default_admin_user()
+    if settings.ENV != "test":
+        await user_service.create_default_admin_user()
 
-    load_default_catalog_fun(db)
+        load_default_catalog_fun(db)
 
     yield
     db.close()

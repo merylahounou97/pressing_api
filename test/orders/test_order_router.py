@@ -21,34 +21,42 @@ class TestOrderRouter:
         # créer un utilisateur admin
         order_test_service.create_order(UserRole.ADMIN, test_customer_id_asbsence=True)
 
-    # def test_order_edit(self, order_test_service):
-    #     """Test edit order
-    #     When the user is a customer, he can't edit an order
-    #     But an admin or a secretary can edit an order
-    #     """
-    #     # Créer un utilisateur customer
-    #     order_test_service.fail_to_edit_order_with_customer()
+    def test_order_get_by_id(self, order_test_service):
+        """Test get order by id"""
+        order_test_service.get_order_by_id(UserRole.SECRETARY)
 
-    #     # créer un utilisateur secretaire
-    #     order_test_service.edit_order(UserRole.SECRETARY)
+        order_test_service.get_order_by_id(UserRole.ADMIN)
 
-    #     # créer un utilisateur admin
-    #     order_test_service.edit_order(UserRole.ADMIN)
+    def test_order_edit(self, order_test_service):
+        """Test edit order
+        When the user is a customer, he can't edit an order
+        But an admin or a secretary can edit an order
+        """
+        # Créer un utilisateur customer
+        order_test_service.fail_to_edit_order_with_customer()
 
-    # def test_order_get_all(self, order_test_service):
-    #     """Test get all orders"""
-    #     order_test_service.get_all_orders()
+        # créer un utilisateur secretaire
+        order_test_service.edit_order(UserRole.SECRETARY)
 
-    # def test_order_get_by_id(self, order_test_service):
-    #     """Test get order by id"""
-    #     order_test_service.get_order_by_id()
+        # créer un utilisateur admin
+        order_test_service.edit_order(UserRole.ADMIN)
 
-    # def test_order_delete(self, order_test_service):
-    #     """Test delete order"""
-    #     order_test_service.delete_order_by_id(role=UserRole.ADMIN)
-    #     order_test_service.delete_order_by_id(role=UserRole.SECRETARY)
-    #     order_test_service.delete_order_customer_by_id()
+    def test_order_get_all(self, order_test_service):
+        """Test get all orders"""
+        order_test_service.get_all_orders(UserRole.SECRETARY)
+        order_test_service.get_all_orders(UserRole.ADMIN)
 
-    # def test_order_search(self, order_test_service):
-    #     """Test search order by name or code"""
-    #     order_test_service.search_order_by_name_or_id()
+        order_test_service.fail_to_get_all_orders_with_customer()
+
+
+    def test_order_cancel(self, order_test_service):
+        """Test cancel order"""
+        order_test_service.cancel_order(UserRole.SECRETARY)
+        order_test_service.cancel_order(UserRole.ADMIN)
+        order_test_service.cancel_order(UserRole.CUSTOMER)
+
+    def test_order_history(self, order_test_service):
+        """Test get order history"""
+        order_test_service.get_order_history(UserRole.SECRETARY)
+        order_test_service.get_order_history(UserRole.ADMIN)
+        order_test_service.get_order_history(UserRole.CUSTOMER)

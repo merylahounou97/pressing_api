@@ -76,7 +76,7 @@ def __send_sms(phone_number: str, message: str):
             body=message,
             from_=TWILIO_PHONE_NUMBER,
             to=phone_number,
-        ) if settings.test_mode is False else None
+        ) if settings.ENV!="test"   else None
     except Exception as e:
         print(e)
         return False

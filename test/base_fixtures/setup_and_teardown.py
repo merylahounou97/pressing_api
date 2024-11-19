@@ -1,3 +1,5 @@
+import copy
+import random
 import pytest
 from src.catalog.catalog_model import ArticleModel
 from src.order.order_model import OrderDetailsModel, OrderModel
@@ -32,17 +34,32 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order):
     # Insérer des articles dans la base de donnée
     _articles = [generate_article() for _ in range(4)]
     # Insrer des commandes dans la base de donnée
-    _orders = [generate_order(article_ids =list(article["id"])) for article in _articles]
-    _orders = list(map(clean_order, _orders))
+    customers_ids = [customer["id"] for customer in _customers]
+    _orders = [generate_order(article_ids = [article["id"]], customer_id=random.sample(customers_ids,1)[0]) for article in _articles]
+
+    _orders_details = []
+    for index, order in enumerate(_orders):
+        order_detail = order["order_details"][0] #Because we have only one detail in each order
+        _orders_details.extend([{**order_detail, "order_id": index + 1}])
+    
+    _orders_db_cleaned = copy.deepcopy(_orders)
+    _orders_db = list(map(clean_order,_orders_db_cleaned))
+
 
 
     with SessionLocal() as db:
        
         db.add_all(map(lambda user: UserModel(**user), users))
+        db.commit()
         
         db.add_all(map(lambda article: ArticleModel(**article), _articles))
         
-        db.add_all(map(lambda order: OrderModel(**order), _orders))
+        db.add_all(map(lambda order: OrderModel(**order), _orders_db))
+        db.commit()
+
+        db.add_all(map(lambda order_detail: OrderDetailsModel(**order_detail), _orders_details))
+
+
         
         db.commit()
 

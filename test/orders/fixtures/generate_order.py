@@ -6,6 +6,7 @@ from src.order.order_enums import OrderStatusEnum, OrderTypeEnum
 
 fake = Faker()
 
+
 @pytest.fixture(scope="session")
 def generate_order(generate_order_details):
     def __generate_order(article_ids: list[str], customer_id: str = None  ):

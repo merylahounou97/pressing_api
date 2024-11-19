@@ -1,4 +1,7 @@
 import pytest
+from src.database import SessionLocal
+
+from src.order.order_model import OrderModel
 
 
 orders = []
@@ -6,5 +9,5 @@ orders = []
 
 @pytest.fixture(scope="session")
 def get_all_orders():
-    """Fixture to get all orders."""
+    """Retrieve all orders from the database with their IDs."""
     return orders

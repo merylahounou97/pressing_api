@@ -35,4 +35,3 @@ class Settings(BaseSettings):
     twilio_auth_token: str
     twilio_phone_number: str
     support_address: str
-    test_mode: bool = False
