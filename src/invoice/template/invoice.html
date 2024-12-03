@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Facture Pro Forma</h1>
+    <p><strong>Date Facture:</strong> {{ invoice_date }}</p>
+    <p><strong>Client:</strong> {{ customer_name }} ({{ customer_reference }})</p>
+    <p><strong>Commande N°:</strong> {{ order_id }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Spécificité</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Total</th>
+                <th>Remise</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.article_name }}</td>
+                <td>{{ item.specificity }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit_price }}</td>
+                <td>{{ item.total_price }}</td>
+                <td>{{ item.discount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p><strong>Total Avant Remise:</strong> {{ total_amount }}</p>
+    <p><strong>Total Remisé:</strong> {{ discounted_amount }}</p>
+    <p><strong>Net à Payer:</strong> {{ net_amount }}</p>
+</body>
+</html>

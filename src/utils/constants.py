@@ -6,3 +6,4 @@ class Constants:
     ARTICLES = "articles"
     ORDERS = "orders"
     ORDER_DETAILS = "order_details"
+    INVOICES  = "invoices"

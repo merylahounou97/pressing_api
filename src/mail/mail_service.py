@@ -26,9 +26,7 @@ def send_mail_from_template(template_name: str, email: str, **kwargs):
 
     mail_content = __get_parsed_template(template_name=template_name, **kwargs)
     return (
-        __send_email(email, "WashMan", mail_content)
-        if settings.ENV!="test" 
-        else None
+        __send_email(email, "WashMan", mail_content) if settings.ENV != "test" else None
     )
 
 

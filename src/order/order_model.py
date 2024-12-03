@@ -25,7 +25,9 @@ class OrderDetailsModel(Base):
     __tablename__ = Constants.ORDER_DETAILS
     order_id = Column(Integer, ForeignKey(f"{Constants.ORDERS}.id"), primary_key=True)
     article_id = Column(
-        String, ForeignKey(f"{Constants.ARTICLES}.id"), primary_key=True
+        String,
+        ForeignKey(f"{Constants.ARTICLES}.id", ondelete="CASCADE"),
+        primary_key=True,
     )
     specificity = Column(
         Enum(ArticleSpecificityEnum), default=ArticleSpecificityEnum.NONE

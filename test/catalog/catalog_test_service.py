@@ -168,7 +168,7 @@ class CatalogTestService(BaseTestService):
             self.customers[0]["email"], self.password_all_users
         )
         # Prendre un article
-        article_id = self.articles[0]["id"]
+        article_id = self.articles[4]["id"]
 
         response = self.client.delete(
             f"/{Constants.ARTICLES}/{article_id}",
@@ -191,14 +191,14 @@ class CatalogTestService(BaseTestService):
                 self.admins[0]["email"], self.password_all_users
             )
             # Prendre un article
-            index= 0
+            index = 9
             article_id = self.articles[index]["id"]  # Prendre l'ID du premier article
         elif role == UserRole.SECRETARY:
             access_token = self.get_access_token(
                 self.secretaries[0]["email"], self.password_all_users
             )
             # Prendre un article
-            index= 1
+            index = 8
             article_id = self.articles[index]["id"]
 
         response = self.client.delete(
@@ -214,9 +214,6 @@ class CatalogTestService(BaseTestService):
         get_response = self.client.get(f"/{Constants.ARTICLES}/{article_id}")
         assert get_response.status_code == 200, "L'article devrait être supprimé"
         assert get_response.json() is None, "L'article devrait être supprimé"
-
-
-
 
     def search_article_by_name_or_code(self):
         """Test pour rechercher un article par son nom ou son code"""

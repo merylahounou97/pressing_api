@@ -35,3 +35,6 @@ class Settings(BaseSettings):
     twilio_auth_token: str
     twilio_phone_number: str
     support_address: str
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes: float

@@ -9,6 +9,7 @@ from .users import users_router
 from .users import member_router
 from .order import order_router
 from .catalog import catalog_router
+from .invoice import invoice_router
 from .database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,11 +24,10 @@ def generate_unique_function_id(route: APIRoute):
 
 
 app = FastAPI(
-    title = "Pressing API" ,
+    title="Pressing API",
     docs_url="/",
     lifespan=initialize_app,
     generate_unique_id_function=generate_unique_function_id,
-
 )
 
 # Configurer les paramètres CORS
@@ -51,3 +51,4 @@ app.include_router(users_router.router)
 app.include_router(auth_router.router)
 app.include_router(order_router.router)
 app.include_router(catalog_router.router)
+app.include_router(invoice_router.router)

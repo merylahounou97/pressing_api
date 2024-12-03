@@ -48,7 +48,6 @@ class TestOrderRouter:
 
         order_test_service.fail_to_get_all_orders_with_customer()
 
-
     def test_order_cancel(self, order_test_service):
         """Test cancel order"""
         order_test_service.cancel_order(UserRole.SECRETARY)

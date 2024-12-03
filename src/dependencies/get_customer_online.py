@@ -26,5 +26,7 @@ def get_user_online(
     Returns:
         UserModel: The user instance.
     """
-    user = user_service.validate_token(access_token=access_token)
+    user = user_service.validate_token(
+        access_token=access_token,
+    )
     return user

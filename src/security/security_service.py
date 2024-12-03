@@ -3,11 +3,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Union
 
 from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTError
 from passlib.hash import bcrypt
+from fastapi import HTTPException
 
-SECRET_KEY = "AJyt451u#a@QKHFS9584TF-'Srfg"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from src.config import Settings
+
+settings = Settings()
 
 
 def hash_text(text: str) -> str:
@@ -51,10 +53,12 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+            minutes=settings.access_token_expire_minutes
         )
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.secret_key, algorithm=settings.algorithm
+    )
     return encoded_jwt
 
 
@@ -67,7 +71,16 @@ def decode_token(token: str):
     Returns:
         dict: The payload of the token.
     """
-    return jwt.decode(str(token), SECRET_KEY, algorithms=[ALGORITHM])
+    try:
+        return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=401, detail="Expired token. Please provide a valid token."
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code=401, detail="Invalid token. Please provide a valid token."
+        )
 
 
 def generate_random_code(low=100, high=99999):
