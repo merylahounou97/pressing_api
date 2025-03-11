@@ -1,8 +1,6 @@
 
 
 
-
-
  header p  {
    font-style: italic;
    color: rgb(3, 122, 122);
@@ -20,6 +18,10 @@
     justify-content: center;
  }
 
+ h1 {
+    font-size: 2.5em;
+    font-weight: 100;
+ }
 
  header {
     display: flex;
@@ -35,4 +37,10 @@
 
 .blue_color {
     color: rgb(41, 143, 221)
+}
+
+header div img {
+    width: 100%;
+    height: 100%;
+    margin: auto;
 }

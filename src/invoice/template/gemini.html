@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facture Pro Forma</title>
+    <style>
+      /* CSS styles will be added here */
+      @page {
+        size: A4;
+        margin: 1cm;
+      }
+
+
+      body {
+        --blue-color: #47c0e7;
+
+        --green-color: #0aa0bb;
+        --black-seemly-color: #44546a;
+
+        margin: auto;
+        font-size: xx-small;
+        width: 90%;
+      }
+
+      header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .logo {
+        width: 100px;
+        margin-right: 20px;
+      }
+
+      .logo img {
+        width: 100%;
+        height: auto;
+      }
+
+      .company-info {
+        text-align: center;
+      }
+
+      .company-info h1 {
+        margin: 0;
+      }
+
+      .italic {
+        font-style: italic;
+        color: var(--green-color);
+        margin: 0;
+      }
+
+      .invoice-title {
+        text-align: center;
+      }
+
+      .invoice-title span {
+        color: var(--blue-color);
+      }
+
+      .invoice-title h2 {
+        text-transform: uppercase;
+      }
+
+      .invoice-details {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .invoice-details p {
+        margin: 1px;
+      }
+
+      .invoice-details span {
+        font-weight: bold;
+      }
+
+      .details-left,
+      .details-right {
+        flex-direction: column;
+        justify-content: space-between;
+        align-content: center;
+      }
+
+      .details-right {
+        color: white;
+        background-color: var(--black-seemly-color);
+      }
+
+      .payment-methods {
+        text-align: center;
+      }
+
+      .payment-methods div :first-child {
+        text-decoration: underline;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .payment-methods div :last-child {
+        color: var(--blue-color);
+        font-weight: bold;
+      }
+
+      span.date_du {
+        color: var(--blue-color);
+      }
+
+      .payment-methods div {
+        padding-left: 1em;
+        padding-right: 1em;
+        border: #022029 2px solid;
+      }
+      .customer-info {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .customer-info table {
+        background-color: var(--black-seemly-color);
+        color: white;
+        width: 85%;
+        border-collapse: collapse;
+        margin: auto;
+      }
+
+      .customer-info th,
+      .customer-info td {
+        border: 1px solid black;
+      }
+
+      #statut_customer {
+        color: yellow;
+      }
+
+      .customer-info table td#statut_customer ~ td {
+        color: var(--blue-color);
+      }
+
+      .order-details {
+        margin: auto;
+      }
+
+      .order-details table {
+        border-collapse: collapse;
+        text-align: center;
+      }
+
+      .order-details thead {
+        background-color: var(--blue-color);
+        color: white;
+      }
+
+      .order-details tbody th,
+      .order-details thead th,
+      .order-details tbody td,
+      .order-details tbody td {
+        border: 1px solid black;
+      }
+
+      .order-details tfoot tr:first-child {
+        border: solid 3px black;
+        font-weight: bold;
+      }
+
+      .order-details tfoot tr:first-child td[colspan] {
+        border-left: solid 3px black;
+      }
+
+      .order-details tfoot tr td[colspan] ~ td {
+        border: solid 2px black;
+      }
+
+      .order-details tfoot tr:nth-child(2),
+      .order-details tfoot tr:last-child {
+        background-color: var(--black-seemly-color);
+        color: white;
+      }
+      .order-details tfoot td[colspan="8"] {
+        background-color: white;
+      }
+
+      .notes p:first-child {
+        color: #ca1818;
+        background-color: yellow;
+      }
+
+      .notes p:last-child {
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .notes span {
+        font-weight: bold;
+        text-decoration: underline;
+        color: black;
+      }
+
+      footer {
+        text-align: justify;
+        background-color: #333;
+        color: #fff;
+        display: flex;
+        font-size: xx-small;
+        justify-content: space-evenly;
+        background-color: var(--blue-color);
+      }
+
+      footer div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+      }
+
+      footer img {
+        width: 50px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="{{api_url}}/files/img/logo.jpg" , alt="RCCM et IFU" />
+      </div>
+      <div class="company-info">
+        <h1>PRESSING & BLANCHISSERIE</h1>
+        <p class="italic">RCCM: RB/ABC/22 A 41623 - IFU 1201525365809</p>
+      </div>
+    </header>
+
+    <section class="invoice-title">
+      <h2>Facture Pro Forma <span># 691/08/2024</span></h2>
+    </section>
+
+    <section class="invoice-details">
+      <section class="details-left">
+        <p><span>Date Facture:</span> 03-Aug-24</p>
+        <p><span>Num Commande:</span> 691/ CP30SM / 02-Aug-24</p>
+        <p><span>Type Commande: Normal </span></p>
+      </section>
+      <section class="payment-methods">
+        <div>
+          <p>MOMO PAY:</p>
+          <p>*880*41*955497 Montant#</p>
+        </div>
+        <div>
+          <p>MOOV PAY:</p>
+          <p>*855*4*1*22518 Montant#</p>
+        </div>
+      </section>
+      <section class="details-right">
+        <p><span>Date de Livraison: 06-Aug-24</span></p>
+        <p><span>Paiement dû: </span><span class="date_du">05-Aug-24</span></p>
+      </section>
+    </section>
+
+    <section class="customer-info">
+      <h3>Informations du client</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Réf Client</th>
+            <th>Nom du Client</th>
+            <th>Statut Client</th>
+            <th>Abonnement</th>
+            <th>Distance</th>
+            <th>Collecte</th>
+            <th>Livraison</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CP30SM</td>
+            <td>SEDJRO MORYA</td>
+            <td id="statut_customer">Heureux de vous avoir</td>
+            <td>N/A</td>
+            <td></td>
+            <td>NON</td>
+            <td>NON</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="order-details">
+      <table>
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Code Art</th>
+            <th>Description</th>
+            <th>Coef 1</th>
+            <th>Spécificité</th>
+            <th>Coef 2</th>
+            <th>Cat Rem</th>
+            <th>Quantité</th>
+            <th>PU Standard</th>
+            <th>PU rem</th>
+            <th>Total avant remise</th>
+            <th>Total Remisé</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>AH</td>
+            <td>Autre Haut (AH)</td>
+            <td>4</td>
+            <td>1</td>
+            <td>0</td>
+            <td>3</td>
+            <td>175</td>
+            <td>175</td>
+            <td>525</td>
+            <td>525</td>
+            <td>525</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>TS</td>
+            <td>T-Shirt (TS)</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>700</td>
+            <td>700</td>
+            <td>700</td>
+            <td>700</td>
+            <td>525</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>CH</td>
+            <td>Chemise (CH)</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>2</td>
+            <td>700</td>
+            <td>700</td>
+            <td>1,400</td>
+            <td>1,400</td>
+            <td>525</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>CO</td>
+            <td>Costume/Tailleur (CO)</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>2</td>
+            <td>2,700</td>
+            <td>2,700</td>
+            <td>5,400</td>
+            <td>5,400</td>
+            <td>525</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">Nombre d'effets</td>
+            <td>10</td>
+            <td colspan="3">Nombre de pièces</td>
+            <td>6</td>
+            <td colspan="2">Sous-total</td>
+            <td>8,875</td>
+            <td>8,875</td>
+          </tr>
+          <tr>
+            <td colspan="8"></td>
+            <td colspan="2">Total HT</td>
+            <td>111</td>
+            <td>222</td>
+          </tr>
+          <tr>
+            <td colspan="8"></td>
+            <td colspan="2">TVA</td>
+            <td>111</td>
+            <td>222</td>
+          </tr>
+          <tr>
+            <td colspan="8"></td>
+            <td colspan="2">AIB</td>
+            <td>111</td>
+            <td>222</td>
+          </tr>
+          <tr>
+            <td colspan="8"></td>
+            <td colspan="3">Net à Payer</td>
+            <td>222</td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <section class="notes">
+      <p>
+        <span>NB:</span> Le client dispose de 7 jours pour payer une fois qu'il
+        a reçu notification que son colis est prêt pour livraison.
+      </p>
+      <p>Washman vous remercie pour la confiance!</p>
+    </section>
+
+    <footer>
+      <div>
+        <img src="{{api_url}}/files/img/address.png" , alt="ADRESSE" />
+        <!-- <img src="../../static/img/address.png" , alt="ADRESSE" /> -->
+        <p>Parcelle O</p> 
+        <p>Msn AHOUNOU V. G. AMBROISE</p>
+        <p>Zopah</p>
+        <p>(non loin du CS Grande Académie)</p>
+      </div>
+      <div>
+        <img src="{{api_url}}/files/img/phone.png" , alt="TELEPHONE" />
+        <!-- <img src="../../static/img/phone.png" , alt="ADRESSE" /> -->
+
+        <p>+229 01 52 52 52 29</p>
+        <p>+229 01 52 52 52 33</p>
+      </div>
+      <div>
+        <img src="{{api_url}}/files/img/gmail.png" , alt="EMAIL" />
+        <!-- <img src="../../static/img/gmail.png" , alt="ADRESSE" /> -->
+
+        <p>washmanbig@gmail.com</p>
+      </div>
+      <div>
+        <img
+          src="{{api_url}}/files/img/information.png"
+          ,
+          alt="AUTRES CONTACTS"
+        />
+        <!-- <img src="../../static/img/information.png" , alt="ADRESSE" /> -->
+
+        <p>AUTRES CONTACTS:</p>
+        <p>
+          <a href="www.wastimanbig.com">www.washmanbig.com</a>
+        </p>
+        <p>-08 BP 544 Tri postal Cotonou</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<!-- 
+// Inject CSS into HTML html_code = html_code.replace('/* CSS styles will be
+added here */', `<style>${css_code}</style>`); // Log the HTML code
+console.log(html_code); -->
