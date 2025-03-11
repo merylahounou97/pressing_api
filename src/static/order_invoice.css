@@ -1,0 +1,38 @@
+
+
+
+
+
+ header p  {
+   font-style: italic;
+   color: rgb(3, 122, 122);
+   font-weight: 100;
+ }
+
+ header div:first-of-type  {
+    flex: 1;
+ }
+
+ header div:last-of-type  {
+    display: flex;
+    flex: 3;
+    flex-direction: column;
+    justify-content: center;
+ }
+
+
+ header {
+    display: flex;
+    width: 80%;
+    margin: auto;
+ }
+
+ h2 {
+    width: 60%;
+    margin: auto;
+    font-weight: 100;
+ }
+
+.blue_color {
+    color: rgb(41, 143, 221)
+}

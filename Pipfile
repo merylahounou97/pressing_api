@@ -16,6 +16,7 @@ twilio = "*"
 pytest = "*"
 pydantic-extra-types = "*"
 faker = "*"
+weasyprint = "*"
 
 [dev-packages]
 faker = "*"

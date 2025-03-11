@@ -1,6 +1,8 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
@@ -11,6 +13,7 @@ from ..dependencies.get_api_url import get_api_url
 
 settings = Settings()
 templates = Jinja2Templates(directory="src/mail/templates")
+api_url = get_api_url()
 
 
 def send_mail_from_template(template_name: str, email: str, **kwargs):
@@ -57,10 +60,12 @@ def __get_parsed_template(template_name: str, **kargs):
         str: The parsed template.
     """
     email_template = templates.get_template(template_name)
-    return email_template.render(kargs)
+    return email_template.render({**kargs, "api_url": api_url})
 
+def send_email(to: str, subject: str, email_content: str, attachment_path=None):
+    return __send_email(to, subject, email_content, attachment_path)
 
-def __send_email(to: str, subject: str, email_content: str):
+def __send_email(to: str, subject: str, email_content: str, attachment_path=None):
     """Send an email to the given recipient.
 
     Args:
@@ -83,6 +88,20 @@ def __send_email(to: str, subject: str, email_content: str):
     # Ajout du corps du message
     message.attach(MIMEText(email_content, "html"))
 
+    if attachment_path:
+        # Ajout de la pièce jointe
+        with open(attachment_path, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+            encoders.encode_base64(part)
+            part.add_header(
+                "Content-Disposition",
+                f"attachment; filename= {attachment_path.split('/')[-1]}",
+            )
+            message.attach(part)
+
+
+
     try:
         # Connexion au serveur SMTP de Gmail
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
@@ -92,3 +111,4 @@ def __send_email(to: str, subject: str, email_content: str):
             return {"status": "Email sent successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
