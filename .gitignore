@@ -10,3 +10,5 @@ secrets/*
 
 # Environment
 .env
+
+data.txt
