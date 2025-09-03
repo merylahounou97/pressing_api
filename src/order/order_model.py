@@ -1,5 +1,7 @@
 from sqlalchemy.types import Enum
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
 
 from src.catalog.catalog_enums import ArticleSpecificityEnum
 from src.database import Base
@@ -19,6 +21,15 @@ class OrderModel(Base):
     discount_order = Column(Float)
     customer_id = Column(String, ForeignKey(f"{Constants.USERS}.id"), nullable=False)
     status = Column(Enum(OrderStatusEnum), default=OrderStatusEnum.PENDING)
+    
+    customer = relationship("UserModel", back_populates="orders")
+    order_details = relationship("OrderDetailsModel", back_populates="order", cascade="all, delete-orphan")
+        
+    @property
+    def num_order(self) -> str:
+        return f"{self.id} / {self.customer_id or ''} / {self.order_date.strftime('%d-%b-%y')}"
+
+
 
 
 class OrderDetailsModel(Base):
@@ -36,3 +47,8 @@ class OrderDetailsModel(Base):
     multiplier_coef = Column(Float)
     discount_article = Column(Float)
     quantity = Column(Integer)
+    
+    order = relationship("OrderModel", back_populates="order_details")
+    article = relationship("ArticleModel", back_populates="order_details")
+    
+

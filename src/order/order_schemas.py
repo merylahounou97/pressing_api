@@ -3,6 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field, computed_field
 from src.catalog.catalog_enums import ArticleSpecificityEnum
 from src.order.order_enums import OrderStatusEnum, OrderTypeEnum
+from src.users.users_schemas import UserOutput
 
 
 class OrderDetailSchema(BaseModel):
@@ -34,7 +35,7 @@ class OrderCreateOutputSchema(OrderCreateInputSchema):
     @computed_field
     @property
     def num_order(self) -> str:
-        return f"{self.id}/{self.customer_id or ''}/{self.order_date}"
+        return f"{self.id} / {self.customer_id or ''} / {self.order_date.strftime('%d-%b-%y')}"
 
 
 class OrderEditInputSchema(BaseModel):
@@ -46,3 +47,7 @@ class OrderEditInputSchema(BaseModel):
     delivery_date: Optional[datetime] = None
     articles_to_delete: Optional[List[str]] = None
     order_details: Optional[List[OrderDetailSchema]] = None
+    
+
+class FullOrderSchema(OrderCreateOutputSchema):
+    customer: Optional[UserOutput] = Field(default=None, description="The customer name")

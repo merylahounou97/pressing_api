@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Enum, Float, Integer, String
+from sqlalchemy.orm import relationship
 from src.catalog.catalog_enums import (
     ArticleCategoryEnum,
     ArticleFreqEnum,
@@ -20,3 +21,5 @@ class ArticleModel(Base):
     description = Column(String)
     price = Column(Integer)
     express_price = Column(Integer)
+    
+    order_details = relationship("OrderDetailsModel", back_populates="article")

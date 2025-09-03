@@ -1,6 +1,8 @@
 import enum
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.types import Enum
+from sqlalchemy.orm import relationship
+
 
 from src.database import Base
 from src.utils.constants import Constants
@@ -35,6 +37,9 @@ class UserModel(Base):
     email_verified = Column(
         Boolean, default=False
     )  # 0 pour non vérifié, 1 pour vérifié
+    
+    orders = relationship("OrderModel", back_populates="customer")
+
 
     def full_name(self):
         return self.first_name + " " + self.last_name

@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 from src.dependencies.db import get_db
 from src.order.order_enums import OrderStatusEnum
@@ -8,6 +9,7 @@ from src.order.order_schemas import (
     OrderCreateOutputSchema,
     OrderEditInputSchema,
     OrderDetailSchema,
+    FullOrderSchema
 )
 from src.users.users_model import UserModel, UserRole
 
@@ -64,12 +66,48 @@ class OrderService:
             .filter(OrderDetailsModel.order_id == order_id)
             .all()
         )
+        print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", f"Order details: {order.__dict__}")
         order_dict = order.__dict__.copy()
         order_dict["order_details"] = [
             OrderDetailSchema(**detail.__dict__) for detail in order_details
         ]
 
         return OrderCreateOutputSchema(**order_dict)
+    
+    
+    def get_order(self, order_id: int) -> OrderCreateOutputSchema:
+        """Get order by ID, including user and details."""
+        
+        # order_details = (
+        #     self.db.query(OrderDetailsModel)
+        #     .filter(OrderDetailsModel.order_id == order_id)
+        #                 .join(OrderDetailsModel.article)
+        #     .options(joinedload(OrderDetailsModel.article))
+        #     .all()
+
+        # )
+
+        # print("ORDER DETAILSsssssssssssssssssssssssss", order_details.__dict__)
+        
+        # Récupération de la commande + jointure avec user
+        order = (
+                self.db.query(OrderModel)
+                .filter(OrderModel.id == order_id)
+                .options(
+                    joinedload(OrderModel.customer),              # jointure avec UserModel
+                    joinedload(OrderModel.order_details)          # jointure avec OrderDetailsModel
+                    .joinedload(OrderDetailsModel.article)        # jointure avec ArticleModel depuis OrderDetails
+                )
+                .first()
+            )
+
+        if not order:
+            raise ValueError("Order not found")
+
+        return order
+                               
+                
+
 
     def edit_order(
         self, order_id: str, order_edit_input: OrderEditInputSchema

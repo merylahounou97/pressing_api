@@ -11,7 +11,6 @@
         margin: 1cm;
       }
 
-
       body {
         --blue-color: #47c0e7;
 
@@ -222,6 +221,10 @@
       }
     </style>
   </head>
+
+  <!-- order_date , delivery_date , collect_date , type_order , collect , delivery , discount_order , customer_id , status , 
+  order_id , article_id , specificity , divider_coef , multiplier_coef , discount_article , quantity = Column(Integer) -->
+
   <body>
     <header>
       <div class="logo">
@@ -234,14 +237,19 @@
     </header>
 
     <section class="invoice-title">
-      <h2>Facture Pro Forma <span># 691/08/2024</span></h2>
+      <h2>
+        Facture Pro Forma
+        <span># {{order.id}}/{{order.order_date.strftime('%m/%Y')}}</span>
+      </h2>
     </section>
 
     <section class="invoice-details">
       <section class="details-left">
-        <p><span>Date Facture:</span> 03-Aug-24</p>
-        <p><span>Num Commande:</span> 691/ CP30SM / 02-Aug-24</p>
-        <p><span>Type Commande: Normal </span></p>
+        <p>
+          <span>Date Facture:</span> {{order.order_date.strftime('%d-%b-%y')}}
+        </p>
+        <p><span>Num Commande:</span> {{order.num_order}}</p>
+        <p><span>Type Commande: {{order.type_order.value}} </span></p>
       </section>
       <section class="payment-methods">
         <div>
@@ -254,8 +262,19 @@
         </div>
       </section>
       <section class="details-right">
-        <p><span>Date de Livraison: 06-Aug-24</span></p>
-        <p><span>Paiement dû: </span><span class="date_du">05-Aug-24</span></p>
+        <p>
+          <span
+            >Date de Livraison:
+            {{order.delivery_date.strftime('%d-%b-%y')}}</span
+          >
+        </p>
+        <p>
+          <span>Paiement dû: </span
+          ><span class="date_du"
+            >{{(order.delivery_date +
+            timedelta(hours=72)).strftime('%d-%b-%y')}}
+          </span>
+        </p>
       </section>
     </section>
 
@@ -275,12 +294,12 @@
         </thead>
         <tbody>
           <tr>
-            <td>CP30SM</td>
-            <td>SEDJRO MORYA</td>
+            <td>{{order.customer_id}}</td>
+            <td>{{order.customer.last_name}} {{order.customer.first_name}}</td>
             <td id="statut_customer">Heureux de vous avoir</td>
             <td>N/A</td>
             <td></td>
-            <td>NON</td>
+            <td>{{order.collect}}</td>
             <td>NON</td>
           </tr>
         </tbody>
@@ -306,62 +325,22 @@
           </tr>
         </thead>
         <tbody>
+          {% for item in order.order_details %}
           <tr>
-            <td>1</td>
-            <td>AH</td>
-            <td>Autre Haut (AH)</td>
-            <td>4</td>
-            <td>1</td>
-            <td>0</td>
-            <td>3</td>
-            <td>175</td>
-            <td>175</td>
-            <td>525</td>
-            <td>525</td>
-            <td>525</td>
+            <td>N°</td>
+            <td>{{item.article_id}}</td>
+            <td>{{item.article.name}}</td>
+            <td>{{item.multiplier_coef}}</td>
+            <td>{{item.specificity.value}}</td>
+            <td>{{item.divider_coef}}</td>
+            <td>{{item.discount_article}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.article.price}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.name}}</td>
           </tr>
-          <tr>
-            <td>2</td>
-            <td>TS</td>
-            <td>T-Shirt (TS)</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>700</td>
-            <td>700</td>
-            <td>700</td>
-            <td>700</td>
-            <td>525</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>CH</td>
-            <td>Chemise (CH)</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>2</td>
-            <td>700</td>
-            <td>700</td>
-            <td>1,400</td>
-            <td>1,400</td>
-            <td>525</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>CO</td>
-            <td>Costume/Tailleur (CO)</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>2</td>
-            <td>2,700</td>
-            <td>2,700</td>
-            <td>5,400</td>
-            <td>5,400</td>
-            <td>525</td>
-          </tr>
+          {% endfor %}
         </tbody>
         <tfoot>
           <tr>
@@ -412,7 +391,7 @@
       <div>
         <img src="{{api_url}}/files/img/address.png" , alt="ADRESSE" />
         <!-- <img src="../../static/img/address.png" , alt="ADRESSE" /> -->
-        <p>Parcelle O</p> 
+        <p>Parcelle O</p>
         <p>Msn AHOUNOU V. G. AMBROISE</p>
         <p>Zopah</p>
         <p>(non loin du CS Grande Académie)</p>
