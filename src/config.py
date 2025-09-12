@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file="src/.env", env_file_encoding="utf-8", extra="allow"
+        env_file=".env", env_file_encoding="utf-8", extra="allow"
     )
 
     app_name: str
@@ -38,3 +38,27 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: float
+
+    # ===== Default Admin =====
+    default_admin_email: str
+    default_admin_phone_number: str
+    default_admin_last_name: str
+    default_admin_first_name: str
+    default_admin_password: str
+    default_admin_address: str
+
+    # ===== Default Secretary =====
+    default_secretary_email: str
+    default_secretary_phone_number: str
+    default_secretary_last_name: str
+    default_secretary_first_name: str
+    default_secretary_address: str
+    default_secretary_password: str
+
+    # ===== Default Customer =====
+    default_customer_email: str
+    default_customer_phone_number: str
+    default_customer_last_name: str
+    default_customer_first_name: str
+    default_customer_address: str
+    default_customer_password: str

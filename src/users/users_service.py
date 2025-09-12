@@ -531,23 +531,23 @@ class UserService:
     @staticmethod
     def get_default_secretary_input():
         return {
-            "email": "merylahounou@gmail.com",
-            "phone_number": "+33666495244",
-            "last_name": "AHOUNOU",
-            "first_name": "Senou",
-            "address": "Cotonou",
-            "password": settings.default_admin_password,
+            "email": settings.default_secretary_email,
+            "phone_number": settings.default_secretary_phone_number or None,
+            "last_name": settings.default_secretary_last_name,
+            "first_name": settings.default_secretary_first_name,
+            "address": settings.default_secretary_address,
+            "password": settings.default_secretary_password or settings.default_admin_password,
             "role": UserRole.SECRETARY,
         }
 
     @staticmethod
     def get_default_customer_input():
         return {
-            "email": "ahounoumeryl@yahoo.fr",
-            "phone_number": None,
-            "last_name": "AHOUNOU",
-            "first_name": "Meryl",
-            "address": "Cotonou",
-            "password": settings.default_admin_password,
+            "email": settings.default_customer_email,
+            "phone_number": settings.default_customer_phone_number or None,
+            "last_name": settings.default_customer_last_name,
+            "first_name": settings.default_customer_first_name,
+            "address": settings.default_customer_address,
+            "password": settings.default_customer_password or settings.default_admin_password,
             "role": UserRole.CUSTOMER,
         }

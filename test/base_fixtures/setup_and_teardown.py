@@ -10,6 +10,8 @@ from test.users.fixtures.seed import customers, secretaries, admins
 from test.catalog.fixtures import articles
 from test.orders.fixtures.seed import orders, get_all_orders
 from test.invoice.fixtures.seed import invoices
+from src.auth.auth_router import settings
+from src.config import Settings
 
 
 def clean_order(order):
@@ -27,6 +29,8 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order, gen
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
+    settings = Settings()
+
     # 1. Générer les utilisateurs
     _customers = [generate_user_data(role=UserRole.CUSTOMER) for _ in range(2)] + [
         generate_user_data(
@@ -35,8 +39,8 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order, gen
     ]
     _secretaries = [generate_user_data(role=UserRole.SECRETARY) for _ in range(2)]
     _admins = [
-        generate_user_data(role=UserRole.ADMIN, phone_number="+33666495244"),
-        generate_user_data(role=UserRole.ADMIN, email="aiounouu@gmail.com"),
+        generate_user_data(role=UserRole.ADMIN, phone_number=settings.default_secretary_phone_number),
+        generate_user_data(role=UserRole.ADMIN, email= settings.default_admin_email),
     ]
 
     users = _customers + _secretaries + _admins
