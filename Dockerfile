@@ -4,7 +4,7 @@ EXPOSE 8000
 
 WORKDIR /app
 
-RUN python -m pip install --upgrade pip && pip install --user pipenv
+RUN python -m pip install --upgrade pip && pip install pipenv
 
 COPY Pipfile Pipfile.lock ./
 
