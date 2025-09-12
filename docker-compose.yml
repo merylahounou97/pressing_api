@@ -4,7 +4,6 @@ services:
     container_name: postgresdb
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
-      # POSTGRES_DB: test
       POSTGRES_USER: ${DATABASE_USER}
     ports:
       - "5432:5432"
