@@ -1,0 +1,35 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - 80:80
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+
+  postgres:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust #Uniquement en developpement
+
+  pressing_api:
+    develop:
+      watch:
+        - path: ./src
+          action: sync+restart
+          target: /app/src
+        - path: ./test
+          action: sync+restart
+          target: /app/test
+        - path: ./Makefile
+          action: sync+restart
+          target: /app/Makefile
+    volumes:
+      - ./Pipfile:/app/Pipfile
+      - /root/.local/share/virtualenvs/app-4PlAip0Q
+      - ./src/invoice:/app/invoices
