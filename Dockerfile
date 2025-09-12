@@ -12,4 +12,4 @@ RUN pipenv install --system --deploy
 
 COPY . .
 
-CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
+CMD ["fastapi", "run", "src/main.py", "--proxy-headers", "--port", "80"]

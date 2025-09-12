@@ -34,4 +34,3 @@ volumes:
     name: pressingdb
   pgadmin-data:
     name: pgadmin-data
-
