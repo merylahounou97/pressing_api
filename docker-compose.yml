@@ -14,27 +14,20 @@ services:
 
   pressing_api:
     container_name: pressing_api
-    image: pressing_api
-    build:
-      context: .
-      dockerfile: Dockerfile
-
+    image: ghcr.io/merylahounou97/pressing_api:dev
     ports:
       - 8000:8000
     depends_on:
       - postgres
 
-
-
   ngrok:
     image: ngrok/ngrok:latest
-    # image: wernight/ngrok
     container_name: ngrok
     ports:
       - "4040:4040"
     environment:
       - NGROK_PORT=8000
-      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} # Ulrich
+      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
     command:  http pressing_api:8000
 
 volumes:

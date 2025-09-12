@@ -4,14 +4,12 @@ EXPOSE 8000
 
 WORKDIR /app
 
-RUN pip install pipenv 
+RUN python -m pip install --upgrade pip && pip install --user pipenv
 
 COPY Pipfile Pipfile.lock ./
 
-RUN pipenv install --skip-lock
+RUN pipenv install --system --deploy
 
 COPY . .
 
-
-
-CMD  ["make","dev-con"]
+CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
