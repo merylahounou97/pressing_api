@@ -8,7 +8,7 @@ on:
       - dev
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: "pressing_api"
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
