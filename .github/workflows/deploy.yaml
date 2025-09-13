@@ -75,7 +75,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          script: docker login ${{env.REGISTRY}} --username ${{github.actor}} --password-stdin ${{ secrets.GITHUB_TOKEN }}
+          script: echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{env.REGISTRY}} --username ${{github.actor}} --password-stdin 
 
       - name: SSH Deploy on remote server — write env files
         uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
