@@ -508,13 +508,15 @@ class UserService:
             self.db.query(UserModel).filter(UserModel.email == admin_email).first()
         )
         if not existing_admin:
-            self.create(
-                UserCreateMemberInput(**UserService.get_default_secretary_input())
-            )
-            self.create(
-                UserCreateMemberInput(**UserService.get_default_customer_input())
-            )
             self.create(UserCreateMemberInput(**UserService.get_default_admin_input()))
+            
+            if not settings.ENV!="prod":
+                self.create(
+                    UserCreateMemberInput(**UserService.get_default_secretary_input())
+                )
+                self.create(
+                    UserCreateMemberInput(**UserService.get_default_customer_input())
+                )
 
     @staticmethod
     def get_default_admin_input():

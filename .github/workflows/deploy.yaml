@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           source: "docker-compose.yml"
-          target: /root/${{env.APP_NAME}}
+          target: /root/${{vars.APP_NAME}}
 
       - name: Docker login on the server
         uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
@@ -86,13 +86,13 @@ jobs:
           script: |
             set -euo pipefail
 
-            DIR="/root/${{env.APP_NAME}}"
+            DIR="/root/${{vars.APP_NAME}}"
             mkdir -p "$DIR"
             chmod 700 "$DIR"
 
             umask 177
             cat > "$DIR/.env" << 'EOF'
-            app_name=${{ env.APP_NAME }}
+            app_name=${{ vars.APP_NAME }}
 
             # Database
             # ==========================
@@ -105,13 +105,13 @@ jobs:
             # Email
             # ==========================
             mail_password=${{ secrets.MAIL_PASSWORD }}
-            sender_email=${{ env.SENDER_EMAIL }}
-            support_address=${{ env.SUPPORT_ADDRESS }}
+            sender_email=${{ vars.SENDER_EMAIL }}
+            support_address=${{ vars.SUPPORT_ADDRESS }}
 
             # ==========================
             # API
             # ==========================
-            api_url=${{ env.API_URL }}
+            api_url=${{ vars.API_URL }}
             ENV=${{ env.APP_ENV }}
 
             # ==========================
@@ -119,8 +119,8 @@ jobs:
             # ==========================
             TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}
             TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}
-            TWILIO_PHONE_NUMBER=${{ env.TWILIO_PHONE_NUMBER }}
-            code_expiry_time=${{ secrets.CODE_EXPIRY_TIME }}
+            TWILIO_PHONE_NUMBER=${{ vars.TWILIO_PHONE_NUMBER }}
+            code_expiry_time=${{ vars.CODE_EXPIRY_TIME }}
 
             # =========================
             # Default Admin
@@ -132,32 +132,12 @@ jobs:
             DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}
             DEFAULT_ADMIN_ADDRESS=${{ secrets.DEFAULT_ADMIN_ADDRESS }}
 
-            # =========================
-            # Default Secretary
-            # =========================
-            DEFAULT_SECRETARY_EMAIL=${{ secrets.DEFAULT_SECRETARY_EMAIL }}
-            DEFAULT_SECRETARY_PHONE_NUMBER=${{ secrets.DEFAULT_SECRETARY_PHONE_NUMBER }}
-            DEFAULT_SECRETARY_LAST_NAME=${{ secrets.DEFAULT_SECRETARY_LAST_NAME }}
-            DEFAULT_SECRETARY_FIRST_NAME=${{ secrets.DEFAULT_SECRETARY_FIRST_NAME }}
-            DEFAULT_SECRETARY_ADDRESS=${{ secrets.DEFAULT_SECRETARY_ADDRESS }}
-            DEFAULT_SECRETARY_PASSWORD=${{ secrets.DEFAULT_SECRETARY_PASSWORD }}
-
-            # =========================
-            # Default Customer
-            # =========================
-            DEFAULT_CUSTOMER_EMAIL=${{ secrets.DEFAULT_CUSTOMER_EMAIL }}
-            DEFAULT_CUSTOMER_PHONE_NUMBER=${{ secrets.DEFAULT_CUSTOMER_PHONE_NUMBER }}
-            DEFAULT_CUSTOMER_LAST_NAME=${{ secrets.DEFAULT_CUSTOMER_LAST_NAME }}
-            DEFAULT_CUSTOMER_FIRST_NAME=${{ secrets.DEFAULT_CUSTOMER_FIRST_NAME }}
-            DEFAULT_CUSTOMER_ADDRESS=${{ secrets.DEFAULT_CUSTOMER_ADDRESS }}
-            DEFAULT_CUSTOMER_PASSWORD=${{ secrets.DEFAULT_CUSTOMER_PASSWORD }}
-
             # ==========================
             # JWT (Authentication)
             # ==========================
             SECRET_KEY=${{ secrets.SECRET_KEY }}
-            ALGORITHM=${{ secrets.JWT_ALGORITHM }}
-            ACCESS_TOKEN_EXPIRE_MINUTES=${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+            ALGORITHM=${{ secrets.ALGORITHM }}
+            ACCESS_TOKEN_EXPIRE_MINUTES=${{ vars.ACCESS_TOKEN_EXPIRE_MINUTES }}
             EOF
 
             chmod 600 "$DIR/.env"
@@ -175,5 +155,5 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            cd /root/${{env.APP_NAME}}
+            cd /root/${{vars.APP_NAME}}
             docker compose up -d
