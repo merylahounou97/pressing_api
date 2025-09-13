@@ -48,17 +48,17 @@ class Settings(BaseSettings):
     default_admin_address: str
 
     # ===== Default Secretary =====
-    default_secretary_email: str
-    default_secretary_phone_number: str
-    default_secretary_last_name: str
-    default_secretary_first_name: str
-    default_secretary_address: str
-    default_secretary_password: str
+    default_secretary_email: str|None = None
+    default_secretary_phone_number: str|None = None
+    default_secretary_last_name: str|None = None
+    default_secretary_first_name: str|None = None
+    default_secretary_address: str|None = None
+    default_secretary_password: str|None = None
 
     # ===== Default Customer =====
-    default_customer_email: str
-    default_customer_phone_number: str
-    default_customer_last_name: str
-    default_customer_first_name: str
-    default_customer_address: str
-    default_customer_password: str
+    default_customer_email: str|None = None
+    default_customer_phone_number: str|None = None
+    default_customer_last_name: str|None = None
+    default_customer_first_name: str|None = None
+    default_customer_address: str|None = None
+    default_customer_password: str|None = None
