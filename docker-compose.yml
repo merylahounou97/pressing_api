@@ -3,21 +3,22 @@ services:
     image: postgres
     container_name: postgresdb
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_DB:  ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+        - ./postgres_password.txt:/run/secrets/postgres_password:ro
     volumes:
       - db:/var/lib/postgresql/data
-      - ./scripts/init_test_databases.sh:/docker-entrypoint-initdb.d/init_test_databases.sh
 
   pressing_api:
     container_name: pressing_api
     image: ghcr.io/merylahounou97/pressing_api:dev
     ports:
-      - 8000:8000
+      - "127.0.0.1:8000:8000"
     depends_on:
       - postgres
+    volumes:
+     - .env:/app/.env:ro
 
   ngrok:
     image: ngrok/ngrok:latest

@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  APP_ENV: prod
 
 jobs:
   build:
@@ -37,7 +38,6 @@ jobs:
         with:
           images: ${{ env.REGISTRY}}/${{env.IMAGE_NAME}}
 
-
       - name: Build and push v6
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
         with:
@@ -47,3 +47,132 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+      id-token: write
+    steps:
+      - name: Checkout to the repo v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Copy files needed via SSH
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "docker-compose.yml"
+          target: /root/${{env.APP_NAME}}
+
+      - name: Docker login on the server
+        uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: docker login ${{env.REGISTRY}} --username ${{github.actor}} --password-stdin ${{ secrets.GITHUB_TOKEN }}
+
+      - name: SSH Deploy on remote server — write env files
+        uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            set -euo pipefail
+
+            DIR="/root/${{env.APP_NAME}}"
+            mkdir -p "$DIR"
+            chmod 700 "$DIR"
+
+            umask 177
+            cat > "$DIR/.env" << 'EOF'
+            app_name=${{ env.APP_NAME }}
+
+            # Database
+            # ==========================
+            database_name=${{ secrets.DATABASE_NAME }}
+            database_user=${{ secrets.DATABASE_USER }}
+            database_host=${{ secrets.DATABASE_HOST }}
+            database_password=${{ secrets.DATABASE_PASSWORD }}
+
+            # ==========================
+            # Email
+            # ==========================
+            mail_password=${{ secrets.MAIL_PASSWORD }}
+            sender_email=${{ env.SENDER_EMAIL }}
+            support_address=${{ env.SUPPORT_ADDRESS }}
+
+            # ==========================
+            # API
+            # ==========================
+            api_url=${{ env.API_URL }}
+            ENV=${{ env.APP_ENV }}
+
+            # ==========================
+            # Twilio (SMS)
+            # ==========================
+            TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}
+            TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}
+            TWILIO_PHONE_NUMBER=${{ env.TWILIO_PHONE_NUMBER }}
+            code_expiry_time=${{ secrets.CODE_EXPIRY_TIME }}
+
+            # =========================
+            # Default Admin
+            # =========================
+            DEFAULT_ADMIN_EMAIL=${{ secrets.DEFAULT_ADMIN_EMAIL }}
+            DEFAULT_ADMIN_PHONE_NUMBER=${{ secrets.DEFAULT_ADMIN_PHONE_NUMBER }}
+            DEFAULT_ADMIN_LAST_NAME=${{ secrets.DEFAULT_ADMIN_LAST_NAME }}
+            DEFAULT_ADMIN_FIRST_NAME=${{ secrets.DEFAULT_ADMIN_FIRST_NAME }}
+            DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}
+            DEFAULT_ADMIN_ADDRESS=${{ secrets.DEFAULT_ADMIN_ADDRESS }}
+
+            # =========================
+            # Default Secretary
+            # =========================
+            DEFAULT_SECRETARY_EMAIL=${{ secrets.DEFAULT_SECRETARY_EMAIL }}
+            DEFAULT_SECRETARY_PHONE_NUMBER=${{ secrets.DEFAULT_SECRETARY_PHONE_NUMBER }}
+            DEFAULT_SECRETARY_LAST_NAME=${{ secrets.DEFAULT_SECRETARY_LAST_NAME }}
+            DEFAULT_SECRETARY_FIRST_NAME=${{ secrets.DEFAULT_SECRETARY_FIRST_NAME }}
+            DEFAULT_SECRETARY_ADDRESS=${{ secrets.DEFAULT_SECRETARY_ADDRESS }}
+            DEFAULT_SECRETARY_PASSWORD=${{ secrets.DEFAULT_SECRETARY_PASSWORD }}
+
+            # =========================
+            # Default Customer
+            # =========================
+            DEFAULT_CUSTOMER_EMAIL=${{ secrets.DEFAULT_CUSTOMER_EMAIL }}
+            DEFAULT_CUSTOMER_PHONE_NUMBER=${{ secrets.DEFAULT_CUSTOMER_PHONE_NUMBER }}
+            DEFAULT_CUSTOMER_LAST_NAME=${{ secrets.DEFAULT_CUSTOMER_LAST_NAME }}
+            DEFAULT_CUSTOMER_FIRST_NAME=${{ secrets.DEFAULT_CUSTOMER_FIRST_NAME }}
+            DEFAULT_CUSTOMER_ADDRESS=${{ secrets.DEFAULT_CUSTOMER_ADDRESS }}
+            DEFAULT_CUSTOMER_PASSWORD=${{ secrets.DEFAULT_CUSTOMER_PASSWORD }}
+
+            # ==========================
+            # JWT (Authentication)
+            # ==========================
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            ALGORITHM=${{ secrets.JWT_ALGORITHM }}
+            ACCESS_TOKEN_EXPIRE_MINUTES=${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+            EOF
+
+            chmod 600 "$DIR/.env"
+
+            printf "%s" "${{ secrets.DATABASE_PASSWORD }}" > "$DIR/postgres_password.txt"
+            chmod 600 "$DIR/postgres_password.txt"
+
+            echo "Secrets written to: $DIR"
+
+
+      - name: Launch Container
+        uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /root/${{env.APP_NAME}}
+            docker compose up -d

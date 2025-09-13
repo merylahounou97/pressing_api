@@ -16,7 +16,8 @@ services:
   postgres:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust #Uniquement en developpement
-
+    ports:
+      - "5432:5432"
   pressing_api:
     build:
       context: .
@@ -36,4 +37,5 @@ services:
       - ./Pipfile:/app/Pipfile
       - /root/.local/share/virtualenvs/app-4PlAip0Q
       - ./src/invoice:/app/invoices
+      - ./scripts/init_test_databases.sh:/docker-entrypoint-initdb.d/init_test_databases.sh
 
