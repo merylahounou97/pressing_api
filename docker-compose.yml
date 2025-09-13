@@ -6,9 +6,10 @@ services:
       POSTGRES_DB:  ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-        - ./postgres_password.txt:/run/secrets/postgres_password:ro
     volumes:
       - db:/var/lib/postgresql/data
+      - ./postgres_password.txt:/run/secrets/postgres_password:ro
+
 
   pressing_api:
     container_name: pressing_api
