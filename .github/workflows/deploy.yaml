@@ -144,7 +144,7 @@ jobs:
             chmod 600 "$DIR/.env"
 
             printf "%s" "${{ secrets.DATABASE_PASSWORD }}" > "$DIR/postgres_password.txt"
-            chmod 600 "$DIR/postgres_password.txt"
+            #chmod 600 "$DIR/postgres_password.txt"
 
             echo "Secrets written to: $DIR"
 
