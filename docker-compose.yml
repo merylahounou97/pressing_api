@@ -24,7 +24,10 @@ services:
       - traefik.http.routers.pressing.entrypoints=websecure
       - traefik.http.routers.pressing.tls.certresolver=myresolver
       - traefik.http.services.pressing.loadbalancer.server.port=8000
+      - traefik.http.routers.pressing.middlewares=pressing-strip@docker
+      - traefik.http.middlewares.pressing-strip.stripPrefix.prefixes=/pressing_api
       - traefik.docker.network=traefik_net
+
 
     depends_on:
       - postgres
