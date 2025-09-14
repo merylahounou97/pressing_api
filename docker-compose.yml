@@ -25,6 +25,8 @@ services:
       - postgres
     volumes:
      - .env:/app/.env:ro
+    networks:
+      - traefik_net
 
   ngrok:
     image: ngrok/ngrok:latest
