@@ -43,3 +43,6 @@ volumes:
     name: pressingdb
   pgadmin-data:
     name: pgadmin-data
+networks:
+  traefik_net:
+    external: true
