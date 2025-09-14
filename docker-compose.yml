@@ -16,12 +16,14 @@ services:
   pressing_api:
     container_name: pressing_api
     image: ghcr.io/merylahounou97/pressing_api:dev
+    restart: always
+    pull_policy: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portefolio.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)"
-      - "traefik.http.routers.portefolio.entrypoints=websecure"
-      - "traefik.http.routers.portefolio.tls.certresolver=myresolver"
-      - traefik.http.services.portefolio.loadbalancer.server.port=8000
+      - "traefik.http.routers.pressing.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)"
+      - "traefik.http.routers.pressing.entrypoints=websecure"
+      - "traefik.http.routers.pressing.tls.certresolver=myresolver"
+      - traefik.http.services.pressing.loadbalancer.server.port=8000
     depends_on:
       - postgres
     volumes:
