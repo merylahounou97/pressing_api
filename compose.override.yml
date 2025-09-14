@@ -16,12 +16,15 @@ services:
   postgres:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust #Uniquement en developpement
+    volumes:
+      - ./secrets/postgres_password.txt:/run/secrets/postgres_password:ro
+
     ports:
       - "5432:5432"
   pressing_api:
     build:
       context: .
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile
     develop:
       watch:
         - path: ./src
