@@ -19,11 +19,13 @@ services:
     restart: always
     pull_policy: always
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.pressing.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)"
-      - "traefik.http.routers.pressing.entrypoints=websecure"
-      - "traefik.http.routers.pressing.tls.certresolver=myresolver"
+      - traefik.enable=true
+      - traefik.http.routers.pressing.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)
+      - traefik.http.routers.pressing.entrypoints=websecure
+      - traefik.http.routers.pressing.tls.certresolver=myresolver
       - traefik.http.services.pressing.loadbalancer.server.port=8000
+      - traefik.docker.network=traefik_net
+
     depends_on:
       - postgres
     volumes:
@@ -54,4 +56,4 @@ networks:
   pressing:
     name: pressing_net
   traefik_net:
-    external: true
+    name: traefik_net
