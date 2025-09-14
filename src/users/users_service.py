@@ -509,8 +509,8 @@ class UserService:
         )
         if not existing_admin:
             self.create(UserCreateMemberInput(**UserService.get_default_admin_input()))
-            
-            if not settings.ENV!="prod":
+
+            if settings.ENV!="prod":
                 self.create(
                     UserCreateMemberInput(**UserService.get_default_secretary_input())
                 )
