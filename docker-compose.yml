@@ -56,4 +56,4 @@ networks:
   pressing:
     name: pressing_net
   traefik_net:
-    name: traefik_net
+    external: true
