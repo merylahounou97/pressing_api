@@ -16,7 +16,7 @@ services:
     image: ghcr.io/merylahounou97/pressing_api:dev
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portefolio.rule=Host(`portefolio.ulrichaiounou.com`)"
+      - "traefik.http.routers.portefolio.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)"
       - "traefik.http.routers.portefolio.entrypoints=websecure"
       - "traefik.http.routers.portefolio.tls.certresolver=myresolver"
       - "traefik.http.routers.portefolio.middlewares=security-chain"

@@ -12,4 +12,4 @@ RUN pipenv install --system --deploy
 
 COPY . .
 
-CMD ["fastapi", "run", "src/main.py", "--proxy-headers", "--port", "8000"]
+CMD ["fastapi", "run", "src/main.py", "--proxy-headers", "--port", "8000", "--root-path","/pressing_api"]
