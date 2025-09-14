@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.portefolio.tls.certresolver=myresolver"
       - "traefik.http.routers.portefolio.middlewares=security-chain"
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:80:80"
     depends_on:
       - postgres
     volumes:
@@ -35,7 +35,7 @@ services:
     environment:
       - NGROK_PORT=8000
       - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
-    command:  http pressing_api:8000
+    command:  http pressing_api:80
 
 volumes:
   db:
