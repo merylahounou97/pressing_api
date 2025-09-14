@@ -20,8 +20,7 @@ services:
       - "traefik.http.routers.portefolio.entrypoints=websecure"
       - "traefik.http.routers.portefolio.tls.certresolver=myresolver"
       - "traefik.http.routers.portefolio.middlewares=security-chain"
-    ports:
-      - "127.0.0.1:80:80"
+      - traefik.http.services.portefolio.loadbalancer.server.port=8000
     depends_on:
       - postgres
     volumes:
