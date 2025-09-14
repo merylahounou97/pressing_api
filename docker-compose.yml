@@ -14,8 +14,15 @@ services:
   pressing_api:
     container_name: pressing_api
     image: ghcr.io/merylahounou97/pressing_api:dev
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portefolio.rule=Host(`portefolio.ulrichaiounou.com`)"
+      - "traefik.http.routers.portefolio.entrypoints=websecure"
+      - "traefik.http.routers.portefolio.tls.certresolver=myresolver"
+      - "traefik.http.routers.portefolio.middlewares=security-chain"
+
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8000:8000
     depends_on:
       - postgres
     volumes:
