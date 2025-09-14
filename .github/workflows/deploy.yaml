@@ -93,26 +93,27 @@ jobs:
 
             umask 177
             cat > "$DIR/.env" << 'EOF'
-            app_name=${{ vars.APP_NAME }}
+            APP_NAME=${{ vars.APP_NAME }}
 
+            # ==========================
             # Database
             # ==========================
-            database_name=${{ secrets.DATABASE_NAME }}
-            database_user=${{ secrets.DATABASE_USER }}
-            database_host=${{ secrets.DATABASE_HOST }}
-            database_password=${{ secrets.DATABASE_PASSWORD }}
+            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+            DATABASE_USER=${{ secrets.DATABASE_USER }}
+            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
 
             # ==========================
             # Email
             # ==========================
-            mail_password=${{ secrets.MAIL_PASSWORD }}
-            sender_email=${{ vars.SENDER_EMAIL }}
-            support_address=${{ vars.SUPPORT_ADDRESS }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            SENDER_EMAIL=${{ vars.SENDER_EMAIL }}
+            SUPPORT_ADDRESS=${{ vars.SUPPORT_ADDRESS }}
 
             # ==========================
             # API
             # ==========================
-            api_url=${{ vars.API_URL }}
+            API_URL=${{ vars.API_URL }}
             ENV=${{ env.APP_ENV }}
 
             # ==========================
