@@ -9,6 +9,8 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
       - ./postgres_password.txt:/run/secrets/postgres_password:ro
+    networks:
+      - pressing
 
 
   pressing_api:
@@ -27,6 +29,7 @@ services:
      - .env:/app/.env:ro
     networks:
       - traefik_net
+      - pressing
 
   ngrok:
     image: ngrok/ngrok:latest
@@ -37,12 +40,17 @@ services:
       - NGROK_PORT=8000
       - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
     command:  http pressing_api:80
+    networks:
+      - pressing
 
 volumes:
   db:
     name: pressingdb
   pgadmin-data:
     name: pgadmin-data
+
 networks:
+  pressing:
+    name: pressing_net
   traefik_net:
     external: true
