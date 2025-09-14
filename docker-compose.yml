@@ -21,7 +21,6 @@ services:
       - "traefik.http.routers.portefolio.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)"
       - "traefik.http.routers.portefolio.entrypoints=websecure"
       - "traefik.http.routers.portefolio.tls.certresolver=myresolver"
-      - "traefik.http.routers.portefolio.middlewares=security-chain"
       - traefik.http.services.portefolio.loadbalancer.server.port=8000
     depends_on:
       - postgres
