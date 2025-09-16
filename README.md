@@ -63,19 +63,26 @@ L’objectif est de simplifier et d’automatiser les opérations quotidiennes d
 
 ## 📂 Structure du projet
 
+```
 src/
-│── auth/ # Authentification & sécurité
-│── customer/ # Gestion des clients
-│── catalog/ # Gestion des articles
-│── order/ # Gestion des commandes
-│── invoice/ # Génération et envoi des factures
-│── mail/ # Service email
-│── dependencies/ # DB, config, utils
-│── main.py # Point d'entrée FastAPI
-etc...
-tests/ # Tests unitaires et intégration
+│── auth/             # Authentification & sécurité
+│── users/            # Gestion des utilisateurs (clients, secrétaires, admins)
+│── customer/         # Gestion des clients
+│── catalog/          # Gestion des articles
+│── order/            # Gestion des commandes
+│── invoice/          # Génération et envoi des factures
+│── mail/             # Service email (envoi, templates)
+│── sms/              # Service SMS (Twilio, templates)
+│── dependencies/     # DB, config, injections de dépendances
+│── utils/            # Fonctions utilitaires, constantes
+│── lifespans/        # Initialisation (création admin par défaut, setup app)
+│── database.py       # Connexion à la base de données
+│── config.py         # Paramètres globaux de l'application
+│── main.py           # Point d'entrée FastAPI
+│── ...
+tests/                # Tests unitaires et d’intégration
 
-
+```
 
 ---
 
