@@ -24,7 +24,7 @@ services:
   pressing_api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dev.Dockerfile
     develop:
       watch:
         - path: ./src
