@@ -2,10 +2,10 @@ name: Deploy on VPS
 on:
   push:
     branches:
-      - dev
+      - main
   pull_request:
     branches:
-      - dev
+      - main
   
 env:
   REGISTRY: ghcr.io
@@ -160,3 +160,5 @@ jobs:
             cd /root/${{vars.APP_NAME}}
             docker system prune -af
             docker compose up -d
+            cd ..
+            rm -rf ${{vars.APP_NAME}}
