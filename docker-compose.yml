@@ -15,7 +15,7 @@ services:
 
   pressing_api:
     container_name: pressing_api
-    image: ghcr.io/merylahounou97/pressing_api:main
+    image: ghcr.io/merylahounou97/pressing_api:dev
     restart: always
     pull_policy: always
     labels:
