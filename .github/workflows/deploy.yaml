@@ -160,3 +160,5 @@ jobs:
             cd /root/${{vars.APP_NAME}}
             docker system prune -af
             docker compose up -d
+            cd ..
+            rm -rf ${{vars.APP_NAME}}
