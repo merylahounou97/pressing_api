@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture Pro Forma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .invoice-container {
+            background-color: #fff;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .invoice-header {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        .invoice-header img {
+            width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .invoice-table th {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            border-top: 2px solid #4CAF50;
+            padding-top: 10px;
+        }
+        .footer img {
+            width: 60px;
+            height: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <img src="logo.png" alt="Logo de WashMan">
+            <h1>FACTURE PRO FORMA #691/08/2024</h1>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Informations du client</div>
+            <p>Nom du client : SEDJRO MORYA</p>
+            <p>Réf Client : CP30SM</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Détails de la Commande</div>
+            <table class="invoice-table">
+                <tr>
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Quantité</th>
+                    <th>Prix Unitaire (PU)</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>AH</td>
+                    <td>Autre Haut (AH)</td>
+                    <td>3</td>
+                    <td>700</td>
+                    <td>2,100</td>
+                </tr>
+                <tr>
+                    <td>TS</td>
+                    <td>T-Shirt (TS)</td>
+                    <td>1</td>
+                    <td>700</td>
+                    <td>700</td>
+                </tr>
+                <tr>
+                    <td>CH</td>
+                    <td>Chemise (CH)</td>
+                    <td>2</td>
+                    <td>700</td>
+                    <td>1,400</td>
+                </tr>
+                <tr>
+                    <td>CO</td>
+                    <td>Costume/Tailleur (CO)</td>
+                    <td>2</td>
+                    <td>2,700</td>
+                    <td>5,400</td>
+                </tr>
+                <tr>
+                    <th colspan="4">Total</th>
+                    <th>8,875</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <p>Type de commande : Normal</p>
+            <p>Date Facture : 02-Aug-24</p>
+            <p>Date de Livraison : 03-Aug-24</p>
+        </div>
+
+        <div class="section">
+            <p>Net à payer : <strong>8,875</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>WashMan vous remercie pour la confiance!</p>
+            <p>"WashMan, Parce que vous méritez le meilleur."</p>
+            <img src="footer-image.png" alt="Image de remerciement">
+        </div>
+    </div>
+</body>
+</html>

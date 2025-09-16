@@ -1,0 +1,29 @@
+# Processus de création de test
+
+## Entité( User, Order)
+
+Pour créer le test dans une entité, on crée une classe dans laquelle on gère toutes les dépendances commune aux tests.
+Ensuite on crée une classe Test dans laquelle on écrit tous les tests, et dans ce cas le seul paramètre est le fixture factory de la classe associée
+
+## Exemple
+
+Pour créer les tests liés à [users](../src/users),
+on a créer une classe [serviceTest](users/test_user_router.py)
+pour cette classe on crée un fixture [factory du service](users/fixtures/others/user_test_service_factory.py)
+Et ce factory est en paramètre pour chaque test écrit dans [la classe de test](users/test_user_router.py)
+
+## Organisation des fixtures
+
+### conftest
+
+Dans chaque dossier il existe un fichier conftest dans lequel on initialise tous les fixtures nécéssaires à l'entité
+
+### Session
+Dans chaque dossier il existe un sous dossier fixture/session. Dans ce sous-dossier il faut mettre tous les fixtures qui doivent être chargée pour tous les tests. 
+et dans le deuxième sous-dossiers others on met les fixtures qui sont propre à l'entité.
+
+
+## Lancer un test
+
+Pour lancer un test il faut exécuter la commande 
+`make pytest`

@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgresdb
+    environment:
+      POSTGRES_DB:  ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./postgres_password.txt:/run/secrets/postgres_password:ro
+    networks:
+      - pressing
+
+
+  pressing_api:
+    container_name: pressing_api
+    image: ghcr.io/merylahounou97/pressing_api:main
+    restart: always
+    pull_policy: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pressing.rule=Host(`portefolio.ulrichaiounou.com`) && PathPrefix(`/pressing_api`)
+      - traefik.http.routers.pressing.entrypoints=websecure
+      - traefik.http.routers.pressing.tls.certresolver=myresolver
+      - traefik.http.services.pressing.loadbalancer.server.port=8000
+      - traefik.http.routers.pressing.middlewares=pressing-strip@docker
+      - traefik.http.middlewares.pressing-strip.stripPrefix.prefixes=/pressing_api
+      - traefik.docker.network=traefik_net
+
+
+    depends_on:
+      - postgres
+    volumes:
+     - .env:/app/.env:ro
+    networks:
+      - traefik_net
+      - pressing
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_PORT=8000
+      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
+    command:  http pressing_api:80
+    networks:
+      - pressing
+
+volumes:
+  db:
+    name: pressingdb
+  pgadmin-data:
+    name: pgadmin-data
+
+networks:
+  pressing:
+    name: pressing_net
+  traefik_net:
+    external: true

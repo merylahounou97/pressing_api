@@ -7,8 +7,19 @@ name = "pypi"
 fastapi = {extras = ["all"] }
 sqlalchemy = "*"
 psycopg2-binary = "*"
+passlib = "*"
+python-jose = {extras = ["cryptography"] }
+phonenumbers = "*"
+jinja2 = "*"
+requests = "*"
+twilio = "*"
+pytest = "*"
+pydantic-extra-types = "*"
+faker = "*"
+weasyprint = "*"
 
 [dev-packages]
+faker = "*"
 
 [requires]
 python_version = "3.10"

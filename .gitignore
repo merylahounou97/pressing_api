@@ -5,3 +5,10 @@ __pycache__/
 __pycache__/
 .vscode/
 .pytest_cache/
+.coverage
+secrets/*
+
+# Environment
+.env
+
+data.txt

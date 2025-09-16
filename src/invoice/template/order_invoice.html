@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facture</title>
+
+    <link
+      rel="stylesheet"
+      href="{{api_url}}/files/order_invoice.css"
+      type="text/css"
+    />
+
+    <link rel="stylesheet" href="C:\Users\ahoun\OneDrive\Documents\Documents\Web\FastAPI\src\static/order_invoice.css" type="text/css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <img src="{{api_url}}/files/logo.jpg" , alt="RCCM et IFU" />
+        <img src="../../static/logo.jpg" alt="RCCM et IFU">
+      </div>
+      <div>
+        <h1>PRESSING & BLANCHISSERIE</h1>
+        <p>RCCM: RB/ABC/22 A 41623 - IFU 1201525365809</p>
+      </div>
+    </header>
+
+    <h2>
+      FACTURE PRO FORMA
+      <span> # {{ num_order}}/{{month_order}}/{{year_order}}</span>
+    </h2>
+
+    <div id="order_infos">
+      <div>
+        <p><strong>Date Facture:</strong> {{ invoice_date }}</p>
+        <p>
+          <strong>Num commande:</strong> {{ customer_name }} ({{
+          customer_reference }})
+        </p>
+        <p><strong>Type commande:</strong> {{ type_order }}</p>
+      </div>
+
+      <div>
+        <table id="payment_methods">
+          <tbody>
+            <tr>
+              <td>MOMO PAY: <span>*880*41*955497*Montant#</span></td>
+            </tr>
+            <tr>
+              <td>MOOV PAY: <span>*855*4*1*22518*Montant#</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <p><strong>Date de Livraison: {{delivery_date}}</strong></p>
+        <p><strong>Paiement dû: {{delivery_date}} - 1</strong></p>
+      </div>
+    </div>
+
+    <div id="customer_infos">
+      <p>Informations du client</p>
+      <!-- <div id="customer_table"> -->
+      <table id="customer_table">
+        <thead>
+          <tr>
+            <th>Réf Client:</th>
+            <th>Nom Client:</th>
+            <th>Statut Client</th>
+            <th>Abonnement</th>
+            <th>Distance</th>
+            <th>Collecte</th>
+            <th>Livraison</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ customer_id }}</td>
+            <td>{{ customer_name }}</td>
+            <td>{{ customer_status }}</td>
+            <td>{{ subscription }}</td>
+            <td>{{ distance }}</td>
+            <td>{{ collect }}</td>
+            <td>{{ delivery }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Spécificité</th>
+          <th>Quantité</th>
+          <th>Prix Unitaire</th>
+          <th>Total</th>
+          <th>Remise</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.order_details %}
+        <tr>
+          <td>{{ item.article_name }}</td>
+          <td>{{ item.specificity }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unit_price }}</td>
+          <td>{{ item.total_price }}</td>
+          <td>{{ item.discount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p><strong>Total Avant Remise:</strong> {{ total_amount }}</p>
+    <p><strong>Total Remisé:</strong> {{ discounted_amount }}</p>
+    <p><strong>Net à Payer:</strong> {{ net_amount }}</p>
+  </body>
+</html>

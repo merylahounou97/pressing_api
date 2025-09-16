@@ -1,0 +1,162 @@
+name: Deploy on VPS
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  APP_ENV: prod
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+      id-token: write
+    steps:
+      - name: Checkout to the repo v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Set up Docker Buildx V3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
+      - name: Login to Docker Hub v3
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY}}/${{env.IMAGE_NAME}}
+
+      - name: Build and push v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+      id-token: write
+    steps:
+      - name: Checkout to the repo v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Copy files needed via SSH
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "docker-compose.yml"
+          target: /root/${{vars.APP_NAME}}
+
+      - name: Docker login on the server
+        uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{env.REGISTRY}} --username ${{github.actor}} --password-stdin 
+
+      - name: SSH Deploy on remote server — write env files
+        uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            set -euo pipefail
+
+            DIR="/root/${{vars.APP_NAME}}"
+            mkdir -p "$DIR"
+            chmod 700 "$DIR"
+
+            umask 177
+            cat > "$DIR/.env" << 'EOF'
+            APP_NAME=${{ vars.APP_NAME }}
+
+            # ==========================
+            # Database
+            # ==========================
+            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+            DATABASE_USER=${{ secrets.DATABASE_USER }}
+            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+
+            # ==========================
+            # Email
+            # ==========================
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            SENDER_EMAIL=${{ vars.SENDER_EMAIL }}
+            SUPPORT_ADDRESS=${{ vars.SUPPORT_ADDRESS }}
+
+            # ==========================
+            # API
+            # ==========================
+            API_URL=${{ vars.API_URL }}
+            ENV=${{ env.APP_ENV }}
+
+            # ==========================
+            # Twilio (SMS)
+            # ==========================
+            TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}
+            TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}
+            TWILIO_PHONE_NUMBER=${{ vars.TWILIO_PHONE_NUMBER }}
+            code_expiry_time=${{ vars.CODE_EXPIRY_TIME }}
+
+            # =========================
+            # Default Admin
+            # =========================
+            DEFAULT_ADMIN_EMAIL=${{ secrets.DEFAULT_ADMIN_EMAIL }}
+            DEFAULT_ADMIN_PHONE_NUMBER=${{ secrets.DEFAULT_ADMIN_PHONE_NUMBER }}
+            DEFAULT_ADMIN_LAST_NAME=${{ secrets.DEFAULT_ADMIN_LAST_NAME }}
+            DEFAULT_ADMIN_FIRST_NAME=${{ secrets.DEFAULT_ADMIN_FIRST_NAME }}
+            DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}
+            DEFAULT_ADMIN_ADDRESS=${{ secrets.DEFAULT_ADMIN_ADDRESS }}
+
+            # ==========================
+            # JWT (Authentication)
+            # ==========================
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            ALGORITHM=${{ secrets.ALGORITHM }}
+            ACCESS_TOKEN_EXPIRE_MINUTES=${{ vars.ACCESS_TOKEN_EXPIRE_MINUTES }}
+            EOF
+
+            chmod 600 "$DIR/.env"
+
+            printf "%s" "${{ secrets.DATABASE_PASSWORD }}" > "$DIR/postgres_password.txt"
+            chmod 600 "$DIR/postgres_password.txt"
+
+            echo "Secrets written to: $DIR"
+
+
+      - name: Launch Container
+        uses: appleboy/ssh-action@2ead5e36573f08b82fbfce1504f1a4b05a647c6f #v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /root/${{vars.APP_NAME}}
+            docker system prune -af
+            docker compose up -d
