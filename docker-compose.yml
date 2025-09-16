@@ -15,7 +15,7 @@ services:
 
   pressing_api:
     container_name: pressing_api
-    image: ghcr.io/merylahounou97/pressing_api:dev
+    image: ghcr.io/merylahounou97/pressing_api:main
     restart: always
     pull_policy: always
     labels:
@@ -34,7 +34,7 @@ services:
     volumes:
      - .env:/app/.env:ro
     networks:
-      # - traefik_net
+      - traefik_net
       - pressing
 
   ngrok:
@@ -58,5 +58,5 @@ volumes:
 networks:
   pressing:
     name: pressing_net
-  # traefik_net:
-  #   external: true
+  traefik_net:
+    external: true
