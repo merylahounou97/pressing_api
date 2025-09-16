@@ -1,8 +1,8 @@
 install:
 	pipenv install
 
-pytest:
-	export ENV=test && pipenv run pytest -v -s
+test:
+	pipenv run pytest
 
 dev:
 	pipenv run uvicorn src.main:app --reload
