@@ -34,7 +34,7 @@ services:
     volumes:
      - .env:/app/.env:ro
     networks:
-      - traefik_net
+      # - traefik_net
       - pressing
 
   ngrok:
@@ -58,5 +58,5 @@ volumes:
 networks:
   pressing:
     name: pressing_net
-  traefik_net:
-    external: true
+  # traefik_net:
+  #   external: true
