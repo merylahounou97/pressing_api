@@ -1,64 +1,91 @@
-# pressing_api
-Cette api est une api pour gérer le pressing de Méryl
+# 🧺 Pressing API
 
-# Pour démarer le projet
+## 🚀 Aperçu du projet
+**Pressing API** est une application backend développée avec **FastAPI** pour la gestion complète d’un service de pressing.  
+Elle centralise la gestion des **utilisateurs** (clients, secrétaires, administrateurs), le **catalogue d’articles**, les **commandes** et la **facturation** avec envoi automatique par email et SMS.  
 
-## En local
+L’objectif est de simplifier et d’automatiser les opérations quotidiennes du pressing, depuis la **prise de commande** jusqu’à la **livraison et facturation**.
 
-- Cloner le projet
-- exécuter la commande `pip install pipenv` pour instaler pipenv
-- exécuter `pipenv install` pour installer toutes les dépendances du projet
-- exécuter `make dev` pour démarer le projet en mode développement
+---
 
-## Avec docker
-Exécuter la commande ci-dessous pour lancer le projet en mode container
+## ✨ Fonctionnalités clés
 
-`docker compose up` 
-ou
- `docker compose watch` 
- pour le lancer en mode container developpement
+### 👥 Gestion des utilisateurs
+- Trois rôles : **Client**, **Secrétaire**, **Administrateur**  
+- Enregistrement, connexion et gestion des profils  
+- Création automatique d’un **compte admin par défaut** lors du premier lancement  
+- Vérification d’identité via **email** ou **numéro de téléphone** avec code de confirmation (email + SMS)  
+- Réinitialisation de mot de passe par **lien sécurisé** envoyé au client  
 
-# Lancer les tests
-Pour lancer les test il faut exécuter la commande `make test`
+### 📦 Catalogue d’articles
+- Gestion des articles du pressing (type de vêtement, prix, etc.)  
+- CRUD complet (ajout, édition, suppression, recherche)  
+- Recherche par **nom** ou **code article**  
 
-# Chargement des fichiers statics
-Pour charger les fichiers statiques comme les images et autres, 
-en local il faut changer la valeur de la variable d'environnement api_url.
-A cet effet on peut utiliser [](ngrok)
-Notamment il faut exécuter `ngrok http 8000` 
+### 📜 Commandes
+- Création, modification, annulation et suivi des commandes  
+- Statuts : **En attente**, **En cours**, **Finalisée**, **Annulée**  
 
-# Norme de commit 
-feat: Une nouvelle fonctionnalité pour l'utilisateur.
-Exemple: feat: ajouter la possibilité de filtrer les résultats de recherche
+### 🧾 Facturation
+- Génération de factures **HTML/PDF** basées sur les commandes  
+- Respect du format standard du pressing (similaire au fichier Excel de référence)  
+- Envoi automatique par **email** au client  
+- Sauvegarde des factures au format PDF  
 
-fix: Une correction de bug.
-Exemple: fix: corriger l'affichage incorrect des dates sur le tableau de bord
+### 📧 Notifications
+- Emails : confirmation d’inscription, facture, reset mot de passe  
+- SMS (Twilio) : validation de compte, confirmation de téléphone, notifications importantes  
 
-docs: Des modifications uniquement au niveau de la documentation.
-Exemple: docs: mettre à jour le fichier README pour expliquer la nouvelle API
+### 🔑 Sécurité
+- Hashage des mots de passe avec **bcrypt**  
+- Authentification via **JWT Tokens**  
+- Vérification d’identité renforcée (email + SMS)  
 
-style: Des changements qui n'affectent pas le sens du code (indentation, espaces, formatage, points-virgules manquants, etc.).
-Exemple: style: reformater le code selon les nouvelles règles ESLint
+### ⚙️ Déploiement & CI/CD
+- **GitHub Actions** pour CI/CD et déploiement automatisé  
+- Hébergement sur **VPS Dockerisé** avec **Traefik** (reverse proxy + HTTPS)  
 
-refactor: Une modification de code qui n'ajoute pas de fonctionnalité ni ne corrige de bug.
-Exemple: refactor: réorganiser les modules pour une meilleure lisibilité
+---
 
-perf: Un changement qui améliore les performances.
-Exemple: perf: optimiser la requête SQL pour réduire le temps de réponse
+## 🛠️ Stack technique
 
-test: Ajout de tests manquants ou correction de tests existants.
-Exemple: test: ajouter des tests unitaires pour la fonction de validation des emails
+- **FastAPI** – Framework backend Python  
+- **PostgreSQL** – Base de données relationnelle  
+- **SQLAlchemy** – ORM pour la gestion des modèles  
+- **Alembic** – Migration de schéma  
+- **Docker & Docker Compose** – Conteneurisation et orchestration  
+- **Traefik** – Reverse proxy & SSL  
+- **Jinja2 + WeasyPrint** – Génération de factures HTML/PDF  
+- **Twilio** – Envoi de SMS  
+- **GitHub Actions** – Intégration & déploiement continu  
 
-chore: Mise à jour des tâches de build, des outils de génération, des dépendances, etc.
-Exemple: chore: mettre à jour les dépendances npm
+---
 
-build: Modifications affectant le système de build ou les dépendances externes (par exemple, gulp, webpack, npm).
-Exemple: build: configurer Babel pour la compilation ES6
+## 📂 Structure du projet
 
-ci: Modifications aux fichiers et scripts de configuration CI (par exemple, CircleCI, SauceLabs).
-Exemple: ci: ajouter la configuration Travis pour les tests automatiques
+src/
+│── auth/ # Authentification & sécurité
+│── customer/ # Gestion des clients
+│── catalog/ # Gestion des articles
+│── order/ # Gestion des commandes
+│── invoice/ # Génération et envoi des factures
+│── mail/ # Service email
+│── dependencies/ # DB, config, utils
+│── main.py # Point d'entrée FastAPI
+etc...
+tests/ # Tests unitaires et intégration
 
-revert: Revenir à un commit précédent.
-Exemple: revert: revenir au commit 12345abcd pour corriger une régression
 
 
+---
+
+## ▶️ Installation & Lancement
+### Prérequis
+Assurez-vous d'avoir installé Docker et Docker Compose sur votre machine.
+
+### 1. Cloner le projet
+```bash
+git clone https://github.com/votre-repo/pressing-api.git
+cd pressing-api
+
+docker-compose up --build
