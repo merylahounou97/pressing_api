@@ -83,19 +83,19 @@ app.include_router(order_router.router)
 app.include_router(catalog_router.router)
 app.include_router(invoice_router.router)
 
-# @app.get("/", include_in_schema=False)
-# async def custom_swagger_ui_html():
-#     return get_swagger_ui_html(
-#         openapi_url=app.openapi_url,
-#         title=app.title + " - Documentation",
-#         custom_css="""
-#             .swagger-ui .topbar img {
-#                 content: url(/files/img/logo.jpg);
-#                 height: 50px;
-#                 width: auto;
-#             }
-#             .swagger-ui .topbar span {
-#                 visibility: hidden;
-#             }
-#         """
-#     )
+@app.get("/", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Documentation",
+        custom_css="""
+            .swagger-ui .topbar img {
+                content: url(/files/img/logo.jpg);
+                height: 50px;
+                width: auto;
+            }
+            .swagger-ui .topbar span {
+                visibility: hidden;
+            }
+        """
+    )

@@ -45,10 +45,9 @@ services:
     environment:
       - NGROK_PORT=8000
       - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
-    command:  http pressing_api:8000
+    command:  http pressing_api:80
     networks:
       - pressing
-      - traefik_net
 
 volumes:
   db:
