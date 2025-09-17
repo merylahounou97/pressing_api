@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html
 
 from src.auth import auth_router
 from src.config import Settings
@@ -13,6 +14,7 @@ from .invoice import invoice_router
 from .database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
+
 settings = Settings()
 
 
@@ -20,7 +22,12 @@ Base.metadata.create_all(bind=engine)
 
 
 def generate_unique_function_id(route: APIRoute):
-    return f"{route.tags[0]}-{route.name}"
+    # Check if the tags list is not empty
+    if route.tags:
+        return f"{route.tags[0]}-{route.name}"
+    else:
+        # Provide a default or a safe fallback if no tags are present
+        return f"default-{route.name}"
 
 api_description = """
 **Pressing API** est un backend **FastAPI** pour automatiser la gestion d’un service de pressing :
@@ -75,3 +82,20 @@ app.include_router(auth_router.router)
 app.include_router(order_router.router)
 app.include_router(catalog_router.router)
 app.include_router(invoice_router.router)
+
+@app.get("/", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Documentation",
+        custom_css="""
+            .swagger-ui .topbar img {
+                content: url(/files/img/logo.jpg);
+                height: 50px;
+                width: auto;
+            }
+            .swagger-ui .topbar span {
+                visibility: hidden;
+            }
+        """
+    )

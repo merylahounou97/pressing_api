@@ -13,7 +13,7 @@ def get_api_url():
     """
 
     # TODO: change test to dev
-    if config.ENV == "test":
+    if config.ENV == "dev":
         response = requests.get("http://ngrok:4040/api/tunnels", timeout=15)
         if response.status_code == 200:
             return response.json()["tunnels"][0]["public_url"]
