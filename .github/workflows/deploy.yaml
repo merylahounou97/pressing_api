@@ -91,6 +91,10 @@ jobs:
             mkdir -p "$DIR"
             chmod 700 "$DIR"
 
+             if [ -d "$DIR/.env" ]; then
+              rm -rf "$DIR/.env"
+            fi
+
             umask 177
             cat > "$DIR/.env" << 'EOF'
             APP_NAME=${{ vars.APP_NAME }}
