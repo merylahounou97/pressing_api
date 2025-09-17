@@ -162,6 +162,9 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /root/${{vars.APP_NAME}}
+            docker stop pressing_api || true
+            docker rm pressing_api || true
+
             docker system prune -af
             docker compose up -d
             cd ..
