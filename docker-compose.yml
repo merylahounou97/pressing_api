@@ -42,8 +42,8 @@ services:
       - "4040:4040"
     environment:
       - NGROK_PORT=8000
-      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN}
-    command: http pressing_api:80
+      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
+    command:  http pressing_api:8000
     networks:
       - pressing
 
