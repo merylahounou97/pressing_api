@@ -46,7 +46,6 @@ services:
     command:  http pressing_api:80
     networks:
       - pressing
-      - traefik_net
 
 volumes:
   db:
