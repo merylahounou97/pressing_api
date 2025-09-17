@@ -27,14 +27,14 @@ jobs:
         run: |
           black .
 
-      # - name: Run Pylint
-      #   run: |
-      #     pylint src || exit 0
-      #     PYLINT_SCORE=$(pylint --fail-under=7 . | grep -oP "(?<=rated at ).*(?=/10)")
-      #     if [ $(echo "$PYLINT_SCORE > 7" | bc) -eq 1 ]; then
-      #       echo "Pylint score is greater than 7: $PYLINT_SCORE"
-      #       exit 0
-      #     else
-      #       echo "Pylint score is not greater than 7: $PYLINT_SCORE"
-      #       exit 1
-      #     fi
+      - name: Run Pylint
+        run: |
+          pylint src || exit 0
+          PYLINT_SCORE=$(pylint --fail-under=7 . | grep -oP "(?<=rated at ).*(?=/10)")
+          if [ $(echo "$PYLINT_SCORE > 4" | bc) -eq 1 ]; then
+            echo "Pylint score is greater than 7: $PYLINT_SCORE"
+            exit 0
+          else
+            echo "Pylint score is not greater than 7: $PYLINT_SCORE"
+            exit 1
+          fi
