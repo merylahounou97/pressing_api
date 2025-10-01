@@ -29,7 +29,6 @@ services:
       - traefik.http.middlewares.pressing-strip.stripPrefix.prefixes=/pressing_api
       - traefik.docker.network=traefik_net
 
-
     depends_on:
       - postgres
     volumes:
@@ -38,18 +37,6 @@ services:
       - traefik_net
       - pressing
 
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok
-    ports:
-      - "4040:4040"
-    environment:
-      - NGROK_PORT=8000
-      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
-    command:  http pressing_api:8000
-    networks:
-      - pressing
-      - traefik_net
 
 volumes:
   db:

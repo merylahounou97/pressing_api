@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from src.dependencies.db import get_db
 from src.order.order_enums import OrderStatusEnum
 from src.order.order_model import OrderDetailsModel, OrderModel
@@ -24,37 +25,42 @@ class OrderService:
         self, order_input: OrderCreateInputSchema
     ) -> OrderCreateOutputSchema:
         """Create a new order."""
-        order_input_dict = order_input.model_dump()
-        new_order = OrderModel(
-            order_date=order_input.order_date,
-            delivery_date=order_input.delivery_date,
-            type_order=order_input.type_order,
-            collect=order_input.collect,
-            delivery=order_input.delivery,
-            customer_id=order_input.customer_id,
-            status=OrderStatusEnum.PENDING,
-        )
-        self.db.add(new_order)
-        self.db.commit()
-        self.db.refresh(new_order)
 
-        for order_detail in order_input.order_details:
-            new_order_detail = OrderDetailsModel(
-                order_id=new_order.id,
-                article_id=order_detail.article_id,
-                specificity=order_detail.specificity,
-                divider_coef=order_detail.divider_coef,
-                multiplier_coef=order_detail.multiplier_coef,
-                discount_article=order_detail.discount_article,
-                quantity=order_detail.quantity,
+        try:
+            order_input_dict = order_input.model_dump()
+            new_order = OrderModel(
+                order_date=order_input.order_date,
+                delivery_date=order_input.delivery_date,
+                type_order=order_input.type_order,
+                collect=order_input.collect,
+                delivery=order_input.delivery,
+                customer_id=order_input.customer_id,
+                status=OrderStatusEnum.PENDING,
             )
-            self.db.add(new_order_detail)
+            self.db.add(new_order)
+            self.db.commit()
+            self.db.refresh(new_order)
 
-        self.db.commit()
-        order_input_dict["order_details"] = order_input.order_details
-        return OrderCreateOutputSchema(
-            **order_input_dict, id=new_order.id, status=new_order.status
-        )
+            for order_detail in order_input.order_details:
+                new_order_detail = OrderDetailsModel(
+                    order_id=new_order.id,
+                    article_id=order_detail.article_id,
+                    specificity=order_detail.specificity,
+                    divider_coef=order_detail.divider_coef,
+                    multiplier_coef=order_detail.multiplier_coef,
+                    discount_article=order_detail.discount_article,
+                    quantity=order_detail.quantity,
+                )
+                self.db.add(new_order_detail)
+
+            self.db.commit()
+            order_input_dict["order_details"] = order_input.order_details
+            return OrderCreateOutputSchema(
+                **order_input_dict, id=new_order.id, status=new_order.status
+            )
+        except Exception as e:
+            raise HTTPException(status_code=400) from e
+        
 
     def get_order_by_id(self, order_id: int) -> OrderCreateOutputSchema:
         """Get order by ID."""
@@ -66,7 +72,6 @@ class OrderService:
             .filter(OrderDetailsModel.order_id == order_id)
             .all()
         )
-        print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", f"Order details: {order.__dict__}")
         order_dict = order.__dict__.copy()
         order_dict["order_details"] = [
             OrderDetailSchema(**detail.__dict__) for detail in order_details
