@@ -43,8 +43,6 @@ api_description = """
 - Code : https://github.com/merylahounou97/pressing_api
 """
 
-api_title = "Pressing API"
-
 app = FastAPI(
     title="Pressing API",
     summary="API FastAPI pour gérer utilisateurs, catalogue, commandes et facturation d’un pressing.",
@@ -60,7 +58,7 @@ app = FastAPI(
        
     },
     docs_url=None,  # Disable default docs  
-# redoc_url="/",
+    redoc_url=None,  # Disable default redoc
     lifespan=initialize_app,
     generate_unique_id_function=generate_unique_function_id,
 )
@@ -87,7 +85,7 @@ app.include_router(order_router.router)
 app.include_router(catalog_router.router)
 app.include_router(invoice_router.router)
 
-@app.get("/", include_in_schema=False)
+@app.get("/pressing_api/", include_in_schema=False)
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
