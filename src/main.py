@@ -28,6 +28,8 @@ def generate_unique_function_id(route: APIRoute):
     else:
         # Provide a default or a safe fallback if no tags are present
         return f"default-{route.name}"
+    
+BASE_PATH =  "/pressing_api" if settings.ENV == "prod" else ""
 
 api_description = """
 **Pressing API** est un backend **FastAPI** pour automatiser la gestion d’un service de pressing :
@@ -85,10 +87,10 @@ app.include_router(order_router.router)
 app.include_router(catalog_router.router)
 app.include_router(invoice_router.router)
 
-@app.get("/pressing_api/", include_in_schema=False)
+@app.get("/", include_in_schema=False)
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
-        openapi_url=app.openapi_url,
+        openapi_url=f"{BASE_PATH}{app.openapi_url}",               
         title="Pressing API - Documentation",
-        swagger_favicon_url="/files/img/logo.jpg",
+        swagger_favicon_url=f"{BASE_PATH}/files/img/logo.jpg",
         )
