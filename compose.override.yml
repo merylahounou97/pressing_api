@@ -11,6 +11,7 @@ services:
       - postgres
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+      
 
 
   postgres:
@@ -57,3 +58,7 @@ services:
     networks:
       - pressing
       - traefik_net
+
+volumes:
+  pgadmin-data:
+    name: pgadmin-data
