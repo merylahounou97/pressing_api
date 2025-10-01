@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres
     container_name: postgresdb
+    restart: always
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -35,18 +36,6 @@ services:
       - traefik_net
       - pressing
 
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok
-    ports:
-      - "4040:4040"
-    environment:
-      - NGROK_PORT=8000
-      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
-    command:  http pressing_api:8000
-    networks:
-      - pressing
-      - traefik_net
 
 volumes:
   db:

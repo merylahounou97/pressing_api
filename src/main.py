@@ -43,6 +43,8 @@ api_description = """
 - Code : https://github.com/merylahounou97/pressing_api
 """
 
+api_title = "Pressing API"
+
 app = FastAPI(
     title="Pressing API",
     summary="API FastAPI pour gérer utilisateurs, catalogue, commandes et facturation d’un pressing.",
@@ -57,7 +59,8 @@ app = FastAPI(
     license_info={
        
     },
-    docs_url="/",  
+    docs_url=None,  # Disable default docs  
+# redoc_url="/",
     lifespan=initialize_app,
     generate_unique_id_function=generate_unique_function_id,
 )
@@ -76,6 +79,7 @@ app.add_middleware(
 
 app.mount("/files", StaticFiles(directory="src/static/"), name="static")
 
+
 app.include_router(member_router.router)
 app.include_router(users_router.router)
 app.include_router(auth_router.router)
@@ -87,15 +91,6 @@ app.include_router(invoice_router.router)
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
-        title=app.title + " - Documentation",
-        custom_css="""
-            .swagger-ui .topbar img {
-                content: url(/files/img/logo.jpg);
-                height: 50px;
-                width: auto;
-            }
-            .swagger-ui .topbar span {
-                visibility: hidden;
-            }
-        """
-    )
+        title="Pressing API - Documentation",
+        swagger_favicon_url="/files/img/logo.jpg",
+        )

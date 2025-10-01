@@ -44,3 +44,16 @@ services:
       - ./src/invoice:/app/invoices
       - ./scripts/init_test_databases.sh:/docker-entrypoint-initdb.d/init_test_databases.sh
 
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_PORT=8000
+      - NGROK_AUTHTOKEN= ${NGROK_AUTHTOKEN} 
+    command:  http pressing_api:8000
+    networks:
+      - pressing
+      - traefik_net
