@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres
     container_name: postgresdb
+    restart: always
     environment:
       POSTGRES_DB:  ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
