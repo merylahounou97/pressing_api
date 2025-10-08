@@ -1,12 +1,11 @@
 from contextlib import asynccontextmanager
-from logging import Logger
 
 from fastapi import FastAPI
 
 from src.lifespans.load_default_catalog import load_default_catalog_fun
 from src.users.users_service import UserService
 from src.database import SessionLocal
-from src.auth.auth_router import settings
+from src.config import get_settings
 
 
 @asynccontextmanager
@@ -19,6 +18,7 @@ async def initialize_app(app: FastAPI):
 
     user_service = UserService(db)
 
+    settings = get_settings()
     if settings.ENV != "test":
         await user_service.create_default_admin_user()
 

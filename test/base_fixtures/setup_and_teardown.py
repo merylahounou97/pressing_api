@@ -3,15 +3,12 @@ import random
 import pytest
 from src.catalog.catalog_model import ArticleModel
 from src.order.order_model import OrderDetailsModel, OrderModel
-from src.invoice.invoice_model import InvoiceModel, InvoiceItemModel
 from src.users.users_model import UserModel, UserRole
 from src.database import Base, engine, SessionLocal
 from test.users.fixtures.seed import customers, secretaries, admins
 from test.catalog.fixtures import articles
-from test.orders.fixtures.seed import orders, get_all_orders
-from test.invoice.fixtures.seed import invoices
-from src.auth.auth_router import settings
-from src.config import Settings
+from test.orders.fixtures.seed import orders
+from src.config import get_settings, Settings
 
 
 def clean_order(order):
@@ -29,7 +26,7 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order, gen
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    settings = Settings()
+    settings = get_settings()
 
     # 1. Générer les utilisateurs
     _customers = [generate_user_data(role=UserRole.CUSTOMER) for _ in range(2)] + [

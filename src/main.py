@@ -1,10 +1,10 @@
+import os
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
 
 from src.auth import auth_router
-from src.config import Settings
 from src.lifespans.create_default_admin import initialize_app
 from .users import users_router
 from .users import member_router
@@ -15,7 +15,7 @@ from .database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
 
-settings = Settings()
+
 
 
 Base.metadata.create_all(bind=engine)
@@ -29,7 +29,10 @@ def generate_unique_function_id(route: APIRoute):
         # Provide a default or a safe fallback if no tags are present
         return f"default-{route.name}"
     
-BASE_PATH =  "/pressing_api" if settings.ENV == "prod" else ""
+ENV = os.getenv("ENV", "prod")
+
+
+BASE_PATH =  "/pressing_api" if ENV == "prod" else ""
 
 api_description = """
 **Pressing API** est un backend **FastAPI** pour automatiser la gestion d’un service de pressing :

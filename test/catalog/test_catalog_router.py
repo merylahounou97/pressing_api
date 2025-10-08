@@ -9,6 +9,7 @@ class TestCatalogRouter:
         When the user is an admin or a secretary, he can create an article
         But a customer can't create an article
         """
+        print("----- TEST CATALOG CREATE -----")
         # Créer un utilisateur secretaire
         catalog_test_service.create_article_with_secretary()
 

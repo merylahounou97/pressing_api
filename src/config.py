@@ -1,3 +1,6 @@
+from functools import lru_cache
+import os
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,8 +21,9 @@ class Settings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="allow"
+        env_file=".env", env_file_encoding="utf-8", extra="allow",
     )
+
 
     app_name: str
     database_name: str
@@ -62,3 +66,20 @@ class Settings(BaseSettings):
     default_customer_first_name: str|None = None
     default_customer_address: str|None = None
     default_customer_password: str|None = None
+
+
+
+
+_settings_instance: Settings | None = None
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    global _settings_instance
+    ENV = os.getenv("ENV", "prod")
+
+    print(f"Starting application in {ENV} environment.")
+    if _settings_instance is None:
+        print("Loading settings...")
+        _settings_instance = Settings()
+    return _settings_instance

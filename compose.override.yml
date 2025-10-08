@@ -11,14 +11,18 @@ services:
       - postgres
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-      
+    networks:
+      - pressing
 
 
   postgres:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust #Uniquement en developpement
+      POSTGRES_DB:  db
     volumes:
       - ./secrets/postgres_password.txt:/run/secrets/postgres_password:ro
+      - ./scripts/init_test_databases.sh:/docker-entrypoint-initdb.d/init_test_databases.sh:ro
+
 
     ports:
       - "5432:5432"
@@ -26,6 +30,9 @@ services:
     build:
       context: .
       dockerfile: dev.Dockerfile
+    environment:
+      DATABASE_NAME: db
+      ENV: dev
     develop:
       watch:
         - path: ./src
@@ -43,7 +50,6 @@ services:
       - ./Pipfile:/app/Pipfile
       - /root/.local/share/virtualenvs/app-4PlAip0Q
       - ./src/invoice:/app/invoices
-      - ./scripts/init_test_databases.sh:/docker-entrypoint-initdb.d/init_test_databases.sh
 
 
   ngrok:

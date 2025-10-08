@@ -7,11 +7,11 @@ from email import encoders
 from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
 
-from src.config import Settings
+from src.config import get_settings, Settings
 
 from ..dependencies.get_api_url import get_api_url
 
-settings = Settings()
+settings = get_settings()
 templates = Jinja2Templates(directory="src/mail/templates")
 api_url = get_api_url()
 

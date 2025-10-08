@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from src.config import Settings
+from src.config import get_settings
 
-settings = Settings()
+
+settings = get_settings()
 
 
 
@@ -12,6 +13,8 @@ SQLALCHEMY_DATABASE_URL = (
     f"@{settings.database_host}/{ settings.database_name}"
 )
 
+
+print(f"Connecting to database at {settings.database_host} with user {settings.database_user} to database {settings.database_name}")
 
 
 engine = create_engine(

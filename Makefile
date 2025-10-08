@@ -2,7 +2,7 @@ install:
 	pipenv install
 
 pytest:
-	export ENV=test && pipenv run pytest -v -s
+	 ENV=test DATABASE_NAME=test pipenv run pytest -v -s 
 
 dev:
 	pipenv run uvicorn src.main:app --reload
