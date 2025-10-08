@@ -14,8 +14,6 @@ SQLALCHEMY_DATABASE_URL = (
 )
 
 
-print(f"Connecting to database at {settings.database_host} with user {settings.database_user} to database {settings.database_name}")
-
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

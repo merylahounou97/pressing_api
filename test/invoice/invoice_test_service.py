@@ -1,7 +1,6 @@
 from test.base_test_service import BaseTestService
 from src.utils.constants import Constants
 from src.users.users_model import UserRole
-from src.utils.error_messages import ErrorMessages
 
 class InvoiceTestService(BaseTestService):
     base_url = f"/{Constants.INVOICES}"

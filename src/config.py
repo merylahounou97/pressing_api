@@ -76,9 +76,7 @@ _settings_instance: Settings | None = None
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     global _settings_instance
-    ENV = os.getenv("ENV", "prod")
 
-    print(f"Starting application in {ENV} environment.")
     if _settings_instance is None:
         print("Loading settings...")
         _settings_instance = Settings()

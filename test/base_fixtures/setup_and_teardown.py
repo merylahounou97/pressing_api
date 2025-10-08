@@ -8,7 +8,7 @@ from src.database import Base, engine, SessionLocal
 from test.users.fixtures.seed import customers, secretaries, admins
 from test.catalog.fixtures import articles
 from test.orders.fixtures.seed import orders
-from src.config import get_settings, Settings
+from src.config import get_settings
 
 
 def clean_order(order):

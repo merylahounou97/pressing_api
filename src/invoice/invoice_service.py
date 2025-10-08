@@ -56,14 +56,6 @@ class InvoiceService:
         """
         order_service = OrderService(self.db)
         order = order_service.get_order(order_id)
-        print("ORDERRRRRRRRRRRRRRRRRR",order)
-        
-        # print("ORDERRRRRRRRRRRRRRRRRR",order)²
-        
-        # if order:
-        #     print("Order as dict:", order.__dict__)
-        # else:
-        #     print("Order is None")
 
         # template = templates.get_template("order_invoice.html")
         template = templates.get_template("gemini.html")   
