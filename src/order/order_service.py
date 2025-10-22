@@ -107,8 +107,7 @@ class OrderService:
             )
 
         if not order:
-            raise ValueError("Order not found")
-
+            raise  HTTPException(status_code=400,detail="Order not found") 
         return order
                                
                 

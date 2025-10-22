@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from src.config import Settings
+from src.config import get_settings
 from src.dependencies.db import get_db
 from src.dependencies.get_api_url import get_api_url
 from src.mail import mail_service
@@ -19,7 +19,6 @@ from src.users.users_schemas import (
     UserBaseSchema,
     UserCreateInput,
     UserCreateMemberInput,
-    UserOutput,
     UserQueryOptions,
     VerifyIdentifierInput,
 )
@@ -28,7 +27,7 @@ from src.utils.functions import get_identifier_type
 from src.utils.mail_constants import MailConstants
 from src.utils.sms_constants import SmsConstants
 
-settings = Settings()
+settings = get_settings()
 
 
 class UserService:

@@ -1,8 +1,7 @@
 import requests
 
-from ..config import Settings
+from src.config import get_settings
 
-config = Settings()
 
 
 def get_api_url():
@@ -11,6 +10,7 @@ def get_api_url():
     Returns:
         str: The API URL.
     """
+    config = get_settings()
 
     if config.ENV == "prod":
         return config.api_url

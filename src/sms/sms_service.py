@@ -1,10 +1,10 @@
 from src.users.users_model import UserModel
 from twilio.rest import Client
 
-from src.config import Settings
+from src.config import get_settings, Settings
 from src.sms.templates import messages
 
-settings = Settings()
+settings = get_settings()
 
 TWILIO_ACCOUNT_SID = settings.twilio_account_sid
 TWILIO_AUTH_TOKEN = settings.twilio_auth_token

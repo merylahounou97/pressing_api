@@ -7,9 +7,9 @@ from jose.exceptions import ExpiredSignatureError, JWTError
 from passlib.hash import bcrypt
 from fastapi import HTTPException
 
-from src.config import Settings
+from src.config import get_settings, Settings
 
-settings = Settings()
+settings = get_settings()
 
 
 def hash_text(text: str) -> str:

@@ -2,7 +2,7 @@ from typing_extensions import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from src.config import Settings
+from src.config import get_settings, Settings
 from src.users.users_router import get_user_online_dep
 from src.users.users_service import UserService
 from src.users.users_schemas import UserCreateMemberInput, UserOutput
@@ -10,7 +10,7 @@ from src.users.users_model import UserRole
 from src.utils.constants import Constants
 
 
-settings = Settings()
+settings = get_settings()
 
 router = APIRouter(prefix=f"/{Constants.MEMBER}", tags=[Constants.MEMBER])
 

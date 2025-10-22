@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from src.config import Settings
+from src.config import get_settings
 
-settings = Settings()
+
+settings = get_settings()
 
 
 

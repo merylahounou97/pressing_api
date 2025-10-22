@@ -2,14 +2,13 @@ from typing import Optional, Union
 from typing_extensions import Annotated
 from fastapi.security import OAuth2PasswordBearer
 
-from src.config import Settings
+from src.config import get_settings
 from src.users.users_service import UserService
 from src.users.users_schemas import (
     ChangeUserPassword,
     ResetPasswordInput,
     UserBaseSchema,
     UserCreateInput,
-    UserCreateMemberInput,
     UserOutput,
     UserQueryOptions,
     VerifyIdentifierInput,
@@ -21,7 +20,6 @@ from src.utils.error_messages import ErrorMessages
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 
 
-settings = Settings()
 
 router = APIRouter(prefix=f"/{Constants.USERS}", tags=[Constants.USERS])
 

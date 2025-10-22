@@ -8,24 +8,24 @@ from .invoice_schema import InvoiceSchema  # Importer le schéma
 
 router = APIRouter(prefix=f"/{Constants.INVOICES}", tags=[Constants.INVOICES])
 
-@router.post("/generate-invoice", response_class=HTMLResponse)
-async def generate_invoice(
-    invoice_data: InvoiceSchema,  # Utilisation du schéma Pydantic
-    invoice_service: InvoiceService = Depends(InvoiceService),
-    user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY])),
-):
-    """
-    Génère une facture HTML. Accessible uniquement aux administrateurs et secrétaires.
-    """
-    # Conversion du schéma en dictionnaire pour le service
-    return invoice_service.generate_invoice_html(invoice_data.dict())
+# @router.post("/generate-invoice", response_class=HTMLResponse)
+# async def generate_invoice(
+#     invoice_data: InvoiceSchema,  # Utilisation du schéma Pydantic
+#     invoice_service: InvoiceService = Depends(InvoiceService),
+#     user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY])),
+# ):
+#     """
+#     Génère une facture HTML. Accessible uniquement aux administrateurs et secrétaires.
+#     """
+#     # Conversion du schéma en dictionnaire pour le service
+#     return invoice_service.generate_invoice_html(invoice_data.dict())
 
-@router.post("/{order_id}", response_class=FileResponse)
+@router.post("/{order_id}", dependencies=[Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY]))])
 def generate_invoice(
     order_id: int,
     invoice_service: InvoiceService = Depends(InvoiceService),
 # user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY])),
-):
+)-> str:
     return invoice_service.create_invoice(order_id)
 
 @router.post("/send/{order_id}")
