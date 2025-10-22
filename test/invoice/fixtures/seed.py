@@ -1,10 +1,11 @@
-import random
-from datetime import datetime, timedelta
-from uuid import uuid4
+import pytest
+
 
 # Liste globale pour stocker les factures
 invoices = []
 
-def generate_invoice_data():
-    """Génère des données de facture simulées."""
+@pytest.fixture(scope="session")
+def get_all_invoices():
+    """Renvoie toutes les factures."""
     return invoices
+

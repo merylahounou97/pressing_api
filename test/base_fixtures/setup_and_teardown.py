@@ -2,6 +2,7 @@ import copy
 import random
 import pytest
 from src.catalog.catalog_model import ArticleModel
+from src.invoice.invoice_model import InvoiceModel
 from src.order.order_model import OrderDetailsModel, OrderModel
 from src.users.users_model import UserModel, UserRole
 from src.database import Base, engine, SessionLocal
@@ -9,7 +10,7 @@ from test.users.fixtures.seed import customers, secretaries, admins
 from test.catalog.fixtures import articles
 from test.orders.fixtures.seed import orders
 from src.config import get_settings
-
+from test.invoice.fixtures.seed import invoices
 
 def clean_order(order):
     """Nettoie une commande en supprimant ses détails."""
@@ -63,8 +64,7 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order, gen
     _orders_db_cleaned = copy.deepcopy(_orders)
     _orders_db = list(map(clean_order, _orders_db_cleaned))
 
-    # 5. Générer les factures
-    # _invoices = [generate_invoice() for _ in range(5)]
+
 
     # 6. Insérer les données dans la base de données
     with SessionLocal() as db:
@@ -87,8 +87,10 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order, gen
         db.commit()
 
         # Insérer les factures
-        # db.add_all(map(lambda invoice: InvoiceModel(**invoice), _invoices))
-        # db.commit()
+            # 5. Générer les factures
+        _invoices = [generate_invoice(x) for x in range(len(_orders))]
+        db.add_all(map(lambda invoice: InvoiceModel(**dict(invoice)), _invoices))
+        db.commit()
 
     # Étendre les listes pour les rendre disponibles dans les tests
     customers.extend(_customers)  # type: ignore
@@ -97,4 +99,4 @@ def setup_and_teardown(generate_user_data, generate_article, generate_order, gen
 
     articles.extend(_articles)  # type: ignore
     orders.extend(_orders)  # type: ignore
-    # invoices.extend(_invoices)  # type: ignore
+    invoices.extend(_invoices)  # type: ignore

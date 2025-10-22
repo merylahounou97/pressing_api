@@ -8,7 +8,8 @@ class TestInvoiceRouter:
         invoice_test_service.create_invoice(UserRole.SECRETARY)
         invoice_test_service.create_invoice(UserRole.ADMIN)
 
-    def test_invoice_get_by_id(self, invoice_test_service):
-        """Test la récupération d'une facture."""
-        invoice_test_service.get_invoice_by_id(UserRole.SECRETARY)
-        invoice_test_service.get_invoice_by_id(UserRole.ADMIN)
+    def test_invoice_send_by_email(self, invoice_test_service):
+        """Test l'envoi de la facture par email."""
+        # Implémenter le test pour l'envoi par email si nécessaire
+        invoice_test_service.send_invoice_by_email(UserRole.SECRETARY)
+        invoice_test_service.send_invoice_by_email(UserRole.ADMIN)

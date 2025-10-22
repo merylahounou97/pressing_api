@@ -45,7 +45,7 @@ services:
     volumes:
       - ./Pipfile:/app/Pipfile
       - /root/.local/share/virtualenvs/app-4PlAip0Q
-      - ./src/invoice:/app/invoices
+      - ./tmp:/tmp
 
 
   ngrok:
