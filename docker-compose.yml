@@ -4,7 +4,7 @@ services:
     container_name: postgresdb
     restart: always
     environment:
-      POSTGRES_DB:  ${DATABASE_NAME}
+      POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     volumes:
@@ -12,7 +12,6 @@ services:
       - ./postgres_password.txt:/run/secrets/postgres_password:ro
     networks:
       - pressing
-
 
   pressing_api:
     container_name: pressing_api
@@ -32,7 +31,7 @@ services:
     depends_on:
       - postgres
     volumes:
-     - .env:/app/.env:ro
+      - .env:/app/.env:ro
     networks:
       - traefik_net
       - pressing
