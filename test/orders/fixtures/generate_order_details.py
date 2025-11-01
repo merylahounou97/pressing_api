@@ -8,9 +8,11 @@ faker = Faker()
 
 
 @pytest.fixture(scope="session")
-def generate_order_details():
+def generate_order_details(generate_article):
     def __generate_order_details(article_id: str = None):
         """Generate order details"""
+        article = generate_article()
+        del article["id"]
         return {
             "article_id": article_id,
             "specificity": faker.enum(ArticleSpecificityEnum).value,
@@ -18,6 +20,7 @@ def generate_order_details():
             "multiplier_coef": random.uniform(0.0, 1),
             "discount_article": random.uniform(0.0, 1),
             "quantity": random.randint(1, 100),
+            **article
         }
 
     return __generate_order_details

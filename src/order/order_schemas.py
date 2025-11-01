@@ -1,18 +1,31 @@
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field, computed_field
-from src.catalog.catalog_enums import ArticleSpecificityEnum
+from src.catalog.catalog_enums import ArticleCategoryEnum, ArticleFreqEnum, ArticleSpecificityEnum, ArticleStatusEnum
 from src.order.order_enums import OrderStatusEnum, OrderTypeEnum
 from src.users.users_schemas import UserOutput
 
 
 class OrderDetailSchema(BaseModel):
+    """Shema for order detail input. when creating or editing an order."""
     article_id: str
     quantity: int
     specificity: ArticleSpecificityEnum
     divider_coef: float
     multiplier_coef: float
     discount_article: float
+
+class OrderDetailOutputSchema(OrderDetailSchema):
+    """Schema for order detail output, including article info."""
+    code: str
+    name: str
+    details: str
+    category: ArticleCategoryEnum
+    status: ArticleStatusEnum
+    freq: ArticleFreqEnum
+    description: str
+    price: int
+    express_price: int
 
 
 class OrderSchema(BaseModel):
@@ -25,12 +38,15 @@ class OrderSchema(BaseModel):
 
 
 class OrderCreateInputSchema(OrderSchema):
+    """Schema pour créer une commande."""
     order_details: List[OrderDetailSchema]
 
 
-class OrderCreateOutputSchema(OrderCreateInputSchema):
+class OrderCreateOutputSchema(OrderSchema):
+    """Schema pour la sortie lors de la création d'une commande."""
     id: int
     status: OrderStatusEnum
+    order_details: List[OrderDetailOutputSchema]
 
     @computed_field
     @property

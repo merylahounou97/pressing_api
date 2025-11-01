@@ -5,28 +5,28 @@ from sqlalchemy.exc import IntegrityError
 from src.dependencies.db import get_db
 from src.order.order_enums import OrderStatusEnum
 from src.order.order_model import OrderDetailsModel, OrderModel
-from src.order.order_schemas import (
-    OrderCreateInputSchema,
-    OrderCreateOutputSchema,
-    OrderEditInputSchema,
-    OrderDetailSchema,
-    FullOrderSchema
-)
+from src.order.order_schemas import (FullOrderSchema, OrderCreateInputSchema,
+    OrderCreateOutputSchema, OrderDetailOutputSchema, OrderDetailSchema, OrderEditInputSchema)
 from src.users.users_model import UserModel, UserRole
+from src.catalog.catalog_service import CatalogService
 
 
 class OrderService:
     db: Session
+    catalogService: CatalogService
 
     def __init__(self, db: Session = Depends(get_db)):
         self.db = db
+        self.catalogService = CatalogService(db)
 
     def create_order(
         self, order_input: OrderCreateInputSchema
     ) -> OrderCreateOutputSchema:
         """Create a new order."""
 
+        
         try:
+
             order_input_dict = order_input.model_dump()
             new_order = OrderModel(
                 order_date=order_input.order_date,
@@ -41,7 +41,9 @@ class OrderService:
             self.db.commit()
             self.db.refresh(new_order)
 
+            orders_details = []
             for order_detail in order_input.order_details:
+                article = self.catalogService.get_article_by_id(order_detail.article_id)
                 new_order_detail = OrderDetailsModel(
                     order_id=new_order.id,
                     article_id=order_detail.article_id,
@@ -50,15 +52,32 @@ class OrderService:
                     multiplier_coef=order_detail.multiplier_coef,
                     discount_article=order_detail.discount_article,
                     quantity=order_detail.quantity,
+
+                    code=article.code,
+                    name=article.name,
+                    details=article.details,
+                    category=article.category,
+                    status=article.status,
+                    freq=article.freq,
+                    description=article.description,
+                    price=article.price,
+                    express_price=article.express_price,  
                 )
+                orders_details.append(OrderDetailOutputSchema(**new_order_detail.__dict__))
                 self.db.add(new_order_detail)
 
             self.db.commit()
-            order_input_dict["order_details"] = order_input.order_details
+
+            # remove order_details from order_input_dict to avoid duplication
+            del order_input_dict["order_details"]
+
             return OrderCreateOutputSchema(
-                **order_input_dict, id=new_order.id, status=new_order.status
+                **order_input_dict, id=new_order.id, 
+                status=new_order.status, 
+                order_details=orders_details
             )
         except Exception as e:
+            print(e)
             raise HTTPException(status_code=400) from e
         
 
@@ -74,7 +93,7 @@ class OrderService:
         )
         order_dict = order.__dict__.copy()
         order_dict["order_details"] = [
-            OrderDetailSchema(**detail.__dict__) for detail in order_details
+            OrderDetailOutputSchema(**detail.__dict__) for detail in order_details
         ]
 
         return OrderCreateOutputSchema(**order_dict)
@@ -82,17 +101,7 @@ class OrderService:
     
     def get_order(self, order_id: int) -> OrderCreateOutputSchema:
         """Get order by ID, including user and details."""
-        
-        # order_details = (
-        #     self.db.query(OrderDetailsModel)
-        #     .filter(OrderDetailsModel.order_id == order_id)
-        #                 .join(OrderDetailsModel.article)
-        #     .options(joinedload(OrderDetailsModel.article))
-        #     .all()
-
-        # )
-
-        # print("ORDER DETAILSsssssssssssssssssssssssss", order_details.__dict__)
+    
         
         # Récupération de la commande + jointure avec user
         order = (
@@ -141,6 +150,7 @@ class OrderService:
                         for key, value in detail.items():
                             setattr(order_detail, key, value)
                     else:
+                        article = self.catalogService.get_article_by_id(detail["article_id"])
                         # Create a new order detail if it does not exist
                         new_order_detail = OrderDetailsModel(
                             order_id=order_id,
@@ -150,6 +160,16 @@ class OrderService:
                             multiplier_coef=detail["multiplier_coef"],
                             discount_article=detail["discount_article"],
                             quantity=detail["quantity"],
+                            
+                            code=article.code,
+                            name=article.name,
+                            details=article.details,
+                            category=article.category,
+                            status=article.status,
+                            freq=article.freq,
+                            description=article.description,
+                            price=article.price,
+                            express_price=article.express_price,
                         )
                         self.db.add(new_order_detail)
             else:
