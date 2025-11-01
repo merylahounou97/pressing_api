@@ -1,13 +1,11 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from src.dependencies.db import get_db
 from src.order.order_enums import OrderStatusEnum
 from src.order.order_model import OrderDetailsModel, OrderModel
-from src.order.order_schemas import (FullOrderSchema, OrderCreateInputSchema,
-    OrderCreateOutputSchema, OrderDetailOutputSchema, OrderDetailSchema, OrderEditInputSchema)
-from src.users.users_model import UserModel, UserRole
+from src.order.order_schemas import (OrderCreateInputSchema,
+    OrderCreateOutputSchema, OrderDetailOutputSchema, OrderEditInputSchema)
 from src.catalog.catalog_service import CatalogService
 
 
