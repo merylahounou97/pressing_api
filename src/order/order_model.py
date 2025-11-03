@@ -3,7 +3,7 @@ from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, St
 from sqlalchemy.orm import relationship
 
 
-from src.catalog.catalog_enums import ArticleSpecificityEnum
+from src.catalog.catalog_enums import ArticleCategoryEnum, ArticleFreqEnum, ArticleSpecificityEnum, ArticleStatusEnum
 from src.database import Base
 from src.order.order_enums import OrderStatusEnum, OrderTypeEnum
 from src.utils.constants import Constants
@@ -47,6 +47,17 @@ class OrderDetailsModel(Base):
     multiplier_coef = Column(Float)
     discount_article = Column(Float)
     quantity = Column(Integer)
+
+    # Redundant fields for easier access and saving of historical data
+    code = Column(String, index=True)
+    name = Column(String)
+    details = Column(String)
+    category = Column(Enum(ArticleCategoryEnum), default=ArticleCategoryEnum.NONE)
+    status = Column(Enum(ArticleStatusEnum), default=ArticleStatusEnum.NONE)
+    freq = Column(Enum(ArticleFreqEnum), default=ArticleFreqEnum.NONE)
+    description = Column(String)
+    price = Column(Integer)
+    express_price = Column(Integer)
     
     order = relationship("OrderModel", back_populates="order_details")
     article = relationship("ArticleModel", back_populates="order_details")

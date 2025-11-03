@@ -45,7 +45,8 @@ async def get_order_by_id(
     """Get order by ID."""
     order = order_service.get_order_by_id(order_id)
     if order.customer_id != user.id and user.role == UserRole.CUSTOMER:
-        raise HTTPException(status_code=403, detail=ErrorMessages.ACTION_NOT_ALLOWED)
+        raise HTTPException(
+            status_code=403, detail=ErrorMessages.ACTION_NOT_ALLOWED)
     return order
 
 
@@ -53,7 +54,8 @@ async def get_order_by_id(
     "/{order_id}",
     response_model=OrderCreateOutputSchema,
     dependencies=[
-        Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY]))
+        Depends(get_user_online_dep(
+            roles=[UserRole.ADMIN, UserRole.SECRETARY]))
     ],
 )
 async def edit_order(
@@ -65,32 +67,32 @@ async def edit_order(
     return order_service.edit_order(order_id, order_edit_input)
 
 
-@router.get("/", response_model=list[OrderCreateOutputSchema])
+@router.get("/", response_model=list[OrderCreateOutputSchema], dependencies=[Depends(get_user_online_dep(
+    roles=[UserRole.ADMIN, UserRole.SECRETARY]))])
 async def get_all_orders(
-    order_service=Depends(OrderService),
-    user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY])),
+    order_service=Depends(OrderService)
 ):
     """Get all orders. admins and secretaries get all orders."""
     return order_service.get_all_orders()
 
 
-@router.patch("/cancel/{order_id}", response_model=OrderCreateOutputSchema)
+@router.patch("/cancel/{order_id}", response_model=OrderCreateOutputSchema, dependencies=[Depends(get_user_online_dep(
+    roles=[UserRole.ADMIN, UserRole.SECRETARY]))])
 async def cancel_order(
     order_id: str,
     order_service=Depends(OrderService),
-    user=Depends(get_user_online_dep(roles=[UserRole.ADMIN, UserRole.SECRETARY])),
 ):
     """Cancel an order."""
     return order_service.cancel_order(order_id)
 
 
-@router.get("/history/{customer_id}", response_model=list[OrderCreateOutputSchema])
+@router.get("/history/{customer_id}", response_model=list[OrderCreateOutputSchema], dependencies=[Depends(get_user_online_dep())])
 async def get_order_history(
     customer_id: str,
     order_service=Depends(OrderService),
-    user=Depends(get_user_online_dep()),
 ):
     """Get order history."""
     if not customer_id:
-        raise HTTPException(status_code=400, detail=ErrorMessages.USER_ID_NOT_PROVIDED)
+        raise HTTPException(
+            status_code=400, detail=ErrorMessages.USER_ID_NOT_PROVIDED)
     return order_service.get_order_history(customer_id)

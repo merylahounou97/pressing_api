@@ -149,6 +149,11 @@ jobs:
             printf "%s" "${{ secrets.DATABASE_PASSWORD }}" > "$DIR/postgres_password.txt"
             chmod 600 "$DIR/postgres_password.txt"
 
+
+                  if [ -d "$DIR/postgres_password.txt" ]; then
+                    rm -rf "$DIR/postgres_password.txt"
+                  fi
+
             echo "Secrets written to: $DIR"
 
 
