@@ -11,7 +11,7 @@ from src.config import get_settings, Settings
 
 def load_default_catalog_fun(db):
     settings = get_settings()
-    if settings.ENV == "prod":
+    if settings.ENV != "test" :
         """Load the default catalog from csv file"""
         totalArticles = db.query(ArticleModel).count()
         if totalArticles == 0:
